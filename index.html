@@ -334,9 +334,6 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
 <div class="tabs">
   <div class="tab active" onclick="switchTab('intro')">Introducción</div>
   <div class="tab" onclick="switchTab('table')">Matriz Completa</div>
-  <div class="tab" onclick="switchTab('scoring')">Puntuación</div>
-  <div class="tab" onclick="switchTab('board')">Priorización</div>
-  <div class="tab" onclick="switchTab('groups')">Grupos de Trabajo</div>
   <div class="tab" onclick="switchTab('worksheets')">Hojas de Trabajo</div>
   <div class="tab" onclick="switchTab('refs')">Referencias</div>
 </div>
@@ -360,37 +357,22 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
   <div class="intro-cards">
     <div class="intro-card" style="border-top-color:var(--gl-blue)">
       <h3><span class="ic-icon" style="background:var(--gl-blue)">1</span> Matriz Completa</h3>
-      <p>Tabla con los 31 problemas del sector atunero, organizados en 7 categorías. Puede filtrar por categoría, plazo, clasificación o buscar por texto libre. Para cada problema puede registrar actores a involucrar, metas, próximo paso con responsable, fecha límite y el estado con el semáforo de progreso (verde / amarillo / rojo).</p>
+      <p>Tabla con los 31 problemas del sector atunero, organizados en 7 categorías. Puede filtrar por categoría, plazo o buscar por texto libre. Para cada problema puede registrar el próximo paso con responsable, fecha límite y el estado con el semáforo de progreso (verde / amarillo / rojo).</p>
       <span class="ic-link" onclick="switchTab('table')">Ir a la Matriz &rarr;</span>
     </div>
-    <div class="intro-card" style="border-top-color:var(--gl-green)">
-      <h3><span class="ic-icon" style="background:var(--gl-green)">2</span> Puntuación</h3>
-      <p>Evalúe cada problema en tres dimensiones: <strong>Impacto</strong> (magnitud del efecto sobre el sector), <strong>Factibilidad</strong> (viabilidad de resolución con los recursos disponibles) y <strong>Urgencia</strong> (necesidad de acción inmediata). El puntaje combinado (3–15) genera un ranking automático para informar la priorización.</p>
-      <span class="ic-link" onclick="switchTab('scoring')">Ir a Puntuación &rarr;</span>
-    </div>
-    <div class="intro-card" style="border-top-color:var(--gl-accent)">
-      <h3><span class="ic-icon" style="background:var(--gl-accent)">3</span> Priorización</h3>
-      <p>Tablero tipo Kanban donde puede arrastrar los problemas a columnas de prioridad: <strong>Alta</strong>, <strong>Media</strong> o <strong>Estacionar</strong>. En la parte superior se muestran los problemas clasificados como alta prioridad para facilitar el seguimiento de la agenda activa de la Mesa.</p>
-      <span class="ic-link" onclick="switchTab('board')">Ir a Priorización &rarr;</span>
-    </div>
-    <div class="intro-card" style="border-top-color:var(--gl-orange)">
-      <h3><span class="ic-icon" style="background:var(--gl-orange)">4</span> Grupos de Trabajo</h3>
-      <p>Visualice la composición de cada grupo de trabajo: quién participa, en qué rol (MINPRO, Growth Lab, sector privado) y qué problemas atiende cada grupo. Editable por todos los participantes para mantener actualizada la conformación de los equipos.</p>
-      <span class="ic-link" onclick="switchTab('groups')">Ir a Grupos &rarr;</span>
-    </div>
     <div class="intro-card" style="border-top-color:#7D3C98">
-      <h3><span class="ic-icon" style="background:#7D3C98">5</span> Hojas de Trabajo</h3>
-      <p>Cinco hojas de trabajo basadas en la metodología PDIA para cada problema: descomposición con los 5 Por Qués, declaración de desafío, lluvia de ideas 3X3X3, teoría de cambio y reflexión de aprendizajes. Incluye un diagrama del proceso iterativo que guía la secuencia de trabajo.</p>
+      <h3><span class="ic-icon" style="background:#7D3C98">2</span> Hojas de Trabajo</h3>
+      <p>Hojas de trabajo basadas en la metodología PDIA para cada problema: descomposición con los 5 Por Qués y lluvia de ideas 3X3X3. Incluye un diagrama del proceso iterativo que guía la secuencia de trabajo.</p>
       <span class="ic-link" onclick="switchTab('worksheets')">Ir a Hojas de Trabajo &rarr;</span>
     </div>
     <div class="intro-card" style="border-top-color:#148F77">
-      <h3><span class="ic-icon" style="background:#148F77">6</span> Referencias</h3>
+      <h3><span class="ic-icon" style="background:#148F77">3</span> Referencias</h3>
       <p>Fuentes metodológicas de las hojas de trabajo: el <strong>PDIA Handbook</strong> (Andrews, Pritchett &amp; Woolcock), el <strong>Laboratorio de Gobierno de Chile</strong> y la guía de <strong>Teoría de Cambio de SoPact</strong>. Incluye enlaces directos a los documentos y lecturas complementarias.</p>
       <span class="ic-link" onclick="switchTab('refs')">Ir a Referencias &rarr;</span>
     </div>
     <div class="intro-card" style="border-top-color:#BDC3C7">
       <h3><span class="ic-icon" style="background:#95A5A6">&#9432;</span> Nota importante</h3>
-      <p>Todos los datos que ingrese se guardan automáticamente en su navegador (localStorage). Esto significa que sus ediciones persisten entre visitas, pero <strong>son locales a su dispositivo</strong>. Si cambia de computador o borra los datos del navegador, se perderán. Puede exportar un respaldo desde la pestaña de Puntuación usando el botón "Exportar CSV".</p>
+      <p>Todos los datos que ingrese se guardan automáticamente en su navegador (localStorage). Esto significa que sus ediciones persisten entre visitas, pero <strong>son locales a su dispositivo</strong>. Si cambia de computador o borra los datos del navegador, se perderán.</p>
     </div>
   </div>
 </div>
@@ -404,8 +386,6 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
     <select id="filter-cat" onchange="applyFilters()"><option value="">Todas</option></select>
     <label>Plazo</label>
     <select id="filter-plazo" onchange="applyFilters()"><option value="">Todos</option><option>Corto</option><option>Mediano</option><option>Largo</option></select>
-    <label>Clasificación</label>
-    <select id="filter-clasif" onchange="applyFilters()"><option value="">Todas</option><option>Quick win</option><option>Estructural</option><option>Fuera de alcance</option><option>Coyuntural</option><option>Sin clasificar</option></select>
     <label>Semáforo</label>
     <select id="filter-sem" onchange="applyFilters()"><option value="">Todos</option><option value="verde">Verde</option><option value="amarillo">Amarillo</option><option value="rojo">Rojo</option><option value="gris">Sin asignar</option></select>
     <input type="text" id="search-box" placeholder="Buscar en la matriz..." oninput="applyFilters()">
@@ -414,9 +394,8 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
   <div class="table-wrapper">
     <table class="matrix-table" id="main-table">
       <thead><tr>
-        <th style="width:60px">Código</th><th>Problema</th><th style="width:80px">Plazo</th><th style="width:90px">Clasificación</th>
-        <th class="editable" style="width:150px">Actores a involucrar</th><th class="editable" style="width:150px">Metas tentativas</th>
-        <th class="editable" style="width:170px">Próximo paso y responsable</th><th class="editable" style="width:110px">Fecha</th>
+        <th style="width:60px">Código</th><th>Problema</th><th style="width:80px">Plazo</th>
+        <th class="editable" style="width:200px">Próximo paso y responsable</th><th class="editable" style="width:110px">Fecha</th>
         <th style="width:110px">Semáforo</th><th style="width:50px"></th>
       </tr></thead>
       <tbody id="table-body"></tbody>
@@ -425,93 +404,11 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
 </div>
 
 <!-- ════════════════════════════════════════════════════════════════ -->
-<!-- TAB 2: PUNTUACIÓN                                              -->
-<!-- ════════════════════════════════════════════════════════════════ -->
-<div id="tab-scoring" class="tab-content">
-  <div class="score-info">
-    <div class="score-info-card" style="border-left-color:#2471A3">
-      <h4>Impacto</h4>
-      <p>¿Qué tan significativo es el efecto de este problema sobre la competitividad, las exportaciones o el empleo del sector atunero? Un puntaje alto indica que resolver el problema generaría un beneficio amplio y medible.</p>
-      <div class="scale"><span>1 = Marginal</span><span>3 = Moderado</span><span>5 = Transformador</span></div>
-    </div>
-    <div class="score-info-card" style="border-left-color:var(--gl-green)">
-      <h4>Factibilidad</h4>
-      <p>¿Qué tan viable es resolver este problema con los recursos, competencias institucionales y voluntad política actuales? Considere si existe un instrumento normativo disponible, si requiere coordinación interinstitucional compleja o inversión significativa.</p>
-      <div class="scale"><span>1 = Muy difícil</span><span>3 = Requiere esfuerzo</span><span>5 = Ejecutable ya</span></div>
-    </div>
-    <div class="score-info-card" style="border-left-color:var(--gl-accent)">
-      <h4>Urgencia</h4>
-      <p>¿Qué tan pronto necesita atención este problema? Considere si existen plazos externos (ej: informe UE sep-2026), si el problema se agrava con el tiempo, o si hay una ventana de oportunidad que se cierra.</p>
-      <div class="scale"><span>1 = Puede esperar</span><span>3 = Este semestre</span><span>5 = Inmediato</span></div>
-    </div>
-  </div>
-  <div class="toolbar">
-    <label>Ordenar por:</label>
-    <select id="score-sort" onchange="renderScoring()">
-      <option value="total">Puntaje total (mayor a menor)</option>
-      <option value="impacto">Impacto</option>
-      <option value="factibilidad">Factibilidad</option>
-      <option value="urgencia">Urgencia</option>
-      <option value="code">Código</option>
-    </select>
-    <button class="btn btn-export" onclick="exportSummary()">Exportar CSV</button>
-  </div>
-  <div class="table-wrapper">
-    <table class="summary-table" id="scoring-table">
-      <thead><tr>
-        <th style="width:40px">#</th><th style="width:55px">Código</th><th>Problema</th><th style="width:80px">Plazo</th><th style="width:90px">Clasificación</th>
-        <th style="width:90px">Impacto</th><th style="width:90px">Factibilidad</th><th style="width:90px">Urgencia</th><th style="width:100px">Puntaje</th>
-      </tr></thead>
-      <tbody id="scoring-body"></tbody>
-    </table>
-  </div>
-</div>
-
-<!-- ════════════════════════════════════════════════════════════════ -->
-<!-- TAB 3: PRIORIZACIÓN (KANBAN)                                   -->
-<!-- ════════════════════════════════════════════════════════════════ -->
-<div id="tab-board" class="tab-content">
-  <div class="high-prio-panel" id="high-prio-panel">
-    <h3>Agenda activa — Problemas de alta prioridad</h3>
-    <div id="high-prio-list"></div>
-  </div>
-  <div class="toolbar" id="board-controls">
-    <span style="font-weight:600;font-size:.9rem;">Filtrar por categoría:</span>
-    <button class="btn active" onclick="filterBoard('')" data-bcat="">Todas</button>
-  </div>
-  <div class="kanban" id="kanban">
-    <div class="kanban-col" id="col-alta" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,'alta')">
-      <div class="col-header col-alta">Prioridad Alta <span class="col-count" id="count-alta">0</span></div>
-    </div>
-    <div class="kanban-col" id="col-media" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,'media')">
-      <div class="col-header col-media">Prioridad Media <span class="col-count" id="count-media">0</span></div>
-    </div>
-    <div class="kanban-col" id="col-estacionar" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,'estacionar')">
-      <div class="col-header col-estacionar">Estacionar <span class="col-count" id="count-estacionar">0</span></div>
-    </div>
-    <div class="kanban-col" id="col-sinpriorizar" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,'sinpriorizar')">
-      <div class="col-header col-sinpriorizar">Sin priorizar <span class="col-count" id="count-sinpriorizar">0</span></div>
-    </div>
-  </div>
-</div>
-
-<!-- ════════════════════════════════════════════════════════════════ -->
-<!-- TAB 4: GRUPOS DE TRABAJO                                       -->
-<!-- ════════════════════════════════════════════════════════════════ -->
-<div id="tab-groups" class="tab-content">
-  <div class="toolbar">
-    <span style="font-weight:600;font-size:.9rem;">Grupos de trabajo de la Mesa Ejecutiva</span>
-    <button class="btn" onclick="addGroup()" style="margin-left:auto">+ Nuevo grupo</button>
-  </div>
-  <div class="wg-container" id="wg-container"></div>
-</div>
-
-<!-- ════════════════════════════════════════════════════════════════ -->
-<!-- TAB 5: HOJAS DE TRABAJO (preserved from v1)                    -->
+<!-- TAB 2: HOJAS DE TRABAJO                                        -->
 <!-- ════════════════════════════════════════════════════════════════ -->
 <div id="tab-worksheets" class="tab-content">
 
-  <!-- ── Iterative Process Cycle ── -->
+  <!-- ── Iterative Process Cycle (5 steps) ── -->
   <div class="cycle-section">
     <h3>Metodología del proceso iterativo</h3>
     <div class="cycle-wrap" id="cycle-wrap">
@@ -525,55 +422,37 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
           </defs>
           <!-- Circular arrow path -->
           <circle cx="300" cy="300" r="210" fill="none" stroke="#E8E8E8" stroke-width="2.5" stroke-dasharray="8 6"/>
-          <!-- Arrow segments between steps -->
-          <path d="M 375 95 A 210 210 0 0 1 485 175" fill="none" stroke="#D0D0D0" stroke-width="2" marker-end="url(#arrowhead)"/>
-          <path d="M 505 225 A 210 210 0 0 1 510 355" fill="none" stroke="#D0D0D0" stroke-width="2" marker-end="url(#arrowhead)"/>
-          <path d="M 490 400 A 210 210 0 0 1 420 490" fill="none" stroke="#D0D0D0" stroke-width="2" marker-end="url(#arrowhead)"/>
-          <path d="M 370 510 A 210 210 0 0 1 230 510" fill="none" stroke="#D0D0D0" stroke-width="2" marker-end="url(#arrowhead)"/>
-          <path d="M 180 490 A 210 210 0 0 1 110 400" fill="none" stroke="#D0D0D0" stroke-width="2" marker-end="url(#arrowhead)"/>
-          <path d="M 92 355 A 210 210 0 0 1 95 225" fill="none" stroke="#D0D0D0" stroke-width="2" marker-end="url(#arrowhead)"/>
-          <path d="M 115 175 A 210 210 0 0 1 225 95" fill="none" stroke="#D0D0D0" stroke-width="2" marker-end="url(#arrowhead)"/>
-          <path d="M 270 90 A 210 210 0 0 1 330 90" fill="none" stroke="#D0D0D0" stroke-width="2" marker-end="url(#arrowhead)"/>
+          <!-- Arrow segments between 5 steps -->
+          <path d="M 354 97 A 210 210 0 0 1 476 186" fill="none" stroke="#D0D0D0" stroke-width="2" marker-end="url(#arrowhead)"/>
+          <path d="M 505 280 A 210 210 0 0 1 463 432" fill="none" stroke="#D0D0D0" stroke-width="2" marker-end="url(#arrowhead)"/>
+          <path d="M 375 496 A 210 210 0 0 1 225 496" fill="none" stroke="#D0D0D0" stroke-width="2" marker-end="url(#arrowhead)"/>
+          <path d="M 137 432 A 210 210 0 0 1 95 280" fill="none" stroke="#D0D0D0" stroke-width="2" marker-end="url(#arrowhead)"/>
+          <path d="M 124 186 A 210 210 0 0 1 246 97" fill="none" stroke="#D0D0D0" stroke-width="2" marker-end="url(#arrowhead)"/>
         </svg>
       </div>
 
-      <!-- 8 Steps positioned in a circle -->
-      <div class="cycle-step" style="top:10px; left:225px;" onclick="cycleClick(1)">
+      <!-- 5 Steps positioned in a circle -->
+      <div class="cycle-step" style="top:15px; left:225px;" onclick="cycleClick(1)">
         <div class="step-circle" style="background:#2471A3">1</div>
-        <div class="step-label">Revisar y actualizar la matriz de seguimiento</div>
+        <div class="step-label">Revisar y actualizar</div>
       </div>
-      <div class="cycle-step" style="top:80px; left:410px;" onclick="cycleClick(2)">
-        <div class="step-circle" style="background:#1A5276">2</div>
-        <div class="step-label">Plantear el problema como pregunta</div>
-      </div>
-      <div class="cycle-step" style="top:215px; left:450px;" onclick="cycleClick(3)">
-        <div class="step-circle" style="background:#148F77">3</div>
-        <div class="step-label">Exploración de las causas: ¿Por qué ocurre?</div>
+      <div class="cycle-step" style="top:160px; left:420px;" onclick="cycleClick(2)" data-ws="1">
+        <div class="step-circle" style="background:#148F77">2</div>
+        <div class="step-label">Investigación del problema</div>
         <div class="step-ws">&#8594; Hoja 1</div>
       </div>
-      <div class="cycle-step" style="top:370px; left:430px;" onclick="cycleClick(4)">
-        <div class="step-circle" style="background:#1E8449">4</div>
-        <div class="step-label">Definir el desafío a resolver</div>
+      <div class="cycle-step" style="top:440px; left:330px;" onclick="cycleClick(3)" data-ws="2">
+        <div class="step-circle" style="background:#B7950B">3</div>
+        <div class="step-label">Propuesta de solución</div>
         <div class="step-ws">&#8594; Hoja 2</div>
       </div>
-      <div class="cycle-step" style="top:478px; left:300px;" onclick="cycleClick(5)">
-        <div class="step-circle" style="background:#B7950B">5</div>
-        <div class="step-label">Lluvia de ideas de soluciones</div>
-        <div class="step-ws">&#8594; Hoja 3</div>
+      <div class="cycle-step" style="top:440px; left:100px;" onclick="cycleClick(4)">
+        <div class="step-circle" style="background:#A93226">4</div>
+        <div class="step-label">Ejecutar</div>
       </div>
-      <div class="cycle-step" style="top:460px; left:50px;" onclick="cycleClick(6)">
-        <div class="step-circle" style="background:#A93226">6</div>
-        <div class="step-label">Teoría de cambio y asignar responsables</div>
-        <div class="step-ws">&#8594; Hoja 4</div>
-      </div>
-      <div class="cycle-step" style="top:310px; left:0px;" onclick="cycleClick(7)">
-        <div class="step-circle" style="background:#7D3C98">7</div>
-        <div class="step-label">Ejecutar acciones planteadas</div>
-      </div>
-      <div class="cycle-step" style="top:155px; left:15px;" onclick="cycleClick(8)">
-        <div class="step-circle" style="background:#5B2C6F">8</div>
-        <div class="step-label">Reflexionar sobre aprendizajes</div>
-        <div class="step-ws">&#8594; Hoja 5</div>
+      <div class="cycle-step" style="top:160px; left:0px;" onclick="cycleClick(5)">
+        <div class="step-circle" style="background:#7D3C98">5</div>
+        <div class="step-label">Reflexionar</div>
       </div>
 
       <!-- Center label -->
@@ -594,10 +473,7 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
 
   <div class="ws-pills" id="ws-pills-container">
     <div class="ws-pill active" onclick="wsSwitch(1)"><span class="pill-num">1</span>Deconstruir el problema</div>
-    <div class="ws-pill" onclick="wsSwitch(2)"><span class="pill-num">2</span>Identificar el desafío</div>
-    <div class="ws-pill" onclick="wsSwitch(3)"><span class="pill-num">3</span>Lluvia de ideas 3X3X3</div>
-    <div class="ws-pill" onclick="wsSwitch(4)"><span class="pill-num">4</span>Teoría de Cambio</div>
-    <div class="ws-pill" onclick="wsSwitch(5)"><span class="pill-num">5</span>Reflexión</div>
+    <div class="ws-pill" onclick="wsSwitch(2)"><span class="pill-num">2</span>Lluvia de ideas 3X3X3</div>
   </div>
 
   <!-- ── HT1: 5 Whys ── -->
@@ -616,52 +492,9 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
     </div>
   </div>
 
-  <!-- ── HT2: Challenge Statement ── -->
+  <!-- ── HT2: 3X3X3 Brainstorming ── -->
   <div class="ws-panel" id="ws-2">
-    <h2>Hoja de Trabajo 2: Identificar el desafío a resolver</h2>
-    <p class="ws-desc">Construya una declaración de desafío de innovación que sintetice el problema, el usuario afectado, el objetivo deseado y las restricciones del contexto.</p>
-    <div class="ws-instructions">
-      <strong>Instrucciones:</strong> Complete cada campo. La vista previa en rojo se actualizará automáticamente para mostrar su declaración de desafío completa. Use esta declaración como guía para la lluvia de ideas (Hoja 3).
-    </div>
-    <div class="challenge-builder">
-      <div class="challenge-field">
-        <label>Acción (verbo infinitivo)</label>
-        <div class="field-hint">¿Qué queremos hacer? Ej: mejorar, agilizar, reducir, facilitar</div>
-        <input type="text" id="ch-accion" placeholder="Ej: agilizar" oninput="updateChallenge()">
-      </div>
-      <div class="challenge-field">
-        <label>Situación o servicio</label>
-        <div class="field-hint">¿Qué proceso, servicio o situación queremos cambiar?</div>
-        <input type="text" id="ch-situacion" placeholder="Ej: la emisión del certificado de captura" oninput="updateChallenge()">
-      </div>
-      <div class="challenge-field">
-        <label>Usuario o beneficiario</label>
-        <div class="field-hint">¿A quién beneficia directamente?</div>
-        <input type="text" id="ch-usuario" placeholder="Ej: los exportadores de atún" oninput="updateChallenge()">
-      </div>
-      <div class="challenge-field">
-        <label>Objetivo</label>
-        <div class="field-hint">¿Para qué? ¿Qué resultado se busca?</div>
-        <input type="text" id="ch-objetivo" placeholder="Ej: evitar que la carga quede retenida en destino" oninput="updateChallenge()">
-      </div>
-      <div class="challenge-field">
-        <label>Restricción o contexto a considerar</label>
-        <div class="field-hint">¿Qué limitaciones existen?</div>
-        <input type="text" id="ch-restriccion" placeholder="Ej: la limitada dotación de personal de la SRP" oninput="updateChallenge()">
-      </div>
-      <div class="challenge-preview">
-        <h3>Declaración de desafío</h3>
-        <p class="preview-text" id="challenge-text"></p>
-      </div>
-      <div class="challenge-example">
-        <strong>Ejemplo:</strong> ¿Cómo podemos <em>agilizar</em> <em>la emisión del certificado de captura</em> de <em>los exportadores de atún</em> para que puedan <em>evitar que la carga quede retenida en destino</em>, considerando <em>la limitada dotación de personal de la SRP</em>?
-      </div>
-    </div>
-  </div>
-
-  <!-- ── HT3: 3X3X3 Brainstorming ── -->
-  <div class="ws-panel" id="ws-3">
-    <h2>Hoja de Trabajo 3: Lluvia de ideas — Actividad 3X3X3</h2>
+    <h2>Hoja de Trabajo 2: Lluvia de ideas — Actividad 3X3X3</h2>
     <p class="ws-desc">Ejercicio colaborativo: 3 participantes generan 3 ideas cada uno, luego rotan para complementar las ideas de los demás. Tres rondas de 5 minutos (15 min total).</p>
     <div class="ws-instructions">
       <strong>Instrucciones:</strong><br>
@@ -682,111 +515,6 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
     </div>
   </div>
 
-  <!-- ── HT4: Theory of Change ── -->
-  <div class="ws-panel" id="ws-4">
-    <h2>Hoja de Trabajo 4: Teoría de Cambio para la solución priorizada</h2>
-    <p class="ws-desc">Desarrolle la cadena lógica que conecta los recursos con el impacto esperado. Cada etapa debe responder a la pregunta: "Si hacemos esto, entonces ocurrirá aquello".</p>
-    <div class="ws-instructions">
-      <strong>Instrucciones:</strong> Complete cada etapa de izquierda a derecha. Sea específico: incluya nombres, plazos y magnitudes cuando sea posible. La cadena debe ser verificable — cada eslabón debe poder confirmarse o refutarse.
-    </div>
-    <div class="toc-flow" id="toc-flow">
-      <div class="toc-stage">
-        <div class="toc-stage-header" style="background:#6C3483">SUPUESTOS</div>
-        <div class="toc-stage-body" style="border-color:#6C3483">
-          <div class="toc-stage-hint">Condiciones que deben cumplirse para que la cadena causal funcione. Cada supuesto es verificable.</div>
-          <textarea id="toc-supuestos" placeholder="Ej: Existe voluntad política para asignar personal, el presupuesto no será recortado, la UE responderá en los plazos previstos..." onchange="wsAutoSave()"></textarea>
-        </div>
-      </div>
-      <div class="toc-arrow">&#10132;</div>
-      <div class="toc-stage">
-        <div class="toc-stage-header" style="background:#2471A3">INSUMOS</div>
-        <div class="toc-stage-body" style="border-color:#2471A3">
-          <div class="toc-stage-hint">Recursos humanos o financieros de los que dispone el emprendimiento</div>
-          <textarea id="toc-insumos" placeholder="Ej: Equipo técnico de la SRP (3 personas), presupuesto de operación vigente, apoyo técnico del Growth Lab..." onchange="wsAutoSave()"></textarea>
-        </div>
-      </div>
-      <div class="toc-arrow">&#10132;</div>
-      <div class="toc-stage">
-        <div class="toc-stage-header" style="background:#1A5276">ACTIVIDADES</div>
-        <div class="toc-stage-body" style="border-color:#1A5276">
-          <div class="toc-stage-hint">Actividades necesarias para implementar tu plan de emprendimiento</div>
-          <textarea id="toc-actividades" placeholder="Ej: Mapear el proceso actual, identificar cuellos de botella, digitalizar formularios, capacitar inspectores..." onchange="wsAutoSave()"></textarea>
-        </div>
-      </div>
-      <div class="toc-arrow">&#10132;</div>
-      <div class="toc-stage">
-        <div class="toc-stage-header" style="background:#148F77">PRODUCTOS</div>
-        <div class="toc-stage-body" style="border-color:#148F77">
-          <div class="toc-stage-hint">Productos o servicios que surgen de tu plan de emprendimiento</div>
-          <textarea id="toc-productos" placeholder="Ej: Proceso digital de certificación, formulario simplificado, protocolo de emisión en 48h..." onchange="wsAutoSave()"></textarea>
-        </div>
-      </div>
-      <div class="toc-arrow">&#10132;</div>
-      <div class="toc-stage">
-        <div class="toc-stage-header" style="background:#B7950B">RESULTADOS</div>
-        <div class="toc-stage-body" style="border-color:#B7950B">
-          <div class="toc-stage-hint">Cambios a corto plazo que se pueden medir</div>
-          <textarea id="toc-resultados" placeholder="Ej: Tiempo de emisión reducido de 10 a 2 días, 0 cargamentos retenidos por certificado, satisfacción del exportador..." onchange="wsAutoSave()"></textarea>
-        </div>
-      </div>
-      <div class="toc-arrow">&#10132;</div>
-      <div class="toc-stage">
-        <div class="toc-stage-header" style="background:#A93226">IMPACTO</div>
-        <div class="toc-stage-body" style="border-color:#A93226">
-          <div class="toc-stage-hint">Los cambios que quiero lograr por medio del emprendimiento</div>
-          <textarea id="toc-impacto" placeholder="Ej: Contribución al levantamiento de la tarjeta amarilla, mayor competitividad del sector atunero ecuatoriano..." onchange="wsAutoSave()"></textarea>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── HT5: Reflection ── -->
-  <div class="ws-panel" id="ws-5">
-    <h2>Hoja de Trabajo 5: Reflexión de aprendizajes</h2>
-    <p class="ws-desc">Al final de cada iteración (cada 2-4 semanas), el grupo de trabajo completa esta reflexión para documentar avances, aprendizajes y bloqueos. Esta información alimenta el reporte a la Mesa Ejecutiva.</p>
-    <div class="ws-instructions">
-      <strong>Instrucciones:</strong> Complete las 4 secciones honestamente. En "¿Qué nos frena?" use el semáforo para clasificar la severidad del bloqueo. En "¿Qué sigue?" incluya nombre y fecha del responsable.
-    </div>
-    <div class="reflection-cards" id="reflection-cards">
-      <div class="reflection-card" style="border-top:4px solid var(--gl-blue)">
-        <div class="reflection-card-header"><span class="rc-num" style="background:var(--gl-blue)">1</span>¿Qué hicimos?</div>
-        <div class="reflection-card-body">
-          <div class="rc-hint">Acciones concretas: reuniones realizadas, borradores circulados, datos recopilados, gestiones ante otras entidades</div>
-          <textarea id="ref-hicimos" placeholder="Describir las acciones concretas realizadas en esta iteración..." onchange="wsAutoSave()"></textarea>
-        </div>
-      </div>
-      <div class="reflection-card" style="border-top:4px solid var(--gl-green)">
-        <div class="reflection-card-header"><span class="rc-num" style="background:var(--gl-green)">2</span>¿Qué aprendimos?</div>
-        <div class="reflection-card-body">
-          <div class="rc-hint">¿El problema era lo que pensábamos? ¿Descubrimos algo nuevo sobre las causas? ¿Cambió nuestra comprensión?</div>
-          <textarea id="ref-aprendimos" placeholder="Describir hallazgos, sorpresas, validaciones o cambios de perspectiva..." onchange="wsAutoSave()"></textarea>
-        </div>
-      </div>
-      <div class="reflection-card" style="border-top:4px solid var(--gl-orange)">
-        <div class="reflection-card-header"><span class="rc-num" style="background:var(--gl-orange)">3</span>¿Qué nos frena?</div>
-        <div class="reflection-card-body">
-          <div class="rc-hint">Bloqueos identificados. Clasifique con el semáforo según severidad.</div>
-          <textarea id="ref-frena" placeholder="Describir los obstáculos o bloqueos encontrados..." onchange="wsAutoSave()"></textarea>
-          <div class="reflection-semaforo" id="ref-semaforo">
-            <div class="sem-option sv" data-sem="verde" onclick="setRefSem('verde',this)"><span class="sem-dot verde" style="width:14px;height:14px;border:none;opacity:1;cursor:pointer"></span>Sin bloqueos</div>
-            <div class="sem-option sa" data-sem="amarillo" onclick="setRefSem('amarillo',this)"><span class="sem-dot amarillo" style="width:14px;height:14px;border:none;opacity:1;cursor:pointer"></span>Retraso leve</div>
-            <div class="sem-option sr" data-sem="rojo" onclick="setRefSem('rojo',this)"><span class="sem-dot rojo" style="width:14px;height:14px;border:none;opacity:1;cursor:pointer"></span>Requiere escalamiento</div>
-          </div>
-        </div>
-      </div>
-      <div class="reflection-card" style="border-top:4px solid var(--gl-accent)">
-        <div class="reflection-card-header"><span class="rc-num" style="background:var(--gl-accent)">4</span>¿Qué sigue?</div>
-        <div class="reflection-card-body">
-          <div class="rc-hint">Próximo paso verificable con responsable (nombre) y fecha</div>
-          <textarea id="ref-sigue" placeholder="Describir el próximo paso concreto y verificable..." onchange="wsAutoSave()"></textarea>
-          <div class="reflection-meta">
-            <div><label>Responsable</label><input type="text" id="ref-responsable" placeholder="Nombre completo" onchange="wsAutoSave()"></div>
-            <div><label>Fecha compromiso</label><input type="date" id="ref-fecha" onchange="wsAutoSave()"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
 </div>
 
@@ -914,7 +642,7 @@ function showSaved() {
 // ══════════════════════════════════════════════════════════════════
 // TAB SWITCHING
 // ══════════════════════════════════════════════════════════════════
-const TAB_IDS = ['intro','table','scoring','board','groups','worksheets','refs'];
+const TAB_IDS = ['intro','table','worksheets','refs'];
 function switchTab(tab) {
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', TAB_IDS[i]===tab));
   TAB_IDS.forEach(id => {
@@ -922,9 +650,6 @@ function switchTab(tab) {
     if (el) el.classList.toggle('active', id===tab);
   });
   if (tab === 'table') renderTable();
-  if (tab === 'scoring') renderScoring();
-  if (tab === 'board') { renderBoard(); renderHighPrio(); }
-  if (tab === 'groups') renderGroups();
   if (tab === 'worksheets') initWorksheets();
 }
 
@@ -933,8 +658,6 @@ function switchTab(tab) {
 // ══════════════════════════════════════════════════════════════════
 function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function plazoClass(p) { return !p?'':p==='Corto'?'plazo-corto':p==='Mediano'?'plazo-mediano':'plazo-largo'; }
-function clasifClass(c) { return !c?'':c==='Quick win'?'clasif-qw':c==='Estructural'?'clasif-est':c==='Fuera de alcance'?'clasif-fda':c==='Coyuntural'?'clasif-coy':''; }
-function getTotal(code) { const s=state.scores[code]||{impacto:3,factibilidad:3,urgencia:3}; return s.impacto+s.factibilidad+s.urgencia; }
 
 // ══════════════════════════════════════════════════════════════════
 // TAB 1: FULL TABLE
@@ -952,35 +675,30 @@ function renderTable() {
   const search = document.getElementById('search-box').value.toLowerCase();
   const fCat = document.getElementById('filter-cat').value;
   const fPlazo = document.getElementById('filter-plazo').value;
-  const fClasif = document.getElementById('filter-clasif').value;
   const fSem = document.getElementById('filter-sem').value;
   let html='', count=0, currentCat='';
   PROBLEMS.forEach(p => {
     if (fCat && p.cat!==fCat) return;
     if (fPlazo && p.plazo!==fPlazo) return;
-    if (fClasif) { if (fClasif==='Sin clasificar' && p.clasificacion!=='') return; if (fClasif!=='Sin clasificar' && p.clasificacion!==fClasif) return; }
     if (fSem && (state.semaforos[p.code]||'gris')!==fSem) return;
     const e = state.edits[p.code]||{};
-    const searchText = (p.code+p.name+p.detalle+p.impacto+p.solucion+p.institucion+(e.actores||'')+(e.metas||'')+(e.paso||'')).toLowerCase();
+    const searchText = (p.code+p.name+p.detalle+p.impacto+p.solucion+p.institucion+(e.paso||'')).toLowerCase();
     if (search && !searchText.includes(search)) return;
     if (p.cat!==currentCat) {
       currentCat=p.cat; const cat=CAT_MAP[p.cat];
-      html+=`<tr class="cat-header" onclick="toggleCat('${p.cat}')"><td colspan="10"><span class="cat-toggle" id="toggle-${p.cat}">&#9660;</span> ${cat.id} &middot; ${cat.name} <span style="font-weight:400;font-size:.8rem;color:#888"> &mdash; ${cat.desc}</span></td></tr>`;
+      html+=`<tr class="cat-header" onclick="toggleCat('${p.cat}')"><td colspan="7"><span class="cat-toggle" id="toggle-${p.cat}">&#9660;</span> ${cat.id} &middot; ${cat.name}</td></tr>`;
     }
     count++;
     html+=`<tr class="problem-row" data-cat="${p.cat}" id="row-${p.code}">
       <td><span class="code-badge" style="background:${CAT_MAP[p.cat].color}">${p.code}</span></td>
       <td><strong>${p.name}</strong></td>
       <td><span class="plazo-badge ${plazoClass(p.plazo)}">${p.plazo}</span></td>
-      <td><span class="clasif-badge ${clasifClass(p.clasificacion)}">${p.clasificacion||'<span style="color:#bbb">—</span>'}</span></td>
-      <td class="editable"><textarea onchange="editField('${p.code}','actores',this.value)" placeholder="Actores...">${esc(e.actores||'')}</textarea></td>
-      <td class="editable"><textarea onchange="editField('${p.code}','metas',this.value)" placeholder="Metas...">${esc(e.metas||'')}</textarea></td>
       <td class="editable"><textarea onchange="editField('${p.code}','paso',this.value)" placeholder="Próximo paso...">${esc(e.paso||'')}</textarea></td>
       <td class="editable"><input type="date" value="${e.fecha||''}" onchange="editField('${p.code}','fecha',this.value)"></td>
       <td>${renderSemaforo(p.code)}</td>
       <td><span class="expand-btn" onclick="toggleDetail('${p.code}')">+</span></td>
     </tr>`;
-    html+=`<tr class="detail-row" id="detail-${p.code}"><td colspan="10"><div class="detail-content">
+    html+=`<tr class="detail-row" id="detail-${p.code}"><td colspan="7"><div class="detail-content">
       <div><h4>Detalle</h4><p>${p.detalle}</p></div><div><h4>Impacto y consecuencias</h4><p>${p.impacto}</p></div>
       <div><h4>Posible solución</h4><p>${p.solucion}</p></div><div><h4>Institución responsable</h4><p>${p.institucion}</p></div>
     </div></td></tr>`;
@@ -1001,175 +719,7 @@ function toggleCat(cat) {
 function applyFilters() { renderTable(); }
 
 // ══════════════════════════════════════════════════════════════════
-// TAB 2: SCORING
-// ══════════════════════════════════════════════════════════════════
-function renderScoring() {
-  const sortBy = document.getElementById('score-sort').value;
-  const sorted = PROBLEMS.slice().sort((a,b) => {
-    if (sortBy==='code') return a.code.localeCompare(b.code);
-    if (sortBy==='impacto') return (state.scores[b.code]?.impacto||3)-(state.scores[a.code]?.impacto||3);
-    if (sortBy==='factibilidad') return (state.scores[b.code]?.factibilidad||3)-(state.scores[a.code]?.factibilidad||3);
-    if (sortBy==='urgencia') return (state.scores[b.code]?.urgencia||3)-(state.scores[a.code]?.urgencia||3);
-    return getTotal(b.code)-getTotal(a.code);
-  });
-  let html='';
-  sorted.forEach((p,i) => {
-    const s=state.scores[p.code]||{impacto:3,factibilidad:3,urgencia:3};
-    const total=s.impacto+s.factibilidad+s.urgencia;
-    const barW=Math.round(total/15*100);
-    const opts = v => [1,2,3,4,5].map(n=>`<option value="${n}" ${n===v?'selected':''}>${n}</option>`).join('');
-    html+=`<tr>
-      <td>${i+1}</td>
-      <td><span class="code-badge" style="background:${CAT_MAP[p.cat].color}">${p.code}</span></td>
-      <td>${p.name}</td>
-      <td><span class="plazo-badge ${plazoClass(p.plazo)}">${p.plazo}</span></td>
-      <td><span class="clasif-badge ${clasifClass(p.clasificacion)}">${p.clasificacion||'—'}</span></td>
-      <td><select class="score-select" onchange="setScore('${p.code}','impacto',+this.value)">${opts(s.impacto)}</select></td>
-      <td><select class="score-select" onchange="setScore('${p.code}','factibilidad',+this.value)">${opts(s.factibilidad)}</select></td>
-      <td><select class="score-select" onchange="setScore('${p.code}','urgencia',+this.value)">${opts(s.urgencia)}</select></td>
-      <td><span class="score-bar" style="width:${barW}%"></span><span class="score-total">${total}/15</span></td>
-    </tr>`;
-  });
-  document.getElementById('scoring-body').innerHTML=html;
-}
-function setScore(code,dim,val) {
-  if(!state.scores[code]) state.scores[code]={impacto:3,factibilidad:3,urgencia:3};
-  state.scores[code][dim]=val; saveState(); renderScoring();
-}
-
-// ══════════════════════════════════════════════════════════════════
-// TAB 3: KANBAN BOARD
-// ══════════════════════════════════════════════════════════════════
-let boardCatFilter='';
-function filterBoard(cat) {
-  boardCatFilter=cat;
-  document.querySelectorAll('#board-controls .btn:not(.btn-export)').forEach(b=>b.classList.toggle('active',b.dataset.bcat===cat));
-  renderBoard();
-}
-function renderHighPrio() {
-  const highItems = PROBLEMS.filter(p=>(state.priorities[p.code]||'sinpriorizar')==='alta');
-  const el = document.getElementById('high-prio-list');
-  if (!highItems.length) { el.innerHTML='<div class="hp-empty">No hay problemas clasificados como alta prioridad. Arrastre tarjetas a la columna "Prioridad Alta" para activar esta sección.</div>'; return; }
-  let html='<table class="summary-table"><thead><tr><th>Código</th><th>Problema</th><th>Plazo</th><th>Puntaje</th><th>Tipo</th><th>Responsable</th></tr></thead><tbody>';
-  highItems.forEach(p => {
-    const total = getTotal(p.code);
-    html+=`<tr><td><span class="code-badge" style="background:${CAT_MAP[p.cat].color}">${p.code}</span></td><td>${p.name}</td><td><span class="plazo-badge ${plazoClass(p.plazo)}">${p.plazo}</span></td><td><strong>${total}/15</strong></td><td>${state.tipos[p.code]||'—'}</td><td>${state.responsables[p.code]||'—'}</td></tr>`;
-  });
-  html+='</tbody></table>';
-  el.innerHTML=html;
-}
-function renderBoard() {
-  const cols=['alta','media','estacionar','sinpriorizar'];
-  cols.forEach(col => { document.getElementById('col-'+col).querySelectorAll('.card').forEach(c=>c.remove()); });
-  PROBLEMS.forEach(p => {
-    if (boardCatFilter && p.cat!==boardCatFilter) return;
-    const priority=state.priorities[p.code]||'sinpriorizar';
-    const total=getTotal(p.code);
-    const card=document.createElement('div');
-    card.className='card'; card.draggable=true; card.dataset.code=p.code;
-    card.style.borderLeftColor=CAT_MAP[p.cat].color;
-    card.ondragstart=e=>e.dataTransfer.setData('text/plain',p.code);
-    card.innerHTML=`<div class="card-code" style="color:${CAT_MAP[p.cat].color}">${p.code}</div>
-      <div class="card-title">${p.name}</div>
-      <div class="card-meta"><span class="plazo-badge ${plazoClass(p.plazo)}">${p.plazo}</span>
-      ${p.clasificacion?`<span class="clasif-badge ${clasifClass(p.clasificacion)}">${p.clasificacion}</span>`:''}
-      <span style="font-size:.72rem;color:#888;margin-left:auto">Puntaje: ${total}/15</span></div>`;
-    document.getElementById('col-'+priority).appendChild(card);
-  });
-  cols.forEach(col => { document.getElementById('count-'+col).textContent=document.getElementById('col-'+col).querySelectorAll('.card').length; });
-  renderHighPrio();
-}
-function dragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
-function dragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
-function drop(e,priority) {
-  e.preventDefault(); e.currentTarget.classList.remove('drag-over');
-  state.priorities[e.dataTransfer.getData('text/plain')]=priority;
-  saveState(); renderBoard();
-}
-
-// ══════════════════════════════════════════════════════════════════
-// TAB 4: WORKING GROUPS
-// ══════════════════════════════════════════════════════════════════
-const WG_COLORS = ['#1B4F72','#7D3C98','#1E8449','#B9770E','#CB4335','#1A5276','#5B2C6F','#148F77'];
-const ROLE_COLORS = { 'MINPRO':'#2471A3', 'Growth Lab':'#A51C30', 'Sector privado':'#B7950B', 'Otro':'#7F8C8D' };
-
-function renderGroups() {
-  const container = document.getElementById('wg-container');
-  if (!state.groups.length) {
-    container.innerHTML='<div style="text-align:center;padding:40px;color:#999;font-size:.9rem;">No hay grupos de trabajo creados. Haga clic en "+ Nuevo grupo" para crear el primer grupo.</div>';
-    return;
-  }
-  let html='';
-  state.groups.forEach((g,gi) => {
-    const color = WG_COLORS[gi%WG_COLORS.length];
-    html+=`<div class="wg-card"><div class="wg-card-header" style="background:${color}">
-      <span contenteditable="true" onblur="updateGroupName(${gi},this.textContent)" style="outline:none">${esc(g.name)}</span>
-      <span style="font-size:.75rem;cursor:pointer;opacity:.7" onclick="removeGroup(${gi})" title="Eliminar grupo">&times;</span>
-    </div><div class="wg-card-body">
-      <div class="wg-problems">`;
-    (g.problems||[]).forEach((pc,pi) => {
-      const prob = PROBLEMS.find(p=>p.code===pc);
-      if (prob) html+=`<span class="wg-prob" style="background:${CAT_MAP[prob.cat].color}22;color:${CAT_MAP[prob.cat].color};border:1px solid ${CAT_MAP[prob.cat].color}44">${pc}</span>`;
-    });
-    html+=`<select style="font-size:.75rem;padding:2px 6px;border:1px dashed #ccc;border-radius:10px;color:#999;background:none;cursor:pointer" onchange="addProblemToGroup(${gi},this.value);this.value=''">
-      <option value="">+ problema</option>`;
-    PROBLEMS.forEach(p => { html+=`<option value="${p.code}">${p.code} — ${p.name.substring(0,40)}</option>`; });
-    html+=`</select></div><div class="wg-members">`;
-    (g.members||[]).forEach((m,mi) => {
-      const rc = ROLE_COLORS[m.role]||'#7F8C8D';
-      const initials = m.name ? m.name.split(' ').map(w=>w[0]).join('').toUpperCase().substring(0,2) : '??';
-      html+=`<div class="wg-member">
-        <div class="wg-member-avatar" style="background:${rc}">${initials}</div>
-        <div class="wg-member-info">
-          <input class="wg-member-name" value="${esc(m.name)}" placeholder="Nombre" onchange="updateMember(${gi},${mi},'name',this.value)">
-          <select style="font-size:.75rem;border:none;color:${rc};font-weight:600;padding:2px 0;cursor:pointer" onchange="updateMember(${gi},${mi},'role',this.value)">
-            <option ${m.role==='MINPRO'?'selected':''}>MINPRO</option>
-            <option ${m.role==='Growth Lab'?'selected':''}>Growth Lab</option>
-            <option ${m.role==='Sector privado'?'selected':''}>Sector privado</option>
-            <option ${m.role==='Otro'?'selected':''}>Otro</option>
-          </select>
-        </div>
-        <span style="cursor:pointer;color:#ccc;font-size:1.1rem" onclick="removeMember(${gi},${mi})">&times;</span>
-      </div>`;
-    });
-    html+=`</div><button class="wg-add-btn" onclick="addMember(${gi})">+ Agregar miembro</button></div></div>`;
-  });
-  container.innerHTML=html;
-}
-function addGroup() {
-  state.groups.push({ name:'Grupo '+(state.groups.length+1), problems:[], members:[] });
-  saveState(); renderGroups();
-}
-function removeGroup(i) { if(confirm('¿Eliminar este grupo?')) { state.groups.splice(i,1); saveState(); renderGroups(); } }
-function updateGroupName(i,name) { state.groups[i].name=name.trim(); saveState(); }
-function addProblemToGroup(gi,code) {
-  if(!code) return;
-  if(!state.groups[gi].problems.includes(code)) { state.groups[gi].problems.push(code); saveState(); renderGroups(); }
-}
-function addMember(gi) { state.groups[gi].members.push({name:'',role:'MINPRO'}); saveState(); renderGroups(); }
-function removeMember(gi,mi) { state.groups[gi].members.splice(mi,1); saveState(); renderGroups(); }
-function updateMember(gi,mi,field,val) { state.groups[gi].members[mi][field]=val; saveState(); }
-
-// ══════════════════════════════════════════════════════════════════
-// EXPORT CSV
-// ══════════════════════════════════════════════════════════════════
-function exportSummary() {
-  const prioLabel={'alta':'Alta','media':'Media','estacionar':'Estacionar','sinpriorizar':'Sin priorizar'};
-  let csv='\uFEFFCódigo,Problema,Categoría,Plazo,Clasificación,Prioridad,Impacto,Factibilidad,Urgencia,Puntaje,Tipo MP/YP,Responsable,Actores,Metas,Próximo paso,Fecha,Semáforo,Comentarios\n';
-  PROBLEMS.forEach(p=>{
-    const s=state.scores[p.code]||{impacto:3,factibilidad:3,urgencia:3}; const e=state.edits[p.code]||{};
-    csv+=[p.code,`"${p.name.replace(/"/g,'""')}"`,p.cat,p.plazo,p.clasificacion||'',prioLabel[state.priorities[p.code]||'sinpriorizar'],
-      s.impacto,s.factibilidad,s.urgencia,s.impacto+s.factibilidad+s.urgencia,state.tipos[p.code]||'',
-      `"${(state.responsables[p.code]||'').replace(/"/g,'""')}"`,`"${(e.actores||'').replace(/"/g,'""')}"`,
-      `"${(e.metas||'').replace(/"/g,'""')}"`,`"${(e.paso||'').replace(/"/g,'""')}"`,e.fecha||'',
-      state.semaforos[p.code]||'gris',`"${(state.comments[p.code]||'').replace(/"/g,'""')}"`].join(',') + '\n';
-  });
-  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
-  a.download='matriz_priorizacion_atun.csv'; a.click();
-}
-
-// ══════════════════════════════════════════════════════════════════
-// TAB 5: WORKSHEETS (HOJAS DE TRABAJO)
+// TAB 2: WORKSHEETS (HOJAS DE TRABAJO)
 // ══════════════════════════════════════════════════════════════════
 const WS_STORAGE_KEY = 'mesa_atun_worksheets_v1';
 let wsState = loadWsState();
@@ -1232,34 +782,11 @@ function wsAutoSave() {
     s.whysGrid[ta.id] = ta.value;
   });
 
-  // HT2: Challenge statement
-  s.challenge = {};
-  ['ch-accion','ch-situacion','ch-usuario','ch-objetivo','ch-restriccion'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) s.challenge[id] = el.value;
-  });
-
-  // HT3: 3X3X3 brainstorming
+  // HT2: 3X3X3 brainstorming
   s.postits = {};
   document.querySelectorAll('#bs-grid .postit textarea').forEach(ta => {
     if (ta.id) s.postits[ta.id] = ta.value;
   });
-
-  // HT4: Theory of Change (including supuestos)
-  s.toc = {};
-  ['toc-supuestos','toc-insumos','toc-actividades','toc-productos','toc-resultados','toc-impacto'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) s.toc[id] = el.value;
-  });
-
-  // HT5: Reflection
-  s.reflection = {};
-  ['ref-hicimos','ref-aprendimos','ref-frena','ref-sigue','ref-responsable','ref-fecha'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) s.reflection[id] = el.value;
-  });
-  const activeSem = document.querySelector('#ref-semaforo .sem-option.active');
-  s.reflection.semaforo = activeSem ? activeSem.dataset.sem : '';
 
   saveWsState();
 }
@@ -1292,13 +819,7 @@ function wsLoadProblem(code) {
     });
   }
 
-  // HT2
-  ['ch-accion','ch-situacion','ch-usuario','ch-objetivo','ch-restriccion'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = (s.challenge && s.challenge[id]) || '';
-  });
-
-  // HT3: 3X3X3 Brainstorming — row-based grid matching CSS (.brainstorm-grid = 80px + 3 cols)
+  // HT2: 3X3X3 Brainstorming — row-based grid matching CSS (.brainstorm-grid = 80px + 3 cols)
   const board = document.getElementById('bs-grid');
   if (board && !board.querySelector('.postit')) {
     let html = '';
@@ -1323,50 +844,15 @@ function wsLoadProblem(code) {
       ta.value = (s.postits && s.postits[ta.id]) || '';
     });
   }
-
-  // HT4
-  ['toc-supuestos','toc-insumos','toc-actividades','toc-productos','toc-resultados','toc-impacto'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = (s.toc && s.toc[id]) || '';
-  });
-
-  // HT5
-  ['ref-hicimos','ref-aprendimos','ref-frena','ref-sigue','ref-responsable','ref-fecha'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = (s.reflection && s.reflection[id]) || '';
-  });
-  document.querySelectorAll('#ref-semaforo .sem-option').forEach(opt => {
-    opt.classList.toggle('active', opt.dataset.sem === (s.reflection?.semaforo || ''));
-  });
 }
 
-function setRefSem(color, el) {
-  document.querySelectorAll('#ref-semaforo .sem-option').forEach(opt => opt.classList.remove('active'));
-  el.classList.add('active');
-  el.dataset.sem = color;
-  wsAutoSave();
+function cycleClick(n) {
+  // Steps 2 and 3 of the cycle link to worksheets 1 and 2
+  if (n === 2) wsSwitch(1);
+  if (n === 3) wsSwitch(2);
 }
 
-function cycleStepClick(wsNum) {
-  if (wsNum >= 1 && wsNum <= 5) wsSwitch(wsNum);
-}
-
-// HT2: Challenge statement preview
-function updateChallenge() {
-  const accion = document.getElementById('ch-accion')?.value || '';
-  const situacion = document.getElementById('ch-situacion')?.value || '';
-  const usuario = document.getElementById('ch-usuario')?.value || '';
-  const objetivo = document.getElementById('ch-objetivo')?.value || '';
-  const restriccion = document.getElementById('ch-restriccion')?.value || '';
-  const wrap = (v, cls) => v ? '<span class="filled">' + v + '</span>' : '<span class="empty">&hellip;</span>';
-  document.getElementById('challenge-text').innerHTML =
-    '\u00bfC\u00f3mo podemos ' + wrap(accion) + ' ' + wrap(situacion) +
-    ' de ' + wrap(usuario) + ' para que puedan ' + wrap(objetivo) +
-    ', considerando ' + wrap(restriccion) + '?';
-  wsAutoSave();
-}
-
-// HT3: Brainstorm timer
+// HT2: Brainstorm timer
 let bsTimerInterval = null;
 let bsTimeLeft = 300;
 let bsRound = 1;
@@ -1438,20 +924,6 @@ function init() {
       opt.value = c.id;
       opt.textContent = c.id + ' \u00b7 ' + c.name;
       catSelect.appendChild(opt);
-    });
-  }
-  // Board category filter buttons
-  const boardCtrl = document.getElementById('board-controls');
-  if (boardCtrl) {
-    CATS.forEach(c => {
-      const btn = document.createElement('button');
-      btn.className = 'btn';
-      btn.dataset.bcat = c.id;
-      btn.textContent = c.id;
-      btn.style.borderLeftColor = c.color;
-      btn.style.borderLeftWidth = '3px';
-      btn.onclick = () => filterBoard(c.id);
-      boardCtrl.appendChild(btn);
     });
   }
   // Render initial table
