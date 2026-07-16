@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mesa Ejecutiva del Sector Atún — Herramienta Interactiva</title>
+<style>
+:root {
+  --gl-dark: #1D1C1D;
+  --gl-accent: #A51C30;
+  --gl-blue: #1B4F72;
+  --gl-green: #1E8449;
+  --gl-orange: #B9770E;
+  --gl-light: #F7F9FB;
+  --gl-border: #D5D8DC;
+  --gl-text: #2C3E50;
+  --sem-verde: #27AE60;
+  --sem-amarillo: #F1C40F;
+  --sem-rojo: #E74C3C;
+  --sem-gris: #BDC3C7;
+  --shadow: 0 2px 8px rgba(0,0,0,.08);
+  --radius: 6px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; background: var(--gl-light); color: var(--gl-text); }
+
+/* ── Header ── */
+.header { background: var(--gl-dark); color: #fff; padding: 18px 32px; display: flex; align-items: center; gap: 18px; }
+.header h1 { font-size: 1.35rem; font-weight: 600; }
+.header .subtitle { font-size: .85rem; opacity: .7; margin-top: 2px; }
+.header .badge { background: var(--gl-accent); padding: 4px 12px; border-radius: 12px; font-size: .75rem; font-weight: 600; }
+
+/* ── Tabs ── */
+.tabs { display: flex; background: #fff; border-bottom: 2px solid var(--gl-border); padding: 0 32px; overflow-x: auto; }
+.tab { padding: 14px 22px; cursor: pointer; font-weight: 600; font-size: .9rem; border-bottom: 3px solid transparent; color: #666; transition: all .2s; white-space: nowrap; }
+.tab:hover { color: var(--gl-dark); }
+.tab.active { color: var(--gl-accent); border-bottom-color: var(--gl-accent); }
+.tab-content { display: none; padding: 24px 32px; }
+.tab-content.active { display: block; }
+
+/* ── Filters bar / toolbar ── */
+.filters, .toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 20px; background: #fff; padding: 16px 20px; border-radius: var(--radius); box-shadow: var(--shadow); }
+.filters label, .toolbar label { font-weight: 600; font-size: .85rem; color: #555; }
+.filters select, .filters input[type="text"], .toolbar select { padding: 8px 12px; border: 1px solid var(--gl-border); border-radius: 4px; font-size: .88rem; font-family: inherit; }
+.filters input[type="text"] { width: 260px; }
+.counter { margin-left: auto; font-size: .85rem; color: #888; font-weight: 600; }
+.btn { padding: 8px 16px; border-radius: 4px; border: 1px solid var(--gl-border); background: #fff; font-family: inherit; font-size: .85rem; cursor: pointer; font-weight: 600; transition: all .2s; }
+.btn:hover { background: #f0f0f0; }
+.btn.active { background: var(--gl-accent); color: #fff; border-color: var(--gl-accent); }
+.btn-export { background: var(--gl-dark); color: #fff; border-color: var(--gl-dark); }
+.btn-export:hover { background: #333; }
+
+/* ── Generic table ── */
+.matrix-table { width: 100%; border-collapse: collapse; background: #fff; box-shadow: var(--shadow); border-radius: var(--radius); overflow: hidden; font-size: .85rem; }
+.matrix-table th { background: var(--gl-dark); color: #fff; padding: 12px 10px; text-align: left; font-weight: 600; font-size: .8rem; text-transform: uppercase; letter-spacing: .3px; position: sticky; top: 0; z-index: 10; }
+.matrix-table td { padding: 10px; border-bottom: 1px solid #EEE; vertical-align: top; }
+.matrix-table tr:hover td { background: #F0F4F8; }
+.matrix-table tr.cat-header td { background: #E8EEF3; font-weight: 700; font-size: .9rem; color: var(--gl-dark); cursor: pointer; }
+.cat-toggle { display: inline-block; width: 18px; transition: transform .2s; }
+.cat-toggle.collapsed { transform: rotate(-90deg); }
+
+.code-badge { display: inline-block; padding: 2px 8px; border-radius: 3px; color: #fff; font-weight: 700; font-size: .78rem; min-width: 32px; text-align: center; }
+.plazo-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: .75rem; font-weight: 600; }
+.plazo-corto { background: #D5F5E3; color: #1E8449; }
+.plazo-mediano { background: #FEF9E7; color: #B7950B; }
+.plazo-largo { background: #FADBD8; color: #C0392B; }
+.clasif-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: .75rem; font-weight: 600; }
+.clasif-qw { background: #D5F5E3; color: #1E8449; }
+.clasif-est { background: #D6EAF8; color: #1B4F72; }
+.clasif-fda { background: #E8E8E8; color: #666; }
+.clasif-coy { background: #FCF3CF; color: #7D6608; }
+
+/* ── Editable cells ── */
+.editable { min-width: 120px; max-width: 200px; }
+.editable textarea { width: 100%; min-height: 50px; border: 1px solid #ddd; border-radius: 3px; padding: 6px 8px; font-family: inherit; font-size: .82rem; resize: vertical; background: #FAFBFC; }
+.editable textarea:focus { border-color: var(--gl-accent); outline: none; background: #fff; }
+.editable input[type="date"] { width: 100%; border: 1px solid #ddd; border-radius: 3px; padding: 6px 8px; font-family: inherit; font-size: .82rem; background: #FAFBFC; }
+.editable input[type="date"]:focus { border-color: var(--gl-accent); outline: none; }
+
+/* ── Semáforo ── */
+.semaforo { display: flex; gap: 6px; align-items: center; }
+.sem-dot { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid #ddd; transition: all .15s; opacity: .35; }
+.sem-dot:hover { opacity: .7; transform: scale(1.1); }
+.sem-dot.active { opacity: 1; border-color: #333; transform: scale(1.15); box-shadow: 0 0 6px rgba(0,0,0,.2); }
+.sem-dot.verde { background: var(--sem-verde); }
+.sem-dot.amarillo { background: var(--sem-amarillo); }
+.sem-dot.rojo { background: var(--sem-rojo); }
+.sem-dot.gris { background: var(--sem-gris); }
+
+/* ── Detail expand ── */
+.detail-row { display: none; }
+.detail-row.visible { display: table-row; }
+.detail-row td { background: #F8FAFB; padding: 16px 20px; }
+.detail-content { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.detail-content h4 { font-size: .8rem; color: #888; text-transform: uppercase; margin-bottom: 4px; }
+.detail-content p { font-size: .85rem; line-height: 1.5; }
+.expand-btn { cursor: pointer; color: var(--gl-accent); font-weight: 600; font-size: .8rem; }
+
+/* ── Intro tab ── */
+.intro-hero { background: linear-gradient(135deg, var(--gl-dark) 0%, #2C2C2C 100%); color: #fff; padding: 48px 40px; border-radius: var(--radius); margin-bottom: 28px; }
+.intro-hero h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: 10px; }
+.intro-hero p { font-size: 1rem; opacity: .85; line-height: 1.6; max-width: 700px; }
+.intro-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-bottom: 28px; }
+.intro-card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; border-top: 4px solid var(--gl-border); }
+.intro-card h3 { font-size: .95rem; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.intro-card .ic-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: .85rem; flex-shrink: 0; }
+.intro-card p { font-size: .85rem; color: #666; line-height: 1.55; }
+.intro-card .ic-link { display: inline-block; margin-top: 10px; color: var(--gl-accent); font-weight: 600; font-size: .85rem; cursor: pointer; }
+.intro-card .ic-link:hover { text-decoration: underline; }
+.intro-stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 28px; }
+.intro-stat { background: #fff; padding: 18px 24px; border-radius: var(--radius); box-shadow: var(--shadow); text-align: center; min-width: 120px; }
+.intro-stat .stat-num { font-size: 2rem; font-weight: 800; color: var(--gl-accent); }
+.intro-stat .stat-label { font-size: .78rem; color: #888; margin-top: 4px; }
+
+/* ── Scoring tab ── */
+.score-info { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+.score-info-card { background: #fff; padding: 20px; border-radius: var(--radius); box-shadow: var(--shadow); border-left: 4px solid; }
+.score-info-card h4 { font-size: .9rem; margin-bottom: 6px; }
+.score-info-card p { font-size: .82rem; color: #666; line-height: 1.5; }
+.score-info-card .scale { display: flex; justify-content: space-between; margin-top: 8px; font-size: .75rem; color: #999; }
+.score-select { width: 60px; padding: 4px; border: 1.5px solid #ddd; border-radius: 4px; font-family: inherit; font-size: .85rem; text-align: center; font-weight: 600; background: #FAFBFC; }
+.score-select:focus { border-color: var(--gl-accent); outline: none; }
+.score-total { font-weight: 800; font-size: .95rem; }
+.score-bar { display: inline-block; height: 8px; border-radius: 4px; background: var(--gl-accent); vertical-align: middle; margin-right: 6px; transition: width .3s; }
+
+/* ── Kanban Board ── */
+.kanban { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; min-height: 400px; }
+.kanban-col { background: #F0F3F5; border-radius: var(--radius); padding: 14px; min-height: 300px; }
+.kanban-col.drag-over { background: #E3EBF0; outline: 2px dashed var(--gl-accent); }
+.col-header { font-weight: 700; font-size: .9rem; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid; display: flex; justify-content: space-between; align-items: center; }
+.col-header .col-count { background: #fff; padding: 2px 8px; border-radius: 10px; font-size: .75rem; }
+.col-alta { border-color: var(--gl-accent); color: var(--gl-accent); }
+.col-media { border-color: var(--gl-orange); color: var(--gl-orange); }
+.col-estacionar { border-color: #7F8C8D; color: #7F8C8D; }
+.col-sinpriorizar { border-color: var(--gl-border); color: #999; }
+
+.card { background: #fff; border-radius: var(--radius); padding: 12px; margin-bottom: 10px; box-shadow: var(--shadow); cursor: grab; border-left: 4px solid #ddd; transition: all .15s; }
+.card:active { cursor: grabbing; box-shadow: 0 4px 16px rgba(0,0,0,.15); }
+.card:hover { box-shadow: 0 3px 12px rgba(0,0,0,.12); }
+.card .card-code { font-weight: 700; font-size: .82rem; margin-bottom: 4px; }
+.card .card-title { font-size: .82rem; line-height: 1.4; margin-bottom: 8px; }
+.card .card-meta { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* ── High priority panel ── */
+.high-prio-panel { background: #fff; border: 2px solid var(--gl-accent); border-radius: var(--radius); padding: 20px; margin-bottom: 24px; }
+.high-prio-panel h3 { color: var(--gl-accent); margin-bottom: 12px; font-size: 1rem; }
+.high-prio-panel .hp-empty { color: #999; font-size: .88rem; font-style: italic; }
+
+/* ── Working groups ── */
+.wg-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+.wg-card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+.wg-card-header { padding: 16px 20px; color: #fff; font-weight: 700; font-size: .95rem; display: flex; justify-content: space-between; align-items: center; }
+.wg-card-body { padding: 16px 20px; }
+.wg-problems { margin-bottom: 14px; }
+.wg-problems .wg-prob { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: .78rem; font-weight: 600; margin: 2px 4px 2px 0; }
+.wg-members { }
+.wg-member { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #F0F0F0; }
+.wg-member:last-child { border-bottom: none; }
+.wg-member-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .75rem; color: #fff; flex-shrink: 0; }
+.wg-member-info { flex: 1; }
+.wg-member-name { font-weight: 600; font-size: .85rem; }
+.wg-member-role { font-size: .75rem; color: #888; }
+.wg-member input { border: 1px solid #ddd; border-radius: 3px; padding: 4px 8px; font-family: inherit; font-size: .82rem; width: 100%; }
+.wg-member input:focus { border-color: var(--gl-accent); outline: none; }
+.wg-add-btn { display: block; width: 100%; padding: 8px; border: 1.5px dashed #ddd; border-radius: 4px; background: none; font-family: inherit; font-size: .82rem; color: #999; cursor: pointer; margin-top: 8px; }
+.wg-add-btn:hover { border-color: var(--gl-accent); color: var(--gl-accent); }
+
+/* ── Summary panel ── */
+.summary-panel { margin-top: 24px; background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
+.summary-panel h3 { margin-bottom: 16px; font-size: 1.1rem; }
+.summary-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.summary-table th { background: var(--gl-dark); color: #fff; padding: 10px; text-align: left; font-size: .8rem; }
+.summary-table td { padding: 8px 10px; border-bottom: 1px solid #eee; }
+.summary-table tr:hover td { background: #F0F4F8; }
+
+.table-wrapper { overflow-x: auto; border-radius: var(--radius); }
+
+/* ── Responsive ── */
+@media (max-width: 1200px) { .kanban { grid-template-columns: repeat(2, 1fr); } .score-info { grid-template-columns: 1fr; } }
+@media (max-width: 768px) { .kanban { grid-template-columns: 1fr; } .filters { flex-direction: column; align-items: stretch; } .detail-content { grid-template-columns: 1fr; } .intro-hero { padding: 28px 20px; } }
+@media print { .filters, .tabs, .toolbar, .btn { display: none !important; } .tab-content { display: block !important; } }
+
+.save-indicator { position: fixed; bottom: 20px; right: 20px; background: var(--gl-dark); color: #fff; padding: 10px 20px; border-radius: var(--radius); font-size: .85rem; opacity: 0; transition: opacity .3s; z-index: 1000; pointer-events: none; }
+.save-indicator.visible { opacity: 1; }
+
+/* ── Process Cycle Diagram ── */
+.cycle-section { margin-bottom: 28px; }
+.cycle-section h3 { font-size: 1.05rem; font-weight: 700; color: var(--gl-dark); margin-bottom: 16px; }
+.cycle-wrap { position: relative; width: 600px; height: 600px; margin: 0 auto; }
+.cycle-ring { position: absolute; inset: 0; pointer-events: none; }
+.cycle-ring svg { width: 100%; height: 100%; }
+.cycle-step {
+  position: absolute; width: 150px; text-align: center; cursor: pointer; transition: transform .15s;
+}
+.cycle-step:hover { transform: scale(1.07); }
+.cycle-step .step-circle {
+  width: 50px; height: 50px; border-radius: 50%; margin: 0 auto 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 1.05rem; color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  transition: box-shadow .15s;
+}
+.cycle-step:hover .step-circle { box-shadow: 0 3px 14px rgba(0,0,0,.25); }
+.cycle-step.active-step .step-circle { box-shadow: 0 0 0 4px var(--gl-accent), 0 3px 14px rgba(0,0,0,.2); }
+.cycle-step .step-label { font-size: .76rem; line-height: 1.35; color: var(--gl-text); font-weight: 500; }
+.cycle-step .step-ws { font-size: .68rem; color: var(--gl-accent); font-weight: 700; margin-top: 2px; }
+.cycle-center {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  text-align: center; max-width: 170px;
+}
+.cycle-center .center-title { font-size: .95rem; font-weight: 800; color: var(--gl-dark); line-height: 1.3; }
+.cycle-center .center-sub { font-size: .75rem; color: #888; margin-top: 4px; }
+
+@media (max-width: 700px) {
+  .cycle-wrap { width: 100%; height: auto; position: static; }
+  .cycle-step { position: relative !important; width: 100% !important; display: flex; align-items: center; gap: 12px; text-align: left !important; margin-bottom: 10px; top: auto !important; left: auto !important; right: auto !important; bottom: auto !important; }
+  .cycle-step .step-circle { margin: 0; flex-shrink: 0; }
+  .cycle-ring { display: none; }
+  .cycle-center { display: none; }
+}
+
+/* ── Worksheet selector ── */
+.ws-toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 20px; background: #fff; padding: 16px 20px; border-radius: var(--radius); box-shadow: var(--shadow); }
+.ws-toolbar label { font-weight: 600; font-size: .85rem; color: #555; }
+.ws-toolbar select { padding: 8px 12px; border: 1px solid var(--gl-border); border-radius: 4px; font-size: .88rem; font-family: inherit; max-width: 420px; }
+.ws-toolbar .ws-problem-name { font-size: .85rem; color: var(--gl-accent); font-weight: 600; margin-left: 8px; max-width: 500px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── Sub-navigation pills ── */
+.ws-pills { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+.ws-pill { padding: 10px 20px; border-radius: 20px; background: #fff; border: 1.5px solid var(--gl-border); cursor: pointer; font-weight: 600; font-size: .85rem; color: #666; transition: all .2s; }
+.ws-pill:hover { border-color: var(--gl-accent); color: var(--gl-accent); }
+.ws-pill.active { background: var(--gl-accent); color: #fff; border-color: var(--gl-accent); }
+.ws-pill .pill-num { display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,.25); font-size: .75rem; margin-right: 6px; }
+.ws-pill.active .pill-num { background: rgba(255,255,255,.35); }
+
+/* ── Worksheet panels ── */
+.ws-panel { display: none; background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); padding: 32px; }
+.ws-panel.active { display: block; }
+.ws-panel h2 { font-size: 1.2rem; color: var(--gl-dark); margin-bottom: 6px; }
+.ws-panel .ws-desc { font-size: .88rem; color: #777; margin-bottom: 24px; line-height: 1.5; }
+.ws-panel .ws-instructions { background: #FEF9E7; border-left: 4px solid var(--gl-orange); padding: 14px 18px; border-radius: 0 var(--radius) var(--radius) 0; margin-bottom: 24px; font-size: .85rem; line-height: 1.6; }
+.ws-panel .ws-instructions strong { color: var(--gl-dark); }
+
+/* ── HT1: 5 Whys grid ── */
+.whys-problem { margin-bottom: 24px; }
+.whys-problem label { display: block; font-weight: 700; font-size: .9rem; color: var(--gl-dark); margin-bottom: 6px; }
+.whys-problem textarea { width: 100%; min-height: 48px; border: 2px solid var(--gl-accent); border-radius: var(--radius); padding: 12px; font-family: inherit; font-size: .95rem; resize: vertical; }
+.whys-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.whys-col { }
+.whys-col-header { background: var(--gl-dark); color: #fff; padding: 10px 14px; border-radius: var(--radius) var(--radius) 0 0; font-weight: 700; font-size: .88rem; text-align: center; }
+.whys-level { position: relative; }
+.whys-level-label { font-size: .75rem; font-weight: 600; color: var(--gl-accent); text-transform: uppercase; margin: 12px 0 4px; display: flex; align-items: center; gap: 6px; }
+.whys-level-label::before { content: ''; display: block; width: 16px; height: 2px; background: var(--gl-accent); }
+.whys-cell textarea { width: 100%; min-height: 65px; border: 1px solid #E0E0E0; border-radius: var(--radius); padding: 10px; font-family: inherit; font-size: .85rem; resize: vertical; background: #FFFDF5; transition: border-color .2s; }
+.whys-cell textarea:focus { border-color: var(--gl-accent); outline: none; background: #fff; }
+
+/* ── HT2: Challenge Statement ── */
+.challenge-builder { max-width: 800px; margin: 0 auto; }
+.challenge-field { margin-bottom: 20px; }
+.challenge-field label { display: block; font-weight: 600; font-size: .85rem; color: var(--gl-dark); margin-bottom: 6px; }
+.challenge-field .field-hint { font-size: .78rem; color: #999; margin-bottom: 6px; font-style: italic; }
+.challenge-field input { width: 100%; padding: 10px 14px; border: 1.5px solid var(--gl-border); border-radius: var(--radius); font-family: inherit; font-size: .92rem; transition: border-color .2s; }
+.challenge-field input:focus { border-color: var(--gl-accent); outline: none; }
+.challenge-preview { background: linear-gradient(135deg, #A51C30 0%, #7B1420 100%); color: #fff; padding: 28px 32px; border-radius: var(--radius); margin-top: 28px; }
+.challenge-preview h3 { font-size: .85rem; text-transform: uppercase; letter-spacing: 1px; opacity: .7; margin-bottom: 12px; }
+.challenge-preview .preview-text { font-size: 1.2rem; line-height: 1.6; font-weight: 300; }
+.challenge-preview .preview-text .filled { background: rgba(255,255,255,.2); padding: 2px 6px; border-radius: 3px; font-weight: 600; }
+.challenge-preview .preview-text .empty { border-bottom: 2px dashed rgba(255,255,255,.4); padding: 0 8px; }
+.challenge-example { margin-top: 20px; padding: 16px; background: #F0F4F8; border-radius: var(--radius); font-size: .85rem; }
+.challenge-example strong { color: var(--gl-dark); }
+
+/* ── HT3: 3X3X3 Brainstorming ── */
+.brainstorm-controls { display: flex; gap: 12px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+.brainstorm-controls button { padding: 8px 16px; border-radius: 4px; border: 1px solid var(--gl-border); background: #fff; font-family: inherit; font-size: .85rem; cursor: pointer; font-weight: 600; }
+.brainstorm-controls button:hover { background: #f0f0f0; }
+.brainstorm-controls .timer { font-size: 1.4rem; font-weight: 700; font-family: 'Courier New', monospace; color: var(--gl-dark); min-width: 70px; }
+.brainstorm-controls .timer.running { color: var(--gl-accent); }
+.brainstorm-grid { display: grid; grid-template-columns: 80px repeat(3, 1fr); gap: 12px; align-items: start; }
+.brainstorm-row-label { writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; font-weight: 700; font-size: .85rem; color: #fff; padding: 12px 6px; border-radius: var(--radius); min-height: 120px; display: flex; align-items: center; justify-content: center; }
+.postit { min-height: 110px; border-radius: 4px; padding: 12px; box-shadow: 2px 3px 8px rgba(0,0,0,.1); position: relative; transition: transform .1s; }
+.postit:hover { transform: rotate(-1deg) scale(1.02); }
+.postit textarea { width: 100%; height: 80px; border: none; background: transparent; font-family: inherit; font-size: .85rem; resize: none; outline: none; }
+.postit-colors { display: flex; gap: 4px; position: absolute; bottom: 6px; right: 6px; }
+
+/* ── HT4: Theory of Change ── */
+.toc-flow { display: flex; align-items: flex-start; gap: 0; margin: 20px 0; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 12px; }
+.toc-stage { flex: 1; min-width: 180px; max-width: 240px; }
+.toc-stage-header { padding: 14px 16px; color: #fff; font-weight: 700; font-size: .9rem; text-align: center; text-transform: uppercase; letter-spacing: .5px; border-radius: var(--radius) var(--radius) 0 0; }
+.toc-stage-body { border: 2px solid; border-top: none; border-radius: 0 0 var(--radius) var(--radius); padding: 14px; min-height: 180px; background: #fff; }
+.toc-stage-body textarea { width: 100%; min-height: 140px; border: 1px dashed #ddd; border-radius: 4px; padding: 10px; font-family: inherit; font-size: .85rem; resize: vertical; background: #FAFBFC; }
+.toc-stage-body textarea:focus { border-color: var(--gl-accent); outline: none; border-style: solid; background: #fff; }
+.toc-stage-hint { font-size: .75rem; color: #999; margin-bottom: 8px; font-style: italic; }
+.toc-arrow { display: flex; align-items: center; font-size: 1.8rem; color: #BDC3C7; padding: 0 4px; margin-top: 40px; }
+
+/* ── HT5: Reflection ── */
+.reflection-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.reflection-card { background: #fff; border: 1.5px solid #E8E8E8; border-radius: var(--radius); overflow: hidden; }
+.reflection-card-header { padding: 14px 18px; font-weight: 700; font-size: .95rem; display: flex; align-items: center; gap: 10px; }
+.reflection-card-header .rc-num { display: inline-flex; width: 28px; height: 28px; align-items: center; justify-content: center; border-radius: 50%; color: #fff; font-size: .8rem; font-weight: 700; }
+.reflection-card-body { padding: 14px 18px; }
+.reflection-card-body .rc-hint { font-size: .82rem; color: #888; margin-bottom: 10px; line-height: 1.5; }
+.reflection-card-body textarea { width: 100%; min-height: 100px; border: 1px solid #E8E8E8; border-radius: var(--radius); padding: 10px; font-family: inherit; font-size: .88rem; resize: vertical; }
+.reflection-card-body textarea:focus { border-color: var(--gl-accent); outline: none; }
+.reflection-semaforo { display: flex; gap: 10px; margin-top: 10px; }
+.reflection-semaforo .sem-option { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 16px; border: 1.5px solid #ddd; cursor: pointer; font-size: .82rem; font-weight: 600; transition: all .15s; }
+.reflection-semaforo .sem-option:hover { border-color: #999; }
+.reflection-semaforo .sem-option.active { border-width: 2px; }
+.reflection-semaforo .sem-option.active.sv { border-color: var(--sem-verde); background: #E8F8F0; color: var(--sem-verde); }
+.reflection-semaforo .sem-option.active.sa { border-color: var(--sem-amarillo); background: #FEF9E7; color: #B7950B; }
+.reflection-semaforo .sem-option.active.sr { border-color: var(--sem-rojo); background: #FDEDEC; color: var(--sem-rojo); }
+.reflection-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+.reflection-meta input { padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: .85rem; }
+.reflection-meta label { font-size: .78rem; font-weight: 600; color: #888; display: block; margin-bottom: 4px; }
+
+@media (max-width: 900px) {
+  .reflection-cards { grid-template-columns: 1fr; }
+  .whys-grid { grid-template-columns: 1fr; }
+  .toc-flow { flex-direction: column; align-items: stretch; }
+  .toc-arrow { transform: rotate(90deg); justify-content: center; }
+  .brainstorm-grid { grid-template-columns: 1fr; }
+  .brainstorm-row-label { writing-mode: horizontal-tb; transform: none; min-height: auto; padding: 8px 12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>Mesa Ejecutiva del Sector Atún</h1>
+    <div class="subtitle">Herramienta interactiva de seguimiento y priorización · Ecuador 2026</div>
+  </div>
+  <span class="badge">BORRADOR DE TRABAJO</span>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('intro')">Introducción</div>
+  <div class="tab" onclick="switchTab('table')">Matriz Completa</div>
+  <div class="tab" onclick="switchTab('scoring')">Puntuación</div>
+  <div class="tab" onclick="switchTab('board')">Priorización</div>
+  <div class="tab" onclick="switchTab('groups')">Grupos de Trabajo</div>
+  <div class="tab" onclick="switchTab('worksheets')">Hojas de Trabajo</div>
+  <div class="tab" onclick="switchTab('refs')">Referencias</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- TAB 0: INTRODUCCIÓN                                            -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<div id="tab-intro" class="tab-content active">
+  <div class="intro-hero">
+    <h2>Herramienta de Seguimiento — Mesa Ejecutiva del Sector Atún</h2>
+    <p>Esta herramienta interactiva permite a los miembros de la Mesa Ejecutiva visualizar, priorizar y dar seguimiento a los 31 problemas identificados en la Sesión 1. Cada pestaña ofrece una funcionalidad distinta para facilitar el trabajo colaborativo entre el sector público y privado.</p>
+  </div>
+
+  <div class="intro-stats">
+    <div class="intro-stat"><div class="stat-num">31</div><div class="stat-label">Problemas identificados</div></div>
+    <div class="intro-stat"><div class="stat-num">7</div><div class="stat-label">Categorías</div></div>
+    <div class="intro-stat"><div class="stat-num">5</div><div class="stat-label">Quick wins</div></div>
+    <div class="intro-stat"><div class="stat-num">5</div><div class="stat-label">Acciones prioritarias</div></div>
+  </div>
+
+  <div class="intro-cards">
+    <div class="intro-card" style="border-top-color:var(--gl-blue)">
+      <h3><span class="ic-icon" style="background:var(--gl-blue)">1</span> Matriz Completa</h3>
+      <p>Tabla con los 31 problemas del sector atunero, organizados en 7 categorías. Puede filtrar por categoría, plazo, clasificación o buscar por texto libre. Para cada problema puede registrar actores a involucrar, metas, próximo paso con responsable, fecha límite y el estado con el semáforo de progreso (verde / amarillo / rojo).</p>
+      <span class="ic-link" onclick="switchTab('table')">Ir a la Matriz &rarr;</span>
+    </div>
+    <div class="intro-card" style="border-top-color:var(--gl-green)">
+      <h3><span class="ic-icon" style="background:var(--gl-green)">2</span> Puntuación</h3>
+      <p>Evalúe cada problema en tres dimensiones: <strong>Impacto</strong> (magnitud del efecto sobre el sector), <strong>Factibilidad</strong> (viabilidad de resolución con los recursos disponibles) y <strong>Urgencia</strong> (necesidad de acción inmediata). El puntaje combinado (3–15) genera un ranking automático para informar la priorización.</p>
+      <span class="ic-link" onclick="switchTab('scoring')">Ir a Puntuación &rarr;</span>
+    </div>
+    <div class="intro-card" style="border-top-color:var(--gl-accent)">
+      <h3><span class="ic-icon" style="background:var(--gl-accent)">3</span> Priorización</h3>
+      <p>Tablero tipo Kanban donde puede arrastrar los problemas a columnas de prioridad: <strong>Alta</strong>, <strong>Media</strong> o <strong>Estacionar</strong>. En la parte superior se muestran los problemas clasificados como alta prioridad para facilitar el seguimiento de la agenda activa de la Mesa.</p>
+      <span class="ic-link" onclick="switchTab('board')">Ir a Priorización &rarr;</span>
+    </div>
+    <div class="intro-card" style="border-top-color:var(--gl-orange)">
+      <h3><span class="ic-icon" style="background:var(--gl-orange)">4</span> Grupos de Trabajo</h3>
+      <p>Visualice la composición de cada grupo de trabajo: quién participa, en qué rol (MINPRO, Growth Lab, sector privado) y qué problemas atiende cada grupo. Editable por todos los participantes para mantener actualizada la conformación de los equipos.</p>
+      <span class="ic-link" onclick="switchTab('groups')">Ir a Grupos &rarr;</span>
+    </div>
+    <div class="intro-card" style="border-top-color:#7D3C98">
+      <h3><span class="ic-icon" style="background:#7D3C98">5</span> Hojas de Trabajo</h3>
+      <p>Cinco hojas de trabajo basadas en la metodología PDIA para cada problema: descomposición con los 5 Por Qués, declaración de desafío, lluvia de ideas 3X3X3, teoría de cambio y reflexión de aprendizajes. Incluye un diagrama del proceso iterativo que guía la secuencia de trabajo.</p>
+      <span class="ic-link" onclick="switchTab('worksheets')">Ir a Hojas de Trabajo &rarr;</span>
+    </div>
+    <div class="intro-card" style="border-top-color:#148F77">
+      <h3><span class="ic-icon" style="background:#148F77">6</span> Referencias</h3>
+      <p>Fuentes metodológicas de las hojas de trabajo: el <strong>PDIA Handbook</strong> (Andrews, Pritchett &amp; Woolcock), el <strong>Laboratorio de Gobierno de Chile</strong> y la guía de <strong>Teoría de Cambio de SoPact</strong>. Incluye enlaces directos a los documentos y lecturas complementarias.</p>
+      <span class="ic-link" onclick="switchTab('refs')">Ir a Referencias &rarr;</span>
+    </div>
+    <div class="intro-card" style="border-top-color:#BDC3C7">
+      <h3><span class="ic-icon" style="background:#95A5A6">&#9432;</span> Nota importante</h3>
+      <p>Todos los datos que ingrese se guardan automáticamente en su navegador (localStorage). Esto significa que sus ediciones persisten entre visitas, pero <strong>son locales a su dispositivo</strong>. Si cambia de computador o borra los datos del navegador, se perderán. Puede exportar un respaldo desde la pestaña de Puntuación usando el botón "Exportar CSV".</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- TAB 1: MATRIZ COMPLETA                                         -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<div id="tab-table" class="tab-content">
+  <div class="filters">
+    <label>Categoría</label>
+    <select id="filter-cat" onchange="applyFilters()"><option value="">Todas</option></select>
+    <label>Plazo</label>
+    <select id="filter-plazo" onchange="applyFilters()"><option value="">Todos</option><option>Corto</option><option>Mediano</option><option>Largo</option></select>
+    <label>Clasificación</label>
+    <select id="filter-clasif" onchange="applyFilters()"><option value="">Todas</option><option>Quick win</option><option>Estructural</option><option>Fuera de alcance</option><option>Coyuntural</option><option>Sin clasificar</option></select>
+    <label>Semáforo</label>
+    <select id="filter-sem" onchange="applyFilters()"><option value="">Todos</option><option value="verde">Verde</option><option value="amarillo">Amarillo</option><option value="rojo">Rojo</option><option value="gris">Sin asignar</option></select>
+    <input type="text" id="search-box" placeholder="Buscar en la matriz..." oninput="applyFilters()">
+    <span class="counter" id="counter"></span>
+  </div>
+  <div class="table-wrapper">
+    <table class="matrix-table" id="main-table">
+      <thead><tr>
+        <th style="width:60px">Código</th><th>Problema</th><th style="width:80px">Plazo</th><th style="width:90px">Clasificación</th>
+        <th class="editable" style="width:150px">Actores a involucrar</th><th class="editable" style="width:150px">Metas tentativas</th>
+        <th class="editable" style="width:170px">Próximo paso y responsable</th><th class="editable" style="width:110px">Fecha</th>
+        <th style="width:110px">Semáforo</th><th style="width:50px"></th>
+      </tr></thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- TAB 2: PUNTUACIÓN                                              -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<div id="tab-scoring" class="tab-content">
+  <div class="score-info">
+    <div class="score-info-card" style="border-left-color:#2471A3">
+      <h4>Impacto</h4>
+      <p>¿Qué tan significativo es el efecto de este problema sobre la competitividad, las exportaciones o el empleo del sector atunero? Un puntaje alto indica que resolver el problema generaría un beneficio amplio y medible.</p>
+      <div class="scale"><span>1 = Marginal</span><span>3 = Moderado</span><span>5 = Transformador</span></div>
+    </div>
+    <div class="score-info-card" style="border-left-color:var(--gl-green)">
+      <h4>Factibilidad</h4>
+      <p>¿Qué tan viable es resolver este problema con los recursos, competencias institucionales y voluntad política actuales? Considere si existe un instrumento normativo disponible, si requiere coordinación interinstitucional compleja o inversión significativa.</p>
+      <div class="scale"><span>1 = Muy difícil</span><span>3 = Requiere esfuerzo</span><span>5 = Ejecutable ya</span></div>
+    </div>
+    <div class="score-info-card" style="border-left-color:var(--gl-accent)">
+      <h4>Urgencia</h4>
+      <p>¿Qué tan pronto necesita atención este problema? Considere si existen plazos externos (ej: informe UE sep-2026), si el problema se agrava con el tiempo, o si hay una ventana de oportunidad que se cierra.</p>
+      <div class="scale"><span>1 = Puede esperar</span><span>3 = Este semestre</span><span>5 = Inmediato</span></div>
+    </div>
+  </div>
+  <div class="toolbar">
+    <label>Ordenar por:</label>
+    <select id="score-sort" onchange="renderScoring()">
+      <option value="total">Puntaje total (mayor a menor)</option>
+      <option value="impacto">Impacto</option>
+      <option value="factibilidad">Factibilidad</option>
+      <option value="urgencia">Urgencia</option>
+      <option value="code">Código</option>
+    </select>
+    <button class="btn btn-export" onclick="exportSummary()">Exportar CSV</button>
+  </div>
+  <div class="table-wrapper">
+    <table class="summary-table" id="scoring-table">
+      <thead><tr>
+        <th style="width:40px">#</th><th style="width:55px">Código</th><th>Problema</th><th style="width:80px">Plazo</th><th style="width:90px">Clasificación</th>
+        <th style="width:90px">Impacto</th><th style="width:90px">Factibilidad</th><th style="width:90px">Urgencia</th><th style="width:100px">Puntaje</th>
+      </tr></thead>
+      <tbody id="scoring-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- TAB 3: PRIORIZACIÓN (KANBAN)                                   -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<div id="tab-board" class="tab-content">
+  <div class="high-prio-panel" id="high-prio-panel">
+    <h3>Agenda activa — Problemas de alta prioridad</h3>
+    <div id="high-prio-list"></div>
+  </div>
+  <div class="toolbar" id="board-controls">
+    <span style="font-weight:600;font-size:.9rem;">Filtrar por categoría:</span>
+    <button class="btn active" onclick="filterBoard('')" data-bcat="">Todas</button>
+  </div>
+  <div class="kanban" id="kanban">
+    <div class="kanban-col" id="col-alta" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,'alta')">
+      <div class="col-header col-alta">Prioridad Alta <span class="col-count" id="count-alta">0</span></div>
+    </div>
+    <div class="kanban-col" id="col-media" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,'media')">
+      <div class="col-header col-media">Prioridad Media <span class="col-count" id="count-media">0</span></div>
+    </div>
+    <div class="kanban-col" id="col-estacionar" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,'estacionar')">
+      <div class="col-header col-estacionar">Estacionar <span class="col-count" id="count-estacionar">0</span></div>
+    </div>
+    <div class="kanban-col" id="col-sinpriorizar" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,'sinpriorizar')">
+      <div class="col-header col-sinpriorizar">Sin priorizar <span class="col-count" id="count-sinpriorizar">0</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- TAB 4: GRUPOS DE TRABAJO                                       -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<div id="tab-groups" class="tab-content">
+  <div class="toolbar">
+    <span style="font-weight:600;font-size:.9rem;">Grupos de trabajo de la Mesa Ejecutiva</span>
+    <button class="btn" onclick="addGroup()" style="margin-left:auto">+ Nuevo grupo</button>
+  </div>
+  <div class="wg-container" id="wg-container"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- TAB 5: HOJAS DE TRABAJO (preserved from v1)                    -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<div id="tab-worksheets" class="tab-content">
+
+  <!-- ── Iterative Process Cycle ── -->
+  <div class="cycle-section">
+    <h3>Metodología del proceso iterativo</h3>
+    <div class="cycle-wrap" id="cycle-wrap">
+      <!-- SVG ring with arrows -->
+      <div class="cycle-ring">
+        <svg viewBox="0 0 600 600">
+          <defs>
+            <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#BDC3C7"/>
+            </marker>
+          </defs>
+          <!-- Circular arrow path -->
+          <circle cx="300" cy="300" r="210" fill="none" stroke="#E8E8E8" stroke-width="2.5" stroke-dasharray="8 6"/>
+          <!-- Arrow segments between steps -->
+          <path d="M 375 95 A 210 210 0 0 1 485 175" fill="none" stroke="#D0D0D0" stroke-width="2" marker-end="url(#arrowhead)"/>
+          <path d="M 505 225 A 210 210 0 0 1 510 355" fill="none" stroke="#D0D0D0" stroke-width="2" marker-end="url(#arrowhead)"/>
+          <path d="M 490 400 A 210 210 0 0 1 420 490" fill="none" stroke="#D0D0D0" stroke-width="2" marker-end="url(#arrowhead)"/>
+          <path d="M 370 510 A 210 210 0 0 1 230 510" fill="none" stroke="#D0D0D0" stroke-width="2" marker-end="url(#arrowhead)"/>
+          <path d="M 180 490 A 210 210 0 0 1 110 400" fill="none" stroke="#D0D0D0" stroke-width="2" marker-end="url(#arrowhead)"/>
+          <path d="M 92 355 A 210 210 0 0 1 95 225" fill="none" stroke="#D0D0D0" stroke-width="2" marker-end="url(#arrowhead)"/>
+          <path d="M 115 175 A 210 210 0 0 1 225 95" fill="none" stroke="#D0D0D0" stroke-width="2" marker-end="url(#arrowhead)"/>
+          <path d="M 270 90 A 210 210 0 0 1 330 90" fill="none" stroke="#D0D0D0" stroke-width="2" marker-end="url(#arrowhead)"/>
+        </svg>
+      </div>
+
+      <!-- 8 Steps positioned in a circle -->
+      <div class="cycle-step" style="top:10px; left:225px;" onclick="cycleClick(1)">
+        <div class="step-circle" style="background:#2471A3">1</div>
+        <div class="step-label">Revisar y actualizar la matriz de seguimiento</div>
+      </div>
+      <div class="cycle-step" style="top:80px; left:410px;" onclick="cycleClick(2)">
+        <div class="step-circle" style="background:#1A5276">2</div>
+        <div class="step-label">Plantear el problema como pregunta</div>
+      </div>
+      <div class="cycle-step" style="top:215px; left:450px;" onclick="cycleClick(3)">
+        <div class="step-circle" style="background:#148F77">3</div>
+        <div class="step-label">Exploración de las causas: ¿Por qué ocurre?</div>
+        <div class="step-ws">&#8594; Hoja 1</div>
+      </div>
+      <div class="cycle-step" style="top:370px; left:430px;" onclick="cycleClick(4)">
+        <div class="step-circle" style="background:#1E8449">4</div>
+        <div class="step-label">Definir el desafío a resolver</div>
+        <div class="step-ws">&#8594; Hoja 2</div>
+      </div>
+      <div class="cycle-step" style="top:478px; left:300px;" onclick="cycleClick(5)">
+        <div class="step-circle" style="background:#B7950B">5</div>
+        <div class="step-label">Lluvia de ideas de soluciones</div>
+        <div class="step-ws">&#8594; Hoja 3</div>
+      </div>
+      <div class="cycle-step" style="top:460px; left:50px;" onclick="cycleClick(6)">
+        <div class="step-circle" style="background:#A93226">6</div>
+        <div class="step-label">Teoría de cambio y asignar responsables</div>
+        <div class="step-ws">&#8594; Hoja 4</div>
+      </div>
+      <div class="cycle-step" style="top:310px; left:0px;" onclick="cycleClick(7)">
+        <div class="step-circle" style="background:#7D3C98">7</div>
+        <div class="step-label">Ejecutar acciones planteadas</div>
+      </div>
+      <div class="cycle-step" style="top:155px; left:15px;" onclick="cycleClick(8)">
+        <div class="step-circle" style="background:#5B2C6F">8</div>
+        <div class="step-label">Reflexionar sobre aprendizajes</div>
+        <div class="step-ws">&#8594; Hoja 5</div>
+      </div>
+
+      <!-- Center label -->
+      <div class="cycle-center">
+        <div class="center-title">Proceso Iterativo</div>
+        <div class="center-sub">Cada iteración: 2-4 semanas</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ws-toolbar">
+    <label>Problema de trabajo:</label>
+    <select id="ws-problem-select" onchange="wsSelectProblem(this.value)">
+      <option value="">— Seleccionar un problema de la matriz —</option>
+    </select>
+    <span class="ws-problem-name" id="ws-problem-name"></span>
+  </div>
+
+  <div class="ws-pills" id="ws-pills-container">
+    <div class="ws-pill active" onclick="wsSwitch(1)"><span class="pill-num">1</span>Deconstruir el problema</div>
+    <div class="ws-pill" onclick="wsSwitch(2)"><span class="pill-num">2</span>Identificar el desafío</div>
+    <div class="ws-pill" onclick="wsSwitch(3)"><span class="pill-num">3</span>Lluvia de ideas 3X3X3</div>
+    <div class="ws-pill" onclick="wsSwitch(4)"><span class="pill-num">4</span>Teoría de Cambio</div>
+    <div class="ws-pill" onclick="wsSwitch(5)"><span class="pill-num">5</span>Reflexión</div>
+  </div>
+
+  <!-- ── HT1: 5 Whys ── -->
+  <div class="ws-panel active" id="ws-1">
+    <h2>Hoja de Trabajo 1: Deconstruir el problema</h2>
+    <p class="ws-desc">Usando la técnica de los "5 Por qués", identifique las causas raíz del problema seleccionado. Comience con 3 causas directas y pregunte iterativamente "¿Por qué ocurre esto?" para llegar a las causas más profundas.</p>
+    <div class="ws-instructions">
+      <strong>Instrucciones:</strong> Escriba el problema como una pregunta en el recuadro superior. Luego identifique 3 posibles causas directas. Para cada causa, pregunte "¿Por qué ocurre esto?" hasta llegar a la causa raíz (máximo 4 niveles). No todas las causas necesitan 4 niveles.
+    </div>
+    <div class="whys-problem">
+      <label>Tu problema como una pregunta:</label>
+      <textarea id="whys-problem-text" placeholder="Ej: ¿Por qué la emisión del certificado de captura es lenta?" onchange="wsAutoSave()"></textarea>
+    </div>
+    <div class="whys-grid" id="whys-grid">
+      <!-- Generated by JS -->
+    </div>
+  </div>
+
+  <!-- ── HT2: Challenge Statement ── -->
+  <div class="ws-panel" id="ws-2">
+    <h2>Hoja de Trabajo 2: Identificar el desafío a resolver</h2>
+    <p class="ws-desc">Construya una declaración de desafío de innovación que sintetice el problema, el usuario afectado, el objetivo deseado y las restricciones del contexto.</p>
+    <div class="ws-instructions">
+      <strong>Instrucciones:</strong> Complete cada campo. La vista previa en rojo se actualizará automáticamente para mostrar su declaración de desafío completa. Use esta declaración como guía para la lluvia de ideas (Hoja 3).
+    </div>
+    <div class="challenge-builder">
+      <div class="challenge-field">
+        <label>Acción (verbo infinitivo)</label>
+        <div class="field-hint">¿Qué queremos hacer? Ej: mejorar, agilizar, reducir, facilitar</div>
+        <input type="text" id="ch-accion" placeholder="Ej: agilizar" oninput="updateChallenge()">
+      </div>
+      <div class="challenge-field">
+        <label>Situación o servicio</label>
+        <div class="field-hint">¿Qué proceso, servicio o situación queremos cambiar?</div>
+        <input type="text" id="ch-situacion" placeholder="Ej: la emisión del certificado de captura" oninput="updateChallenge()">
+      </div>
+      <div class="challenge-field">
+        <label>Usuario o beneficiario</label>
+        <div class="field-hint">¿A quién beneficia directamente?</div>
+        <input type="text" id="ch-usuario" placeholder="Ej: los exportadores de atún" oninput="updateChallenge()">
+      </div>
+      <div class="challenge-field">
+        <label>Objetivo</label>
+        <div class="field-hint">¿Para qué? ¿Qué resultado se busca?</div>
+        <input type="text" id="ch-objetivo" placeholder="Ej: evitar que la carga quede retenida en destino" oninput="updateChallenge()">
+      </div>
+      <div class="challenge-field">
+        <label>Restricción o contexto a considerar</label>
+        <div class="field-hint">¿Qué limitaciones existen?</div>
+        <input type="text" id="ch-restriccion" placeholder="Ej: la limitada dotación de personal de la SRP" oninput="updateChallenge()">
+      </div>
+      <div class="challenge-preview">
+        <h3>Declaración de desafío</h3>
+        <p class="preview-text" id="challenge-text"></p>
+      </div>
+      <div class="challenge-example">
+        <strong>Ejemplo:</strong> ¿Cómo podemos <em>agilizar</em> <em>la emisión del certificado de captura</em> de <em>los exportadores de atún</em> para que puedan <em>evitar que la carga quede retenida en destino</em>, considerando <em>la limitada dotación de personal de la SRP</em>?
+      </div>
+    </div>
+  </div>
+
+  <!-- ── HT3: 3X3X3 Brainstorming ── -->
+  <div class="ws-panel" id="ws-3">
+    <h2>Hoja de Trabajo 3: Lluvia de ideas — Actividad 3X3X3</h2>
+    <p class="ws-desc">Ejercicio colaborativo: 3 participantes generan 3 ideas cada uno, luego rotan para complementar las ideas de los demás. Tres rondas de 5 minutos (15 min total).</p>
+    <div class="ws-instructions">
+      <strong>Instrucciones:</strong><br>
+      1. Asignen una fila por persona y un color de post-it. Escriban 1 idea por cuadro (3 ideas en total, 5 min).<br>
+      2. Bajen una fila a las ideas del compañero y complémentenlas usando otro post-it (5 min).<br>
+      3. Repitan bajando una fila más a la columna que sigue y re-complementen las ideas previas (5 min).<br>
+      <strong>Recomendación:</strong> Pueden proponer desde conceptos generales hasta aspectos específicos de una posible solución.
+    </div>
+    <div class="brainstorm-controls">
+      <button onclick="startTimer()">&#9654; Iniciar ronda (5 min)</button>
+      <button onclick="resetTimer()">&#8635; Reiniciar</button>
+      <span class="timer" id="bs-timer">5:00</span>
+      <span style="font-size:.82rem;color:#888;margin-left:8px" id="bs-round">Ronda 1 de 3</span>
+      <button onclick="addBsRow()" style="margin-left:auto">+ Agregar participante</button>
+    </div>
+    <div class="brainstorm-grid" id="bs-grid">
+      <!-- Generated by JS -->
+    </div>
+  </div>
+
+  <!-- ── HT4: Theory of Change ── -->
+  <div class="ws-panel" id="ws-4">
+    <h2>Hoja de Trabajo 4: Teoría de Cambio para la solución priorizada</h2>
+    <p class="ws-desc">Desarrolle la cadena lógica que conecta los recursos con el impacto esperado. Cada etapa debe responder a la pregunta: "Si hacemos esto, entonces ocurrirá aquello".</p>
+    <div class="ws-instructions">
+      <strong>Instrucciones:</strong> Complete cada etapa de izquierda a derecha. Sea específico: incluya nombres, plazos y magnitudes cuando sea posible. La cadena debe ser verificable — cada eslabón debe poder confirmarse o refutarse.
+    </div>
+    <div class="toc-flow" id="toc-flow">
+      <div class="toc-stage">
+        <div class="toc-stage-header" style="background:#6C3483">SUPUESTOS</div>
+        <div class="toc-stage-body" style="border-color:#6C3483">
+          <div class="toc-stage-hint">Condiciones que deben cumplirse para que la cadena causal funcione. Cada supuesto es verificable.</div>
+          <textarea id="toc-supuestos" placeholder="Ej: Existe voluntad política para asignar personal, el presupuesto no será recortado, la UE responderá en los plazos previstos..." onchange="wsAutoSave()"></textarea>
+        </div>
+      </div>
+      <div class="toc-arrow">&#10132;</div>
+      <div class="toc-stage">
+        <div class="toc-stage-header" style="background:#2471A3">INSUMOS</div>
+        <div class="toc-stage-body" style="border-color:#2471A3">
+          <div class="toc-stage-hint">Recursos humanos o financieros de los que dispone el emprendimiento</div>
+          <textarea id="toc-insumos" placeholder="Ej: Equipo técnico de la SRP (3 personas), presupuesto de operación vigente, apoyo técnico del Growth Lab..." onchange="wsAutoSave()"></textarea>
+        </div>
+      </div>
+      <div class="toc-arrow">&#10132;</div>
+      <div class="toc-stage">
+        <div class="toc-stage-header" style="background:#1A5276">ACTIVIDADES</div>
+        <div class="toc-stage-body" style="border-color:#1A5276">
+          <div class="toc-stage-hint">Actividades necesarias para implementar tu plan de emprendimiento</div>
+          <textarea id="toc-actividades" placeholder="Ej: Mapear el proceso actual, identificar cuellos de botella, digitalizar formularios, capacitar inspectores..." onchange="wsAutoSave()"></textarea>
+        </div>
+      </div>
+      <div class="toc-arrow">&#10132;</div>
+      <div class="toc-stage">
+        <div class="toc-stage-header" style="background:#148F77">PRODUCTOS</div>
+        <div class="toc-stage-body" style="border-color:#148F77">
+          <div class="toc-stage-hint">Productos o servicios que surgen de tu plan de emprendimiento</div>
+          <textarea id="toc-productos" placeholder="Ej: Proceso digital de certificación, formulario simplificado, protocolo de emisión en 48h..." onchange="wsAutoSave()"></textarea>
+        </div>
+      </div>
+      <div class="toc-arrow">&#10132;</div>
+      <div class="toc-stage">
+        <div class="toc-stage-header" style="background:#B7950B">RESULTADOS</div>
+        <div class="toc-stage-body" style="border-color:#B7950B">
+          <div class="toc-stage-hint">Cambios a corto plazo que se pueden medir</div>
+          <textarea id="toc-resultados" placeholder="Ej: Tiempo de emisión reducido de 10 a 2 días, 0 cargamentos retenidos por certificado, satisfacción del exportador..." onchange="wsAutoSave()"></textarea>
+        </div>
+      </div>
+      <div class="toc-arrow">&#10132;</div>
+      <div class="toc-stage">
+        <div class="toc-stage-header" style="background:#A93226">IMPACTO</div>
+        <div class="toc-stage-body" style="border-color:#A93226">
+          <div class="toc-stage-hint">Los cambios que quiero lograr por medio del emprendimiento</div>
+          <textarea id="toc-impacto" placeholder="Ej: Contribución al levantamiento de la tarjeta amarilla, mayor competitividad del sector atunero ecuatoriano..." onchange="wsAutoSave()"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── HT5: Reflection ── -->
+  <div class="ws-panel" id="ws-5">
+    <h2>Hoja de Trabajo 5: Reflexión de aprendizajes</h2>
+    <p class="ws-desc">Al final de cada iteración (cada 2-4 semanas), el grupo de trabajo completa esta reflexión para documentar avances, aprendizajes y bloqueos. Esta información alimenta el reporte a la Mesa Ejecutiva.</p>
+    <div class="ws-instructions">
+      <strong>Instrucciones:</strong> Complete las 4 secciones honestamente. En "¿Qué nos frena?" use el semáforo para clasificar la severidad del bloqueo. En "¿Qué sigue?" incluya nombre y fecha del responsable.
+    </div>
+    <div class="reflection-cards" id="reflection-cards">
+      <div class="reflection-card" style="border-top:4px solid var(--gl-blue)">
+        <div class="reflection-card-header"><span class="rc-num" style="background:var(--gl-blue)">1</span>¿Qué hicimos?</div>
+        <div class="reflection-card-body">
+          <div class="rc-hint">Acciones concretas: reuniones realizadas, borradores circulados, datos recopilados, gestiones ante otras entidades</div>
+          <textarea id="ref-hicimos" placeholder="Describir las acciones concretas realizadas en esta iteración..." onchange="wsAutoSave()"></textarea>
+        </div>
+      </div>
+      <div class="reflection-card" style="border-top:4px solid var(--gl-green)">
+        <div class="reflection-card-header"><span class="rc-num" style="background:var(--gl-green)">2</span>¿Qué aprendimos?</div>
+        <div class="reflection-card-body">
+          <div class="rc-hint">¿El problema era lo que pensábamos? ¿Descubrimos algo nuevo sobre las causas? ¿Cambió nuestra comprensión?</div>
+          <textarea id="ref-aprendimos" placeholder="Describir hallazgos, sorpresas, validaciones o cambios de perspectiva..." onchange="wsAutoSave()"></textarea>
+        </div>
+      </div>
+      <div class="reflection-card" style="border-top:4px solid var(--gl-orange)">
+        <div class="reflection-card-header"><span class="rc-num" style="background:var(--gl-orange)">3</span>¿Qué nos frena?</div>
+        <div class="reflection-card-body">
+          <div class="rc-hint">Bloqueos identificados. Clasifique con el semáforo según severidad.</div>
+          <textarea id="ref-frena" placeholder="Describir los obstáculos o bloqueos encontrados..." onchange="wsAutoSave()"></textarea>
+          <div class="reflection-semaforo" id="ref-semaforo">
+            <div class="sem-option sv" data-sem="verde" onclick="setRefSem('verde',this)"><span class="sem-dot verde" style="width:14px;height:14px;border:none;opacity:1;cursor:pointer"></span>Sin bloqueos</div>
+            <div class="sem-option sa" data-sem="amarillo" onclick="setRefSem('amarillo',this)"><span class="sem-dot amarillo" style="width:14px;height:14px;border:none;opacity:1;cursor:pointer"></span>Retraso leve</div>
+            <div class="sem-option sr" data-sem="rojo" onclick="setRefSem('rojo',this)"><span class="sem-dot rojo" style="width:14px;height:14px;border:none;opacity:1;cursor:pointer"></span>Requiere escalamiento</div>
+          </div>
+        </div>
+      </div>
+      <div class="reflection-card" style="border-top:4px solid var(--gl-accent)">
+        <div class="reflection-card-header"><span class="rc-num" style="background:var(--gl-accent)">4</span>¿Qué sigue?</div>
+        <div class="reflection-card-body">
+          <div class="rc-hint">Próximo paso verificable con responsable (nombre) y fecha</div>
+          <textarea id="ref-sigue" placeholder="Describir el próximo paso concreto y verificable..." onchange="wsAutoSave()"></textarea>
+          <div class="reflection-meta">
+            <div><label>Responsable</label><input type="text" id="ref-responsable" placeholder="Nombre completo" onchange="wsAutoSave()"></div>
+            <div><label>Fecha compromiso</label><input type="date" id="ref-fecha" onchange="wsAutoSave()"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- TAB 6: REFERENCIAS                                            -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<div id="tab-refs" class="tab-content">
+  <div style="max-width:900px;margin:0 auto">
+    <h2 style="margin-bottom:8px;font-size:1.3rem;">Referencias metodológicas</h2>
+    <p style="color:#666;margin-bottom:28px;font-size:.9rem;line-height:1.6;">Las hojas de trabajo y la metodología iterativa de esta herramienta se basan en las siguientes fuentes. Se recomienda consultarlas para profundizar en los marcos conceptuales utilizados.</p>
+
+    <div style="display:grid;gap:20px;">
+      <!-- PDIA Handbook -->
+      <div style="background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;border-left:4px solid var(--gl-accent)">
+        <div style="display:flex;align-items:flex-start;gap:16px;">
+          <div style="width:50px;height:50px;border-radius:50%;background:var(--gl-accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.2rem;flex-shrink:0">P</div>
+          <div style="flex:1">
+            <h3 style="font-size:1rem;margin-bottom:6px;">PDIA Handbook — Building State Capability</h3>
+            <p style="font-size:.85rem;color:#666;line-height:1.55;margin-bottom:8px;">Andrews, M., Pritchett, L. &amp; Woolcock, M. (2017). <em>Building State Capability: Evidence, Analysis, Action.</em> Oxford University Press.</p>
+            <p style="font-size:.85rem;color:#666;line-height:1.55;margin-bottom:12px;">Marco fundacional del enfoque PDIA (Problem-Driven Iterative Adaptation). Propone que la construcción de capacidad estatal debe partir de problemas concretos, avanzar mediante iteraciones rápidas y escalar a través de grupos de trabajo. Las Hojas de Trabajo 1 (5 Por Qués), 2 (Declaración de Desafío) y 5 (Reflexión) se derivan directamente de este marco.</p>
+            <p style="font-size:.85rem;"><strong>Relación con las hojas de trabajo:</strong> HT1 (descomposición del problema), HT2 (formulación del desafío), HT5 (ciclo de aprendizaje iterativo).</p>
+            <a href="https://library.oapen.org/bitstream/id/bb540dab-9bbb-45ea-8ef1-4843b24dd432/624551.pdf" target="_blank" style="display:inline-block;margin-top:10px;color:var(--gl-accent);font-weight:600;font-size:.85rem;text-decoration:none;">Descargar PDF (acceso abierto) &rarr;</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Laboratorio de Gobierno de Chile -->
+      <div style="background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;border-left:4px solid var(--gl-blue)">
+        <div style="display:flex;align-items:flex-start;gap:16px;">
+          <div style="width:50px;height:50px;border-radius:50%;background:var(--gl-blue);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.2rem;flex-shrink:0">L</div>
+          <div style="flex:1">
+            <h3 style="font-size:1rem;margin-bottom:6px;">Laboratorio de Gobierno de Chile</h3>
+            <p style="font-size:.85rem;color:#666;line-height:1.55;margin-bottom:8px;">Gobierno de Chile. <em>Herramientas para proyectos de innovación pública.</em></p>
+            <p style="font-size:.85rem;color:#666;line-height:1.55;margin-bottom:12px;">Plataforma de innovación pública del gobierno chileno que ofrece herramientas para cinco fases: exploración institucional, investigación del problema, ideación de soluciones, pilotaje y evaluación, e implementación. Su enfoque de co-creación ciudadana y prototipado rápido complementa la metodología PDIA. Útil especialmente para la Hoja de Trabajo 3 (lluvia de ideas 3X3X3).</p>
+            <p style="font-size:.85rem;"><strong>Relación con las hojas de trabajo:</strong> HT3 (técnicas de ideación y prototipado rápido).</p>
+            <a href="https://www.lab.gob.cl/landing-block" target="_blank" style="display:inline-block;margin-top:10px;color:var(--gl-accent);font-weight:600;font-size:.85rem;text-decoration:none;">Visitar sitio web &rarr;</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- SoPact Theory of Change -->
+      <div style="background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;border-left:4px solid var(--gl-green)">
+        <div style="display:flex;align-items:flex-start;gap:16px;">
+          <div style="width:50px;height:50px;border-radius:50%;background:var(--gl-green);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.2rem;flex-shrink:0">T</div>
+          <div style="flex:1">
+            <h3 style="font-size:1rem;margin-bottom:6px;">Theory of Change — SoPact</h3>
+            <p style="font-size:.85rem;color:#666;line-height:1.55;margin-bottom:8px;">SoPact. <em>Theory of Change: A practical guide.</em></p>
+            <p style="font-size:.85rem;color:#666;line-height:1.55;margin-bottom:12px;">Guía práctica que define la Teoría de Cambio como una hipótesis verificable que explica cómo y por qué un programa produce cambios. Diferencia la Teoría de Cambio (que explica el <em>por qué</em>) del modelo lógico (que describe el <em>qué</em>). Propone seis componentes encadenados: Problema &rarr; Insumos &rarr; Actividades &rarr; Productos &rarr; Resultados &rarr; Impacto, donde cada eslabón requiere supuestos explícitos que los datos puedan verificar o refutar. La Hoja de Trabajo 4 de esta herramienta sigue esta estructura, incluyendo la columna de Supuestos.</p>
+            <p style="font-size:.85rem;"><strong>Relación con las hojas de trabajo:</strong> HT4 (Teoría de Cambio — estructura completa incluyendo supuestos).</p>
+            <a href="https://www.sopact.com/use-case/theory-of-change" target="_blank" style="display:inline-block;margin-top:10px;color:var(--gl-accent);font-weight:600;font-size:.85rem;text-decoration:none;">Visitar sitio web &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:28px;background:#F8F9FA;border-radius:var(--radius);padding:20px;border:1px solid #E8E8E8;">
+      <h4 style="font-size:.9rem;margin-bottom:8px;color:#555;">Lecturas complementarias</h4>
+      <ul style="font-size:.85rem;color:#666;line-height:1.7;padding-left:20px;">
+        <li>Samji, S., Andrews, M., Pritchett, L. &amp; Woolcock, M. (2018). <em>PDIA Toolkit.</em> The Policy Practice. <a href="https://thepolicypractice.com/sites/default/files/2023-03/PDIA%20Toolkit.pdf" target="_blank" style="color:var(--gl-accent)">PDF</a></li>
+        <li>Ghezzi, P. (2017). <em>Mesas Ejecutivas en Perú: Diálogo del sector público y privado para la diversificación productiva.</em></li>
+        <li>Growth Lab (2025). <em>Public-private dialogs to spur export-led growth.</em> Harvard University.</li>
+        <li>Weiss, C. (1995). <em>Nothing as practical as good theory: Exploring theory-based evaluation.</em> New Directions for Evaluation, 65.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="save-indicator" id="save-ind">Cambios guardados</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════════════════
+const DATA = {"categories": [{"id": "A", "name": "Acceso a mercados y barreras comerciales", "desc": "El nudo más mencionado; concentra el mayor valor defensivo y de crecimiento", "color": "#1B4F72"}, {"id": "B", "name": "Tramitología y capacidad operativa del Estado", "desc": "Donde están los quick wins operativos", "color": "#7D3C98"}, {"id": "C", "name": "Tributario y costos", "desc": "Vías normativas ya existentes", "color": "#1E8449"}, {"id": "D", "name": "Infraestructura", "desc": "Mayoritariamente estructural / largo plazo", "color": "#B9770E"}, {"id": "E", "name": "Mercado interno e informalidad", "desc": "Nivelar la cancha y abrir la demanda doméstica", "color": "#CB4335"}, {"id": "F", "name": "Riesgos exógenos y gobernanza multilateral", "desc": "Varios fuera del alcance de la Mesa", "color": "#5B2C6F"}, {"id": "G", "name": "Institucionalidad y coordinación", "desc": "Causa raíz transversal", "color": "#1A5276"}], "problems": [{"code": "A1", "cat": "A", "name": "Tarjeta amarilla por pesca ilegal (INDNR) de la Unión Europea", "detalle": "Advertencia de la UE vigente desde octubre de 2019 por deficiencias frente a la pesca ilegal, no declarada y no reglamentada (INDNR). Se atendieron los tres requisitos vía la LODAP (2020) y su reglamento; avance verificable (de 56 observaciones y 60 actividades en 2019 a 14 y 12). Reunión con la DG MARE en Bruselas (ene-2026); nuevo informe el 1-sep-2026.", "impacto": "Muy alto. Protege >USD 1.000 M del mercado UE (≈60% de las conservas); su permanencia condiciona financiamiento, competitividad y certificación.", "plazo": "Mediano", "solucion": "Cerrar los pendientes técnicos y activar la negociación política de alto nivel para concretar el levantamiento en 2026. Establecer mesa técnica público-privada con Comercio Exterior. Esto incluye abordar el problema G2.", "institucion": "Viceministerio de Acuacultura y Pesca, en coordinación con la Comisión Europea (DG MARE). Viceministerio de Comercio Exterior.", "clasificacion": "Estructural"}, {"code": "A2", "cat": "A", "name": "Pérdida de preferencias arancelarias", "detalle": "Erosión de la ventaja de Ecuador (0% en la UE): el Reino Unido suspendió aranceles a más de 100 productos hasta 2028, y avanzan los TLC de la UE con Tailandia e Indonesia.", "impacto": "Alto. Iguala el acceso de competidores asiáticos y diluye la preferencia ecuatoriana en mercados clave.", "plazo": "Mediano", "solucion": "Estrategia comercial defensiva; diferenciar por sostenibilidad (certificación MSC) y trazabilidad; incidir para excluir el atún o fijar salvaguardas en el TLC UE–Tailandia.", "institucion": "Viceministerio de Comercio Exterior; gremios.", "clasificacion": ""}, {"code": "A3", "cat": "A", "name": "TLCs subutilizados", "detalle": "Acuerdos vigentes o disponibles —China, Corea, EFTA, Reino Unido y el CPTPP— se aprovechan poco, en parte por protocolos sanitarios no homologados.", "impacto": "Medio-Alto. Mercados con potencial desaprovechado que limitan la diversificación.", "plazo": "Mediano", "solucion": "Programa de aprovechamiento de TLCs; homologación de protocolos sanitarios; inteligencia comercial.", "institucion": "Viceministerio de Comercio Exterior, Viceministerio de Acuacultura y Pesca, Cancillería; gremios.", "clasificacion": ""}, {"code": "A4", "cat": "A", "name": "Acceso limitado a Estados Unidos", "detalle": "El atún paga arancel base (35% en aceite, 12,5% en agua) más la sobretasa del 15% vigente desde agosto de 2025 —carga combinada ≈50% y 27,5%— y quedó excluido de las exoneraciones de 2025–2026. Existe además riesgo por la Sección 301.", "impacto": "Alto. Encarece y resta competitividad en un mercado principal.", "plazo": "Largo", "solucion": "Priorizar la recuperación del acceso (Acuerdo Comercial Recíproco con el atún incluido) y preparar la defensa frente a la Sección 301.", "institucion": "Viceministerio de Comercio Exterior; Cancillería. Viceministerio de Acuacultura y Pesca.", "clasificacion": ""}, {"code": "A5", "cat": "A", "name": "Desventaja competitiva estructural frente a Tailandia", "detalle": "Tailandia, principal competidor mundial, enfrenta una estructura de costos más baja como resultado de una regulación laboral menos exigente, estándares de trazabilidad más bajos y beneficios tributarios.", "impacto": "Alto. Eleva el costo relativo del producto ecuatoriano frente a Tailandia.", "plazo": "Largo", "solucion": "Convertir el mayor estándar en valor comercial (sello de sostenibilidad y legalidad, certificación MSC); buscar nivelación regulatoria en foros multilaterales (CIAT y OMC). Actualizar el benchmarking internacional.", "institucion": "Viceministerio de Comercio Exterior y Viceministerio de Acuacultura y Pesca; gremios.", "clasificacion": ""}, {"code": "B1", "cat": "B", "name": "Certificado de captura es lento", "detalle": "La emisión del certificado de captura es lenta; lo que provoca que carga quede detenida en Europa.", "impacto": "Muy alto. Carga retenida en destino; frena exportaciones y liquidez.", "plazo": "Corto", "solucion": "Optimizar proceso; aumentar dotación de personal y equipos necesarios. Se relaciona directamente con B5 y B8.", "institucion": "Viceministerio de Acuacultura y Pesca / Subsecretaría de Recursos Pesqueros (SRP).", "clasificacion": "Estructural"}, {"code": "B2", "cat": "B", "name": "Un solo firmante del certificado de origen ante la UE", "detalle": "Existe un único firmante autorizado del certificado de origen reconocido por la UE (en Manta), lo que crea un punto único de falla.", "impacto": "Alto. Cualquier ausencia o cuello en ese firmante detiene la certificación de exportaciones.", "plazo": "Corto", "solucion": "Notificar a la UE varios firmantes; medida administrativa de bajo costo. En el mediano plazo, avanzar en el reconocimiento de la firma digital y automatización.", "institucion": "Viceministerio de Comercio Exterior. Viceministerio de Acuacultura y Pesca.", "clasificacion": "Quick win"}, {"code": "B3", "cat": "B", "name": "Registros distintos de establecimientos", "detalle": "Las dos subsecretarías mantienen registros distintos de establecimientos, sin información unificada del sector.", "impacto": "Medio. Dificulta el diseño de política y el control.", "plazo": "Corto", "solucion": "Cruzar y unificar el registro; adoptar un checklist común.", "institucion": "Subsecretaría de Recursos Pesqueros (SRP) y Subsecretaría de Calidad e Inocuidad.", "clasificacion": ""}, {"code": "B4", "cat": "B", "name": "Certificado de origen no aceptado en digital", "detalle": "La UE no acepta el certificado de origen en forma digital, lo que obliga a procesos en papel y genera demoras.", "impacto": "Medio-Alto. Lentitud y costo administrativo evitables.", "plazo": "Mediano", "solucion": "Gestionar ante la UE la aceptación de la firma electrónica; simplificar y digitalizar el proceso.", "institucion": "Viceministerio de Acuacultura y Pesca. Viceministerio de Comercio Exterior. Cancillería.", "clasificacion": ""}, {"code": "B5", "cat": "B", "name": "SIAP con mejoras pendientes", "detalle": "El SIAP debe ser fortalecido, con ~14 procesos de mejora pendientes.", "impacto": "Alto. Trazabilidad completa, pero susceptible a mejoras para fortalecerla.", "plazo": "Mediano", "solucion": "Incorporar los ~14 procesos pendientes. En términos más estructurales, establecer un equipo de mejora continua.", "institucion": "Subsecretaría de Recursos Pesqueros (SRP). Ministerio de Economía y Finanzas.", "clasificacion": "Estructural"}, {"code": "B6", "cat": "B", "name": "Conexión del SIAP con el sistema aduanero (SENAE) puede volverse crítica", "detalle": "Sistema aduanero (SENAE) interopera con el de trazabilidad, pero esta interoperabilidad es lenta como resultado del reducido número de personal, de procesos ineficientes y/o del desarrollo dispar de los sistemas.", "impacto": "Muy alto. Dificulta acreditar la legalidad del producto a lo largo de toda la cadena.", "plazo": "Mediano", "solucion": "Fortalecer interconexión entre el SIAP con el sistema aduanero (SENAE) para trazabilidad en tiempo real. Establecer un equipo de mejora continua.", "institucion": "Subsecretaría de Calidad e Inocuidad; SENAE.", "clasificacion": "Estructural"}, {"code": "B7", "cat": "B", "name": "Exceso y duplicación de permisos de planta", "detalle": "Multiplicidad y duplicación de permisos de planta ('tetris' regulatorio) entre varias entidades (Calidad e Inocuidad, ARCSA y SRP), con un fast-track informal.", "impacto": "Medio-Alto. Costos y tiempos administrativos elevados; inequidad entre operadores.", "plazo": "Mediano", "solucion": "Ventanilla única / checklist unificado; cerrar el fast-track informal.", "institucion": "ARCSA, Subsecretaría de Calidad e Inocuidad, Ministerio del Ambiente, GAD, SRP.", "clasificacion": ""}, {"code": "B8", "cat": "B", "name": "Alta rotación de inspectores – bajo conocimiento normativo", "detalle": "Cuerpo de inspectores con formación insuficiente, con criterios dispares entre inspecciones. Se capacita personal técnico, pero salen como resultado de cambios de autoridad o cambios políticos.", "impacto": "Alto. Demoras y variabilidad en el control y riesgos de calidad y pesca ilegal.", "plazo": "Mediano", "solucion": "Formación profesional y sistematización de auditorías; reforzar la capacidad técnica del Estado.", "institucion": "Subsecretaría de Calidad e Inocuidad, SRP.", "clasificacion": ""}, {"code": "B9", "cat": "B", "name": "Certificados de captura de países cooperantes", "detalle": "Los certificados de captura de terceros estados cooperantes pueden demorar entre 15 y 60 días por falta de aplicación de memorandos de cooperación administrativa.", "impacto": "Alto. Retrasa el procesamiento de materia prima importada. Sin el certificado, no se puede manipular el pescado.", "plazo": "Mediano", "solucion": "Coordinación internacional ágil y acuerdos de intercambio de información con los Estados cooperantes. Aplicación Normativa vigente.", "institucion": "Viceministerio de Acuacultura y Pesca (coordinación con los Estados cooperantes). Cancillería.", "clasificacion": ""}, {"code": "C1", "cat": "C", "name": "ISD del 5% sobre materia prima importada", "detalle": "El ISD del 5% sobre la importación de materia prima empuja las descargas hacia Perú. Existe vía normativa (Decreto 272/2025 y Acuerdo MPCEI-2026-0035-A) para aplicar el ISD reducido (2,5%).", "impacto": "Alto. Encarece la materia prima y desvía descargas a otros países.", "plazo": "Corto", "solucion": "Verificar e incluir las partidas correspondientes en el ISD reducido mediante acuerdo ministerial (sin necesidad de ley). Alternativamente, verificar calidad de exportadores habituales.", "institucion": "Viceministerio de Producción e Industrias, Viceministerio de Comercio Exterior y Ministerio de Economía y Finanzas.", "clasificacion": "Quick win"}, {"code": "C2", "cat": "C", "name": "Procesos no automatizados en SENAE", "detalle": "Procesos no automatizados en SENAE para pago de compensaciones y devoluciones de garantías; lo que genera demoras en la recepción de recursos financieros.", "impacto": "Medio. Genera un costo financiero a las empresas del sector.", "plazo": "Corto", "solucion": "Automatización de anexos compensatorios; solicitud de devolución de garantías; reversos en compensaciones aduaneras de desperdicios.", "institucion": "SENAE.", "clasificacion": ""}, {"code": "C3", "cat": "C", "name": "Devoluciones tributarias lentas", "detalle": "Las devoluciones del IVA (≈60%) y del impuesto a la renta (hasta 6 meses) son lentas y generan problemas de liquidez a los exportadores.", "impacto": "Alto. Tensiona el flujo de caja de las empresas exportadoras.", "plazo": "Mediano", "solucion": "Agilizar las devoluciones a exportadores habituales y restituir la compensación plena del IVA.", "institucion": "Servicio de Rentas Internas (SRI) y Ministerio de Economía y Finanzas.", "clasificacion": ""}, {"code": "C4", "cat": "C", "name": "Sobrecostos macro", "detalle": "Sobrecostos estructurales (salario, tasas de interés, dolarización) que afectan la competitividad. Corresponden a la política económica nacional.", "impacto": "Alto. Fuera del alcance directo de la Mesa; mitigable solo vía productividad interna.", "plazo": "Largo", "solucion": "Fuera del alcance de la Mesa; abordable mediante mejoras de productividad.", "institucion": "Política económica nacional.", "clasificacion": "Fuera de alcance"}, {"code": "D1", "cat": "D", "name": "Sin puerto de exportación operativo en Manta", "detalle": "Pese a concentrar ~70% de la industria, Manta no cuenta con un puerto de exportación operativo, lo que añade unos USD 600–700 por contenedor al exportar vía Guayaquil y Posorja.", "impacto": "Alto. Sobrecosto logístico permanente para la mayor parte de la industria.", "plazo": "Largo", "solucion": "Desarrollar la conectividad vial con el interior para sumar carga y volumen que atraiga frecuencias navieras a Manta; alianzas con navieras y mejora del Terminal Portuario.", "institucion": "Autoridad Portuaria de Manta; Ministerio de Infraestructura y Transporte; navieras.", "clasificacion": ""}, {"code": "D2", "cat": "D", "name": "Energía y agua insuficientes", "detalle": "Insuficiencia de transmisión eléctrica y de agua potable para la industria, en un contexto de crisis energética nacional recurrente. El autoabastecimiento se ve seriamente limitado por requisitos legales.", "impacto": "Alto. Riesgo operativo y sobrecostos de autogeneración para una industria intensiva en frío.", "plazo": "Largo", "solucion": "Generar mecanismos de incentivos para la inversión en generación de energía verde. En el caso del agua, firmar un convenio de excepcionalidad con INTERAGUA o reactivar el proyecto de acueducto.", "institucion": "Ministerio de Ambiente y Energía; CENACE y CELEC.", "clasificacion": ""}, {"code": "D3", "cat": "D", "name": "Único astillero/dique", "detalle": "Un solo astillero/dique para ~109 embarcaciones, lo que provoca que los mantenimientos se realicen con frecuencia en Perú y Panamá.", "impacto": "Medio. Mayores costos y tiempos de mantenimiento de la flota.", "plazo": "Largo", "solucion": "Programa nacional de astilleros y atracción de inversión privada. Eliminar carta de beneplácito. Considerar reciente fusión de Astinave y Flopec (bajo Ecumar).", "institucion": "Inversión privada y/o extranjero, con acompañamiento del sector público.", "clasificacion": ""}, {"code": "E1", "cat": "E", "name": "Competencia desleal de informales", "detalle": "Competencia desleal de operadores informales ('empresas de parqueadero') que no cumplen los mismos estándares.", "impacto": "Medio. Distorsiona el mercado y penaliza a las empresas formales.", "plazo": "Mediano", "solucion": "Censo plantas, identificación y cierre de informales. Barreras de entrada efectivas / revisión de requisitos para calificación como usuarios; cruzar datos entre entidades de control.", "institucion": "Subsecretaría de Recursos Pesqueros (SRP) y Subsecretaría de Calidad e Inocuidad. Superintendencia de Competencia, GAD, UAFE.", "clasificacion": ""}, {"code": "E2", "cat": "E", "name": "Bajo consumo interno", "detalle": "Consumo interno bajo (~9 kg per cápita frente a ~20 kg de media mundial), en parte por mitos sobre el mercurio.", "impacto": "Medio. Demanda doméstica desaprovechada como amortiguador de los mercados externos.", "plazo": "Mediano", "solucion": "Campaña de consumo; atún en la alimentación escolar; desmitificar el mercurio. Impulso de la nota de inversión de la FAO. Mapear costos de transacción para reducir precio.", "institucion": "Ministerio de Producción y Ministerio de Educación; con apoyo técnico de la FAO. Vicepresidencia de la República.", "clasificacion": ""}, {"code": "F1", "cat": "F", "name": "Fenómeno de El Niño 2026", "detalle": "El Niño 2026 podría reducir las capturas (~−40%) y las exportaciones estimadas (~−12%).", "impacto": "Muy Alto. Caída temporal de materia prima y de exportaciones en 2026 (de naturaleza coyuntural).", "plazo": "Corto", "solucion": "Reducción del ISD para la importación de materia prima; firma digitalizada para certificación de origen. Programa de cambio de motores más eficientes.", "institucion": "Riesgo natural; respuesta multisectorial.", "clasificacion": "Coyuntural"}, {"code": "F2", "cat": "F", "name": "Pago de Cuotas de la CIAT", "detalle": "La cuota de la CIAT debe ser pagada para tener derecho a voz y voto.", "impacto": "Medio. Mantener la cuota al día resulta clave para proteger acceso a las cuotas de captura y derecho a voto.", "plazo": "Corto", "solucion": "Garantizar pagos oportunos cuotas CIAT.", "institucion": "Viceministerio de Acuacultura y Pesca (delegación de Ecuador ante la CIAT).", "clasificacion": "Quick win"}, {"code": "F3", "cat": "F", "name": "Endeudamiento por vedas y crédito atado a la tarjeta amarilla", "detalle": "Endeudamiento durante las vedas y financiamiento encarecido o restringido por la tarjeta amarilla.", "impacto": "Medio. Tensiona la liquidez del sector, en especial pymes y armadores.", "plazo": "Mediano", "solucion": "Levantar la tarjeta amarilla y habilitar líneas de capital de trabajo para el período de veda.", "institucion": "Banca pública: BanEcuador y la CFN; vinculado a A1.", "clasificacion": ""}, {"code": "F4", "cat": "F", "name": "Inseguridad a nivel nacional", "detalle": "Se estima que la inseguridad genera costos anuales a la industria de entre USD 200 y 300 millones. Fuera del alcance de la Mesa.", "impacto": "Alto. Riesgo a la operación y a la inversión; fuera del alcance de la Mesa.", "plazo": "Largo", "solucion": "Intervención integral del Estado; fuera del alcance de la Mesa.", "institucion": "Seguridad nacional / Estado.", "clasificacion": "Fuera de alcance"}, {"code": "F5", "cat": "F", "name": "Pesca ilegal (INDNR) a escala global", "detalle": "La pesca ilegal (INDNR) a escala global presiona reputación y competencia. La trazabilidad ya es una fortaleza de Ecuador (certificación MSC en las tres especies y blockchain reconocido por la FAO).", "impacto": "Medio. Riesgo reputacional y de competencia desleal externa.", "plazo": "Largo", "solucion": "Control reforzado y trazabilidad (fortaleza existente de Ecuador).", "institucion": "DIRNEA; foros de cooperación internacional.", "clasificacion": "Fuera de alcance"}, {"code": "G1", "cat": "G", "name": "Sistema de monitoreo de barcos inoperativo", "detalle": "Aunque se cuenta con un sistema de respaldo, el sistema de monitoreo de barcos se encuentra actualmente inoperativo debido a que no ha sido posible trasladarlo a las nuevas dependencias.", "impacto": "Muy alto. Falta de supervisión puede provocar sanciones.", "plazo": "Corto", "solucion": "Suscribir el convenio interministerial que habilita el trasladado del sistema a las dependencias del SENAE (pendiente de firma en Presidencia).", "institucion": "SENAE.", "clasificacion": "Quick win"}, {"code": "G2", "cat": "G", "name": "Gobernanza y coordinación insuficientes frente a la tarjeta amarilla", "detalle": "La articulación público-privada y la conducción de la agenda son insuficientes: la mesa técnica de la tarjeta amarilla no sesiona desde hace más de seis meses, los gremios no cuentan con feedback formal y, tras trasladar las competencias del MPCEIP al MAG, la responsabilidad quedó difusa entre carteras.", "impacto": "Alto. Sin un espacio de coordinación activo ni un responsable claro, se diluyen la rendición de cuentas y el seguimiento.", "plazo": "Corto", "solucion": "Definir mandato y plazos para el avance del expediente UE; activar mecanismos de comunicación de avances con el sector atunero.", "institucion": "Viceministerio de Acuacultura y Pesca y Viceministerio de Comercio Exterior; con DIRNEA y el Ministerio de Economía y Finanzas.", "clasificacion": "Quick win"}, {"code": "G3", "cat": "G", "name": "Falta de continuidad de la autoridad técnica", "detalle": "Constantes cambios de cartera y de equipos erosionan la rectoría y la memoria institucional del sector. La creación del MDEP, aún en implementación, es a la vez una oportunidad y un riesgo.", "impacto": "Alto. Causa raíz que alimenta la no solución de la tarjeta amarilla y la lentitud de trámites.", "plazo": "Mediano", "solucion": "Fortalecer cuadros técnicos de carrera y la continuidad de los equipos; documentar y dar seguimiento a las agendas; institucionalizar la política sectorial. Constituir el Consejo Consultivo previsto en la LODAP.", "institucion": "Viceministerio de Acuacultura y Pesca.", "clasificacion": ""}]};
+const CATS = DATA.categories;
+const PROBLEMS = DATA.problems;
+const CAT_MAP = {};
+CATS.forEach(c => CAT_MAP[c.id] = c);
+
+// ── State ──
+const STORAGE_KEY = 'mesa_atun_matrix_v1';
+let state = loadState();
+
+function defaultState() {
+  const s = { edits: {}, priorities: {}, scores: {}, comments: {}, tipos: {}, responsables: {}, semaforos: {}, groups: [] };
+  PROBLEMS.forEach(p => {
+    s.edits[p.code] = { actores:'', metas:'', paso:'', fecha:'' };
+    s.priorities[p.code] = 'sinpriorizar';
+    s.scores[p.code] = { impacto:3, factibilidad:3, urgencia:3 };
+    s.comments[p.code] = '';
+    s.tipos[p.code] = '';
+    s.responsables[p.code] = '';
+    s.semaforos[p.code] = 'gris';
+  });
+  return s;
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return defaultState();
+    const s = JSON.parse(raw);
+    const def = defaultState();
+    for (const key of Object.keys(def)) {
+      if (!s[key]) s[key] = def[key];
+      if (typeof def[key] === 'object' && !Array.isArray(def[key])) {
+        for (const code of Object.keys(def[key])) {
+          if (s[key][code] === undefined) s[key][code] = def[key][code];
+        }
+      }
+    }
+    if (!s.groups) s.groups = [];
+    return s;
+  } catch(e) { return defaultState(); }
+}
+
+function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); showSaved(); }
+function showSaved() {
+  const el = document.getElementById('save-ind');
+  el.classList.add('visible');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('visible'), 1500);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// TAB SWITCHING
+// ══════════════════════════════════════════════════════════════════
+const TAB_IDS = ['intro','table','scoring','board','groups','worksheets','refs'];
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', TAB_IDS[i]===tab));
+  TAB_IDS.forEach(id => {
+    const el = document.getElementById('tab-'+id);
+    if (el) el.classList.toggle('active', id===tab);
+  });
+  if (tab === 'table') renderTable();
+  if (tab === 'scoring') renderScoring();
+  if (tab === 'board') { renderBoard(); renderHighPrio(); }
+  if (tab === 'groups') renderGroups();
+  if (tab === 'worksheets') initWorksheets();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════════════
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function plazoClass(p) { return !p?'':p==='Corto'?'plazo-corto':p==='Mediano'?'plazo-mediano':'plazo-largo'; }
+function clasifClass(c) { return !c?'':c==='Quick win'?'clasif-qw':c==='Estructural'?'clasif-est':c==='Fuera de alcance'?'clasif-fda':c==='Coyuntural'?'clasif-coy':''; }
+function getTotal(code) { const s=state.scores[code]||{impacto:3,factibilidad:3,urgencia:3}; return s.impacto+s.factibilidad+s.urgencia; }
+
+// ══════════════════════════════════════════════════════════════════
+// TAB 1: FULL TABLE
+// ══════════════════════════════════════════════════════════════════
+function renderSemaforo(code) {
+  const current = state.semaforos[code]||'gris';
+  return '<div class="semaforo">' + ['verde','amarillo','rojo','gris'].map(c =>
+    `<div class="sem-dot ${c} ${current===c?'active':''}" onclick="setSemaforo('${code}','${c}')" title="${c}"></div>`
+  ).join('') + '</div>';
+}
+function setSemaforo(code,color) { state.semaforos[code]=color; saveState(); renderTable(); }
+
+function renderTable() {
+  const tbody = document.getElementById('table-body');
+  const search = document.getElementById('search-box').value.toLowerCase();
+  const fCat = document.getElementById('filter-cat').value;
+  const fPlazo = document.getElementById('filter-plazo').value;
+  const fClasif = document.getElementById('filter-clasif').value;
+  const fSem = document.getElementById('filter-sem').value;
+  let html='', count=0, currentCat='';
+  PROBLEMS.forEach(p => {
+    if (fCat && p.cat!==fCat) return;
+    if (fPlazo && p.plazo!==fPlazo) return;
+    if (fClasif) { if (fClasif==='Sin clasificar' && p.clasificacion!=='') return; if (fClasif!=='Sin clasificar' && p.clasificacion!==fClasif) return; }
+    if (fSem && (state.semaforos[p.code]||'gris')!==fSem) return;
+    const e = state.edits[p.code]||{};
+    const searchText = (p.code+p.name+p.detalle+p.impacto+p.solucion+p.institucion+(e.actores||'')+(e.metas||'')+(e.paso||'')).toLowerCase();
+    if (search && !searchText.includes(search)) return;
+    if (p.cat!==currentCat) {
+      currentCat=p.cat; const cat=CAT_MAP[p.cat];
+      html+=`<tr class="cat-header" onclick="toggleCat('${p.cat}')"><td colspan="10"><span class="cat-toggle" id="toggle-${p.cat}">&#9660;</span> ${cat.id} &middot; ${cat.name} <span style="font-weight:400;font-size:.8rem;color:#888"> &mdash; ${cat.desc}</span></td></tr>`;
+    }
+    count++;
+    html+=`<tr class="problem-row" data-cat="${p.cat}" id="row-${p.code}">
+      <td><span class="code-badge" style="background:${CAT_MAP[p.cat].color}">${p.code}</span></td>
+      <td><strong>${p.name}</strong></td>
+      <td><span class="plazo-badge ${plazoClass(p.plazo)}">${p.plazo}</span></td>
+      <td><span class="clasif-badge ${clasifClass(p.clasificacion)}">${p.clasificacion||'<span style="color:#bbb">—</span>'}</span></td>
+      <td class="editable"><textarea onchange="editField('${p.code}','actores',this.value)" placeholder="Actores...">${esc(e.actores||'')}</textarea></td>
+      <td class="editable"><textarea onchange="editField('${p.code}','metas',this.value)" placeholder="Metas...">${esc(e.metas||'')}</textarea></td>
+      <td class="editable"><textarea onchange="editField('${p.code}','paso',this.value)" placeholder="Próximo paso...">${esc(e.paso||'')}</textarea></td>
+      <td class="editable"><input type="date" value="${e.fecha||''}" onchange="editField('${p.code}','fecha',this.value)"></td>
+      <td>${renderSemaforo(p.code)}</td>
+      <td><span class="expand-btn" onclick="toggleDetail('${p.code}')">+</span></td>
+    </tr>`;
+    html+=`<tr class="detail-row" id="detail-${p.code}"><td colspan="10"><div class="detail-content">
+      <div><h4>Detalle</h4><p>${p.detalle}</p></div><div><h4>Impacto y consecuencias</h4><p>${p.impacto}</p></div>
+      <div><h4>Posible solución</h4><p>${p.solucion}</p></div><div><h4>Institución responsable</h4><p>${p.institucion}</p></div>
+    </div></td></tr>`;
+  });
+  tbody.innerHTML=html;
+  document.getElementById('counter').textContent=count+' de '+PROBLEMS.length+' problemas';
+}
+function editField(code,field,value) { if(!state.edits[code]) state.edits[code]=={}; state.edits[code][field]=value; saveState(); }
+function toggleDetail(code) {
+  const row=document.getElementById('detail-'+code); row.classList.toggle('visible');
+  document.querySelector(`#row-${code} .expand-btn`).textContent=row.classList.contains('visible')?'−':'+';
+}
+function toggleCat(cat) {
+  const toggle=document.getElementById('toggle-'+cat); const isCollapsed=toggle.classList.toggle('collapsed');
+  document.querySelectorAll(`tr.problem-row[data-cat="${cat}"]`).forEach(r=>r.style.display=isCollapsed?'none':'');
+  PROBLEMS.filter(p=>p.cat===cat).forEach(p=>{ const dr=document.getElementById('detail-'+p.code); if(dr) dr.style.display=isCollapsed?'none':''; });
+}
+function applyFilters() { renderTable(); }
+
+// ══════════════════════════════════════════════════════════════════
+// TAB 2: SCORING
+// ══════════════════════════════════════════════════════════════════
+function renderScoring() {
+  const sortBy = document.getElementById('score-sort').value;
+  const sorted = PROBLEMS.slice().sort((a,b) => {
+    if (sortBy==='code') return a.code.localeCompare(b.code);
+    if (sortBy==='impacto') return (state.scores[b.code]?.impacto||3)-(state.scores[a.code]?.impacto||3);
+    if (sortBy==='factibilidad') return (state.scores[b.code]?.factibilidad||3)-(state.scores[a.code]?.factibilidad||3);
+    if (sortBy==='urgencia') return (state.scores[b.code]?.urgencia||3)-(state.scores[a.code]?.urgencia||3);
+    return getTotal(b.code)-getTotal(a.code);
+  });
+  let html='';
+  sorted.forEach((p,i) => {
+    const s=state.scores[p.code]||{impacto:3,factibilidad:3,urgencia:3};
+    const total=s.impacto+s.factibilidad+s.urgencia;
+    const barW=Math.round(total/15*100);
+    const opts = v => [1,2,3,4,5].map(n=>`<option value="${n}" ${n===v?'selected':''}>${n}</option>`).join('');
+    html+=`<tr>
+      <td>${i+1}</td>
+      <td><span class="code-badge" style="background:${CAT_MAP[p.cat].color}">${p.code}</span></td>
+      <td>${p.name}</td>
+      <td><span class="plazo-badge ${plazoClass(p.plazo)}">${p.plazo}</span></td>
+      <td><span class="clasif-badge ${clasifClass(p.clasificacion)}">${p.clasificacion||'—'}</span></td>
+      <td><select class="score-select" onchange="setScore('${p.code}','impacto',+this.value)">${opts(s.impacto)}</select></td>
+      <td><select class="score-select" onchange="setScore('${p.code}','factibilidad',+this.value)">${opts(s.factibilidad)}</select></td>
+      <td><select class="score-select" onchange="setScore('${p.code}','urgencia',+this.value)">${opts(s.urgencia)}</select></td>
+      <td><span class="score-bar" style="width:${barW}%"></span><span class="score-total">${total}/15</span></td>
+    </tr>`;
+  });
+  document.getElementById('scoring-body').innerHTML=html;
+}
+function setScore(code,dim,val) {
+  if(!state.scores[code]) state.scores[code]={impacto:3,factibilidad:3,urgencia:3};
+  state.scores[code][dim]=val; saveState(); renderScoring();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// TAB 3: KANBAN BOARD
+// ══════════════════════════════════════════════════════════════════
+let boardCatFilter='';
+function filterBoard(cat) {
+  boardCatFilter=cat;
+  document.querySelectorAll('#board-controls .btn:not(.btn-export)').forEach(b=>b.classList.toggle('active',b.dataset.bcat===cat));
+  renderBoard();
+}
+function renderHighPrio() {
+  const highItems = PROBLEMS.filter(p=>(state.priorities[p.code]||'sinpriorizar')==='alta');
+  const el = document.getElementById('high-prio-list');
+  if (!highItems.length) { el.innerHTML='<div class="hp-empty">No hay problemas clasificados como alta prioridad. Arrastre tarjetas a la columna "Prioridad Alta" para activar esta sección.</div>'; return; }
+  let html='<table class="summary-table"><thead><tr><th>Código</th><th>Problema</th><th>Plazo</th><th>Puntaje</th><th>Tipo</th><th>Responsable</th></tr></thead><tbody>';
+  highItems.forEach(p => {
+    const total = getTotal(p.code);
+    html+=`<tr><td><span class="code-badge" style="background:${CAT_MAP[p.cat].color}">${p.code}</span></td><td>${p.name}</td><td><span class="plazo-badge ${plazoClass(p.plazo)}">${p.plazo}</span></td><td><strong>${total}/15</strong></td><td>${state.tipos[p.code]||'—'}</td><td>${state.responsables[p.code]||'—'}</td></tr>`;
+  });
+  html+='</tbody></table>';
+  el.innerHTML=html;
+}
+function renderBoard() {
+  const cols=['alta','media','estacionar','sinpriorizar'];
+  cols.forEach(col => { document.getElementById('col-'+col).querySelectorAll('.card').forEach(c=>c.remove()); });
+  PROBLEMS.forEach(p => {
+    if (boardCatFilter && p.cat!==boardCatFilter) return;
+    const priority=state.priorities[p.code]||'sinpriorizar';
+    const total=getTotal(p.code);
+    const card=document.createElement('div');
+    card.className='card'; card.draggable=true; card.dataset.code=p.code;
+    card.style.borderLeftColor=CAT_MAP[p.cat].color;
+    card.ondragstart=e=>e.dataTransfer.setData('text/plain',p.code);
+    card.innerHTML=`<div class="card-code" style="color:${CAT_MAP[p.cat].color}">${p.code}</div>
+      <div class="card-title">${p.name}</div>
+      <div class="card-meta"><span class="plazo-badge ${plazoClass(p.plazo)}">${p.plazo}</span>
+      ${p.clasificacion?`<span class="clasif-badge ${clasifClass(p.clasificacion)}">${p.clasificacion}</span>`:''}
+      <span style="font-size:.72rem;color:#888;margin-left:auto">Puntaje: ${total}/15</span></div>`;
+    document.getElementById('col-'+priority).appendChild(card);
+  });
+  cols.forEach(col => { document.getElementById('count-'+col).textContent=document.getElementById('col-'+col).querySelectorAll('.card').length; });
+  renderHighPrio();
+}
+function dragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function dragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+function drop(e,priority) {
+  e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+  state.priorities[e.dataTransfer.getData('text/plain')]=priority;
+  saveState(); renderBoard();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// TAB 4: WORKING GROUPS
+// ══════════════════════════════════════════════════════════════════
+const WG_COLORS = ['#1B4F72','#7D3C98','#1E8449','#B9770E','#CB4335','#1A5276','#5B2C6F','#148F77'];
+const ROLE_COLORS = { 'MINPRO':'#2471A3', 'Growth Lab':'#A51C30', 'Sector privado':'#B7950B', 'Otro':'#7F8C8D' };
+
+function renderGroups() {
+  const container = document.getElementById('wg-container');
+  if (!state.groups.length) {
+    container.innerHTML='<div style="text-align:center;padding:40px;color:#999;font-size:.9rem;">No hay grupos de trabajo creados. Haga clic en "+ Nuevo grupo" para crear el primer grupo.</div>';
+    return;
+  }
+  let html='';
+  state.groups.forEach((g,gi) => {
+    const color = WG_COLORS[gi%WG_COLORS.length];
+    html+=`<div class="wg-card"><div class="wg-card-header" style="background:${color}">
+      <span contenteditable="true" onblur="updateGroupName(${gi},this.textContent)" style="outline:none">${esc(g.name)}</span>
+      <span style="font-size:.75rem;cursor:pointer;opacity:.7" onclick="removeGroup(${gi})" title="Eliminar grupo">&times;</span>
+    </div><div class="wg-card-body">
+      <div class="wg-problems">`;
+    (g.problems||[]).forEach((pc,pi) => {
+      const prob = PROBLEMS.find(p=>p.code===pc);
+      if (prob) html+=`<span class="wg-prob" style="background:${CAT_MAP[prob.cat].color}22;color:${CAT_MAP[prob.cat].color};border:1px solid ${CAT_MAP[prob.cat].color}44">${pc}</span>`;
+    });
+    html+=`<select style="font-size:.75rem;padding:2px 6px;border:1px dashed #ccc;border-radius:10px;color:#999;background:none;cursor:pointer" onchange="addProblemToGroup(${gi},this.value);this.value=''">
+      <option value="">+ problema</option>`;
+    PROBLEMS.forEach(p => { html+=`<option value="${p.code}">${p.code} — ${p.name.substring(0,40)}</option>`; });
+    html+=`</select></div><div class="wg-members">`;
+    (g.members||[]).forEach((m,mi) => {
+      const rc = ROLE_COLORS[m.role]||'#7F8C8D';
+      const initials = m.name ? m.name.split(' ').map(w=>w[0]).join('').toUpperCase().substring(0,2) : '??';
+      html+=`<div class="wg-member">
+        <div class="wg-member-avatar" style="background:${rc}">${initials}</div>
+        <div class="wg-member-info">
+          <input class="wg-member-name" value="${esc(m.name)}" placeholder="Nombre" onchange="updateMember(${gi},${mi},'name',this.value)">
+          <select style="font-size:.75rem;border:none;color:${rc};font-weight:600;padding:2px 0;cursor:pointer" onchange="updateMember(${gi},${mi},'role',this.value)">
+            <option ${m.role==='MINPRO'?'selected':''}>MINPRO</option>
+            <option ${m.role==='Growth Lab'?'selected':''}>Growth Lab</option>
+            <option ${m.role==='Sector privado'?'selected':''}>Sector privado</option>
+            <option ${m.role==='Otro'?'selected':''}>Otro</option>
+          </select>
+        </div>
+        <span style="cursor:pointer;color:#ccc;font-size:1.1rem" onclick="removeMember(${gi},${mi})">&times;</span>
+      </div>`;
+    });
+    html+=`</div><button class="wg-add-btn" onclick="addMember(${gi})">+ Agregar miembro</button></div></div>`;
+  });
+  container.innerHTML=html;
+}
+function addGroup() {
+  state.groups.push({ name:'Grupo '+(state.groups.length+1), problems:[], members:[] });
+  saveState(); renderGroups();
+}
+function removeGroup(i) { if(confirm('¿Eliminar este grupo?')) { state.groups.splice(i,1); saveState(); renderGroups(); } }
+function updateGroupName(i,name) { state.groups[i].name=name.trim(); saveState(); }
+function addProblemToGroup(gi,code) {
+  if(!code) return;
+  if(!state.groups[gi].problems.includes(code)) { state.groups[gi].problems.push(code); saveState(); renderGroups(); }
+}
+function addMember(gi) { state.groups[gi].members.push({name:'',role:'MINPRO'}); saveState(); renderGroups(); }
+function removeMember(gi,mi) { state.groups[gi].members.splice(mi,1); saveState(); renderGroups(); }
+function updateMember(gi,mi,field,val) { state.groups[gi].members[mi][field]=val; saveState(); }
+
+// ══════════════════════════════════════════════════════════════════
+// EXPORT CSV
+// ══════════════════════════════════════════════════════════════════
+function exportSummary() {
+  const prioLabel={'alta':'Alta','media':'Media','estacionar':'Estacionar','sinpriorizar':'Sin priorizar'};
+  let csv='\uFEFFCódigo,Problema,Categoría,Plazo,Clasificación,Prioridad,Impacto,Factibilidad,Urgencia,Puntaje,Tipo MP/YP,Responsable,Actores,Metas,Próximo paso,Fecha,Semáforo,Comentarios\n';
+  PROBLEMS.forEach(p=>{
+    const s=state.scores[p.code]||{impacto:3,factibilidad:3,urgencia:3}; const e=state.edits[p.code]||{};
+    csv+=[p.code,`"${p.name.replace(/"/g,'""')}"`,p.cat,p.plazo,p.clasificacion||'',prioLabel[state.priorities[p.code]||'sinpriorizar'],
+      s.impacto,s.factibilidad,s.urgencia,s.impacto+s.factibilidad+s.urgencia,state.tipos[p.code]||'',
+      `"${(state.responsables[p.code]||'').replace(/"/g,'""')}"`,`"${(e.actores||'').replace(/"/g,'""')}"`,
+      `"${(e.metas||'').replace(/"/g,'""')}"`,`"${(e.paso||'').replace(/"/g,'""')}"`,e.fecha||'',
+      state.semaforos[p.code]||'gris',`"${(state.comments[p.code]||'').replace(/"/g,'""')}"`].join(',') + '\n';
+  });
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download='matriz_priorizacion_atun.csv'; a.click();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// TAB 5: WORKSHEETS (HOJAS DE TRABAJO)
+// ══════════════════════════════════════════════════════════════════
+const WS_STORAGE_KEY = 'mesa_atun_worksheets_v1';
+let wsState = loadWsState();
+let currentWsProblem = null;
+let currentWsSheet = 1;
+
+function loadWsState() {
+  try {
+    const raw = localStorage.getItem(WS_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch(e) { return {}; }
+}
+function saveWsState() { localStorage.setItem(WS_STORAGE_KEY, JSON.stringify(wsState)); showSaved(); }
+
+function initWorksheets() {
+  const sel = document.getElementById('ws-problem-select');
+  if (!sel || sel.options.length > 1) return;
+  PROBLEMS.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.code;
+    opt.textContent = p.code + ' \u2014 ' + p.name;
+    sel.appendChild(opt);
+  });
+}
+
+function wsSelectProblem(code) {
+  if (!code) return;
+  currentWsProblem = code;
+  document.querySelectorAll('.ws-panel').forEach(p => p.style.display = 'none');
+  document.getElementById('ws-' + currentWsSheet).style.display = 'block';
+  document.getElementById('ws-pills-container').style.display = 'flex';
+  wsLoadProblem(code);
+}
+
+function wsSwitch(n) {
+  currentWsSheet = n;
+  document.querySelectorAll('.ws-panel').forEach(p => p.style.display = 'none');
+  document.getElementById('ws-' + n).style.display = 'block';
+  document.querySelectorAll('.ws-pill').forEach((pill, i) => {
+    pill.classList.toggle('active', i === n - 1);
+  });
+  document.querySelectorAll('.cycle-step').forEach(s => {
+    const stepN = parseInt(s.dataset.ws || '0');
+    s.classList.toggle('active', stepN === n);
+  });
+  if (currentWsProblem) wsLoadProblem(currentWsProblem);
+}
+
+function wsAutoSave() {
+  if (!currentWsProblem) return;
+  const code = currentWsProblem;
+  if (!wsState[code]) wsState[code] = {};
+  const s = wsState[code];
+
+  // HT1: 5 Whys
+  const wp = document.getElementById('whys-problem-text');
+  if (wp) s.whysProblem = wp.value;
+  s.whysGrid = {};
+  document.querySelectorAll('#whys-grid textarea').forEach(ta => {
+    s.whysGrid[ta.id] = ta.value;
+  });
+
+  // HT2: Challenge statement
+  s.challenge = {};
+  ['ch-accion','ch-situacion','ch-usuario','ch-objetivo','ch-restriccion'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) s.challenge[id] = el.value;
+  });
+
+  // HT3: 3X3X3 brainstorming
+  s.postits = {};
+  document.querySelectorAll('#bs-grid .postit textarea').forEach(ta => {
+    if (ta.id) s.postits[ta.id] = ta.value;
+  });
+
+  // HT4: Theory of Change (including supuestos)
+  s.toc = {};
+  ['toc-supuestos','toc-insumos','toc-actividades','toc-productos','toc-resultados','toc-impacto'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) s.toc[id] = el.value;
+  });
+
+  // HT5: Reflection
+  s.reflection = {};
+  ['ref-hicimos','ref-aprendimos','ref-frena','ref-sigue','ref-responsable','ref-fecha'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) s.reflection[id] = el.value;
+  });
+  const activeSem = document.querySelector('#ref-semaforo .sem-option.active');
+  s.reflection.semaforo = activeSem ? activeSem.dataset.sem : '';
+
+  saveWsState();
+}
+
+function wsLoadProblem(code) {
+  const s = wsState[code] || {};
+
+  // HT1: 5 Whys — column-based layout matching CSS (.whys-col, .whys-col-header, .whys-level)
+  const whysProblemEl = document.getElementById('whys-problem-text');
+  if (whysProblemEl) whysProblemEl.value = s.whysProblem || '';
+  const whysGrid = document.getElementById('whys-grid');
+  if (whysGrid && !whysGrid.querySelector('textarea')) {
+    let html = '';
+    const causeLabels = ['Causa 1', 'Causa 2', 'Causa 3'];
+    const levelLabels = ['1er Por Qu\u00e9', '2do Por Qu\u00e9', '3er Por Qu\u00e9', '4to Por Qu\u00e9'];
+    causeLabels.forEach((cause, ci) => {
+      html += '<div class="whys-col"><div class="whys-col-header">' + cause + '</div>';
+      levelLabels.forEach((level, li) => {
+        const id = 'why-' + ci + '-' + li;
+        const val = (s.whysGrid && s.whysGrid[id]) || '';
+        html += '<div class="whys-level"><div class="whys-level-label">' + level + '</div>';
+        html += '<div class="whys-cell"><textarea id="' + id + '" placeholder="\u00bfPor qu\u00e9 ocurre esto?" onchange="wsAutoSave()">' + val + '</textarea></div></div>';
+      });
+      html += '</div>';
+    });
+    whysGrid.innerHTML = html;
+  } else if (whysGrid) {
+    whysGrid.querySelectorAll('textarea').forEach(ta => {
+      ta.value = (s.whysGrid && s.whysGrid[ta.id]) || '';
+    });
+  }
+
+  // HT2
+  ['ch-accion','ch-situacion','ch-usuario','ch-objetivo','ch-restriccion'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = (s.challenge && s.challenge[id]) || '';
+  });
+
+  // HT3: 3X3X3 Brainstorming — row-based grid matching CSS (.brainstorm-grid = 80px + 3 cols)
+  const board = document.getElementById('bs-grid');
+  if (board && !board.querySelector('.postit')) {
+    let html = '';
+    const rowLabels = ['Persona 1', 'Persona 2', 'Persona 3'];
+    const rowColors = ['#1B4F72', '#7D3C98', '#1E8449'];
+    const postitColors = [
+      ['#FFF9C4','#FFF9C4','#FFF9C4'],
+      ['#FFCCBC','#FFCCBC','#FFCCBC'],
+      ['#C8E6C9','#C8E6C9','#C8E6C9']
+    ];
+    rowLabels.forEach((label, ri) => {
+      html += '<div class="brainstorm-row-label" style="background:' + rowColors[ri] + '">' + label + '</div>';
+      for (let ci = 0; ci < 3; ci++) {
+        const id = 'postit-' + (ri * 3 + ci);
+        const val = (s.postits && s.postits[id]) || '';
+        html += '<div class="postit" style="background:' + postitColors[ri][ci] + '"><textarea id="' + id + '" placeholder="Idea ' + (ci+1) + '..." onchange="wsAutoSave()">' + val + '</textarea></div>';
+      }
+    });
+    board.innerHTML = html;
+  } else if (board) {
+    board.querySelectorAll('.postit textarea').forEach(ta => {
+      ta.value = (s.postits && s.postits[ta.id]) || '';
+    });
+  }
+
+  // HT4
+  ['toc-supuestos','toc-insumos','toc-actividades','toc-productos','toc-resultados','toc-impacto'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = (s.toc && s.toc[id]) || '';
+  });
+
+  // HT5
+  ['ref-hicimos','ref-aprendimos','ref-frena','ref-sigue','ref-responsable','ref-fecha'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = (s.reflection && s.reflection[id]) || '';
+  });
+  document.querySelectorAll('#ref-semaforo .sem-option').forEach(opt => {
+    opt.classList.toggle('active', opt.dataset.sem === (s.reflection?.semaforo || ''));
+  });
+}
+
+function setRefSem(color, el) {
+  document.querySelectorAll('#ref-semaforo .sem-option').forEach(opt => opt.classList.remove('active'));
+  el.classList.add('active');
+  el.dataset.sem = color;
+  wsAutoSave();
+}
+
+function cycleStepClick(wsNum) {
+  if (wsNum >= 1 && wsNum <= 5) wsSwitch(wsNum);
+}
+
+// HT2: Challenge statement preview
+function updateChallenge() {
+  const accion = document.getElementById('ch-accion')?.value || '';
+  const situacion = document.getElementById('ch-situacion')?.value || '';
+  const usuario = document.getElementById('ch-usuario')?.value || '';
+  const objetivo = document.getElementById('ch-objetivo')?.value || '';
+  const restriccion = document.getElementById('ch-restriccion')?.value || '';
+  const wrap = (v, cls) => v ? '<span class="filled">' + v + '</span>' : '<span class="empty">&hellip;</span>';
+  document.getElementById('challenge-text').innerHTML =
+    '\u00bfC\u00f3mo podemos ' + wrap(accion) + ' ' + wrap(situacion) +
+    ' de ' + wrap(usuario) + ' para que puedan ' + wrap(objetivo) +
+    ', considerando ' + wrap(restriccion) + '?';
+  wsAutoSave();
+}
+
+// HT3: Brainstorm timer
+let bsTimerInterval = null;
+let bsTimeLeft = 300;
+let bsRound = 1;
+
+function startTimer() {
+  if (bsTimerInterval) return;
+  const timerEl = document.getElementById('bs-timer');
+  timerEl.classList.add('running');
+  bsTimerInterval = setInterval(() => {
+    bsTimeLeft--;
+    if (bsTimeLeft <= 0) {
+      clearInterval(bsTimerInterval);
+      bsTimerInterval = null;
+      timerEl.classList.remove('running');
+      bsRound = Math.min(bsRound + 1, 3);
+      document.getElementById('bs-round').textContent = 'Ronda ' + bsRound + ' de 3';
+      bsTimeLeft = 300;
+      timerEl.textContent = '5:00';
+      alert('\u00a1Tiempo! Roten a la siguiente fila.');
+      return;
+    }
+    const m = Math.floor(bsTimeLeft / 60);
+    const ss = String(bsTimeLeft % 60).padStart(2, '0');
+    timerEl.textContent = m + ':' + ss;
+  }, 1000);
+}
+
+function resetTimer() {
+  clearInterval(bsTimerInterval);
+  bsTimerInterval = null;
+  bsTimeLeft = 300;
+  bsRound = 1;
+  document.getElementById('bs-timer').textContent = '5:00';
+  document.getElementById('bs-timer').classList.remove('running');
+  document.getElementById('bs-round').textContent = 'Ronda 1 de 3';
+}
+
+function addBsRow() {
+  const grid = document.getElementById('bs-grid');
+  if (!grid) return;
+  const existingPostits = grid.querySelectorAll('.postit').length;
+  const rowNum = Math.floor(existingPostits / 3) + 1;
+  const colors = ['#B3E5FC','#E1BEE7','#FFE0B2','#F0F4C3','#B2DFDB','#D1C4E9'];
+  const rowColor = colors[(rowNum - 1) % colors.length];
+  const labelEl = document.createElement('div');
+  labelEl.className = 'brainstorm-row-label';
+  labelEl.style.background = '#7F8C8D';
+  labelEl.textContent = 'Persona ' + rowNum;
+  grid.appendChild(labelEl);
+  for (let c = 0; c < 3; c++) {
+    const id = 'postit-' + (existingPostits + c);
+    const postit = document.createElement('div');
+    postit.className = 'postit';
+    postit.style.background = rowColor;
+    postit.innerHTML = '<textarea id="' + id + '" placeholder="Idea ' + (c+1) + '..." onchange="wsAutoSave()"></textarea>';
+    grid.appendChild(postit);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+function init() {
+  // Populate category filter
+  const catSelect = document.getElementById('filter-cat');
+  if (catSelect) {
+    CATS.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = c.id + ' \u00b7 ' + c.name;
+      catSelect.appendChild(opt);
+    });
+  }
+  // Board category filter buttons
+  const boardCtrl = document.getElementById('board-controls');
+  if (boardCtrl) {
+    CATS.forEach(c => {
+      const btn = document.createElement('button');
+      btn.className = 'btn';
+      btn.dataset.bcat = c.id;
+      btn.textContent = c.id;
+      btn.style.borderLeftColor = c.color;
+      btn.style.borderLeftWidth = '3px';
+      btn.onclick = () => filterBoard(c.id);
+      boardCtrl.appendChild(btn);
+    });
+  }
+  // Render initial table
+  renderTable();
+}
+init();
+</script>
+</body>
+</html>
