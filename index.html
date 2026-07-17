@@ -329,6 +329,7 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
     <div class="subtitle">Herramienta interactiva de seguimiento y priorización · Ecuador 2026</div>
   </div>
   <span class="badge">BORRADOR DE TRABAJO</span>
+  <button onclick="exportPDF()" style="margin-left:auto;padding:8px 18px;border-radius:4px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.12);color:#fff;font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer;transition:background .2s;white-space:nowrap" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.12)'">&#128196; Exportar resumen (PDF)</button>
 </div>
 
 <div class="tabs">
@@ -921,6 +922,138 @@ function addBsRow() {
     postit.innerHTML = '<textarea id="' + id + '" placeholder="Idea ' + (c+1) + '..." onchange="wsAutoSave()"></textarea>';
     grid.appendChild(postit);
   }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// EXPORT PDF
+// ══════════════════════════════════════════════════════════════════
+function exportPDF() {
+  const today = new Date().toLocaleDateString('es-EC', { year:'numeric', month:'long', day:'numeric' });
+  const semLabel = { verde:'Verde', amarillo:'Amarillo', rojo:'Rojo', gris:'Sin asignar' };
+  const semColor = { verde:'#27AE60', amarillo:'#F1C40F', rojo:'#E74C3C', gris:'#BDC3C7' };
+
+  // ── 1. Matrix summary: problems with any edits ──
+  let matrixRows = '';
+  let editCount = 0;
+  PROBLEMS.forEach(p => {
+    const e = state.edits[p.code] || {};
+    const sem = state.semaforos[p.code] || 'gris';
+    const hasPaso = (e.paso || '').trim();
+    const hasFecha = (e.fecha || '').trim();
+    const hasSem = sem !== 'gris';
+    if (!hasPaso && !hasFecha && !hasSem) return;
+    editCount++;
+    matrixRows += '<tr>' +
+      '<td style="padding:8px 10px;border-bottom:1px solid #ddd;font-weight:700;color:' + CAT_MAP[p.cat].color + '">' + p.code + '</td>' +
+      '<td style="padding:8px 10px;border-bottom:1px solid #ddd">' + p.name + '</td>' +
+      '<td style="padding:8px 10px;border-bottom:1px solid #ddd;text-align:center">' + p.plazo + '</td>' +
+      '<td style="padding:8px 10px;border-bottom:1px solid #ddd">' + (hasPaso ? e.paso.replace(/</g,'&lt;') : '<span style="color:#bbb">—</span>') + '</td>' +
+      '<td style="padding:8px 10px;border-bottom:1px solid #ddd;text-align:center">' + (hasFecha ? e.fecha : '<span style="color:#bbb">—</span>') + '</td>' +
+      '<td style="padding:8px 10px;border-bottom:1px solid #ddd;text-align:center"><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:' + semColor[sem] + '"></span> ' + semLabel[sem] + '</td>' +
+      '</tr>';
+  });
+
+  // ── 2. Worksheets summary ──
+  let wsHtml = '';
+  let wsCount = 0;
+  const wsSaved = loadWsState();
+  PROBLEMS.forEach(p => {
+    const s = wsSaved[p.code];
+    if (!s) return;
+    const hasWhys = s.whysProblem || (s.whysGrid && Object.values(s.whysGrid).some(v => v.trim()));
+    const hasPostits = s.postits && Object.values(s.postits).some(v => v.trim());
+    if (!hasWhys && !hasPostits) return;
+    wsCount++;
+
+    wsHtml += '<div style="page-break-inside:avoid;margin-bottom:24px;border:1px solid #ddd;border-radius:6px;overflow:hidden">';
+    wsHtml += '<div style="background:' + CAT_MAP[p.cat].color + ';color:#fff;padding:10px 16px;font-weight:700">' + p.code + ' — ' + p.name + '</div>';
+
+    // HT1: 5 Whys
+    if (hasWhys) {
+      wsHtml += '<div style="padding:16px">';
+      wsHtml += '<h4 style="margin:0 0 10px;font-size:.9rem;color:#1D1C1D">HT1: Deconstruir el problema (5 Por Qués)</h4>';
+      if (s.whysProblem) wsHtml += '<p style="margin:0 0 12px;padding:8px 12px;background:#FFF8E1;border-left:3px solid #B7950B;font-style:italic">' + s.whysProblem.replace(/</g,'&lt;') + '</p>';
+      if (s.whysGrid) {
+        wsHtml += '<table style="width:100%;border-collapse:collapse;font-size:.82rem">';
+        wsHtml += '<tr><th style="background:#1D1C1D;color:#fff;padding:8px;text-align:center;width:33%">Causa 1</th><th style="background:#1D1C1D;color:#fff;padding:8px;text-align:center;width:33%">Causa 2</th><th style="background:#1D1C1D;color:#fff;padding:8px;text-align:center;width:33%">Causa 3</th></tr>';
+        const levels = ['1er Por Qué','2do Por Qué','3er Por Qué','4to Por Qué'];
+        levels.forEach((lbl, li) => {
+          wsHtml += '<tr>';
+          for (let ci = 0; ci < 3; ci++) {
+            const val = (s.whysGrid['why-' + ci + '-' + li] || '').trim();
+            wsHtml += '<td style="padding:6px 8px;border:1px solid #eee;vertical-align:top"><span style="font-size:.7rem;color:#A51C30;font-weight:600">' + lbl + '</span><br>' + (val ? val.replace(/</g,'&lt;') : '<span style="color:#ccc">—</span>') + '</td>';
+          }
+          wsHtml += '</tr>';
+        });
+        wsHtml += '</table>';
+      }
+      wsHtml += '</div>';
+    }
+
+    // HT2: Brainstorming
+    if (hasPostits) {
+      wsHtml += '<div style="padding:16px;border-top:1px solid #eee">';
+      wsHtml += '<h4 style="margin:0 0 10px;font-size:.9rem;color:#1D1C1D">HT2: Lluvia de ideas 3X3X3</h4>';
+      wsHtml += '<table style="width:100%;border-collapse:collapse;font-size:.82rem">';
+      const colors = ['#FFF9C4','#FFCCBC','#C8E6C9'];
+      const maxRows = Math.ceil(Object.keys(s.postits).length / 3);
+      for (let ri = 0; ri < Math.max(maxRows, 3); ri++) {
+        wsHtml += '<tr>';
+        for (let ci = 0; ci < 3; ci++) {
+          const val = (s.postits['postit-' + (ri * 3 + ci)] || '').trim();
+          if (!val && ri >= 3) continue;
+          wsHtml += '<td style="padding:8px;border:1px solid #eee;background:' + (colors[ri] || '#F5F5F5') + ';vertical-align:top;min-height:40px">' + (val ? val.replace(/</g,'&lt;') : '<span style="color:#ccc">—</span>') + '</td>';
+        }
+        wsHtml += '</tr>';
+      }
+      wsHtml += '</table>';
+      wsHtml += '</div>';
+    }
+
+    wsHtml += '</div>';
+  });
+
+  // ── 3. Build the report ──
+  const html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Resumen — Mesa Ejecutiva Atún</title>' +
+    '<style>' +
+    'body{font-family:"Source Sans Pro","Segoe UI",system-ui,sans-serif;color:#2C3E50;margin:0;padding:32px 40px;font-size:13px;line-height:1.5}' +
+    'h1{font-size:1.4rem;margin:0 0 4px}' +
+    'h2{font-size:1.1rem;margin:28px 0 12px;padding-bottom:6px;border-bottom:2px solid #A51C30;color:#1D1C1D}' +
+    'h3{font-size:.95rem;margin:20px 0 8px;color:#1D1C1D}' +
+    '.meta{font-size:.85rem;color:#888;margin-bottom:24px}' +
+    '.badge{display:inline-block;background:#A51C30;color:#fff;padding:2px 10px;border-radius:10px;font-size:.75rem;font-weight:600;margin-left:8px}' +
+    'table{width:100%;border-collapse:collapse}' +
+    'th{background:#1D1C1D;color:#fff;padding:8px 10px;text-align:left;font-size:.78rem;text-transform:uppercase}' +
+    '.empty-msg{color:#999;font-style:italic;padding:16px 0}' +
+    '.summary-box{display:inline-block;background:#F7F9FB;border:1px solid #ddd;border-radius:6px;padding:12px 20px;margin-right:12px;text-align:center}' +
+    '.summary-box .num{font-size:1.6rem;font-weight:800;color:#A51C30}' +
+    '.summary-box .lbl{font-size:.75rem;color:#888}' +
+    '@media print{body{padding:20px 24px}h2{break-before:auto}}' +
+    '</style></head><body>' +
+    '<h1>Mesa Ejecutiva del Sector Atún <span class="badge">RESUMEN DE SESIÓN</span></h1>' +
+    '<div class="meta">Generado el ' + today + '</div>' +
+
+    '<div style="margin-bottom:24px">' +
+    '<div class="summary-box"><div class="num">' + editCount + '</div><div class="lbl">Problemas con seguimiento</div></div>' +
+    '<div class="summary-box"><div class="num">' + wsCount + '</div><div class="lbl">Problemas con hojas de trabajo</div></div>' +
+    '<div class="summary-box"><div class="num">' + PROBLEMS.filter(p=>(state.semaforos[p.code]||'gris')!=='gris').length + '</div><div class="lbl">Semáforos asignados</div></div>' +
+    '</div>' +
+
+    '<h2>Matriz de seguimiento</h2>' +
+    (matrixRows
+      ? '<table><thead><tr><th>Código</th><th>Problema</th><th style="text-align:center">Plazo</th><th>Próximo paso y responsable</th><th style="text-align:center">Fecha</th><th style="text-align:center">Semáforo</th></tr></thead><tbody>' + matrixRows + '</tbody></table>'
+      : '<p class="empty-msg">No se han registrado cambios en la matriz de seguimiento.</p>') +
+
+    '<h2>Hojas de trabajo</h2>' +
+    (wsHtml || '<p class="empty-msg">No se han completado hojas de trabajo para ningún problema.</p>') +
+
+    '<div style="margin-top:32px;padding-top:12px;border-top:1px solid #ddd;font-size:.78rem;color:#aaa;text-align:center">Mesa Ejecutiva del Sector Atún — Herramienta interactiva de seguimiento · Growth Lab, Harvard Kennedy School · Ecuador 2026</div>' +
+    '</body></html>';
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  setTimeout(() => win.print(), 400);
 }
 
 // ══════════════════════════════════════════════════════════════════
