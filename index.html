@@ -347,13 +347,6 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
     <p>Esta herramienta interactiva permite a los miembros de la Mesa Ejecutiva visualizar, priorizar y dar seguimiento a los 31 problemas identificados en la Sesión 1. Cada pestaña ofrece una funcionalidad distinta para facilitar el trabajo colaborativo entre el sector público y privado.</p>
   </div>
 
-  <div class="intro-stats">
-    <div class="intro-stat"><div class="stat-num">31</div><div class="stat-label">Problemas identificados</div></div>
-    <div class="intro-stat"><div class="stat-num">7</div><div class="stat-label">Categorías</div></div>
-    <div class="intro-stat"><div class="stat-num">5</div><div class="stat-label">Quick wins</div></div>
-    <div class="intro-stat"><div class="stat-num">5</div><div class="stat-label">Acciones prioritarias</div></div>
-  </div>
-
   <div class="intro-cards">
     <div class="intro-card" style="border-top-color:var(--gl-blue)">
       <h3><span class="ic-icon" style="background:var(--gl-blue)">1</span> Matriz Completa</h3>
@@ -381,6 +374,10 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
 <!-- TAB 1: MATRIZ COMPLETA                                         -->
 <!-- ════════════════════════════════════════════════════════════════ -->
 <div id="tab-table" class="tab-content">
+  <div class="intro-stats" style="margin-bottom:20px">
+    <div class="intro-stat"><div class="stat-num">31</div><div class="stat-label">Problemas identificados</div></div>
+    <div class="intro-stat"><div class="stat-num">7</div><div class="stat-label">Categorías</div></div>
+  </div>
   <div class="filters">
     <label>Categoría</label>
     <select id="filter-cat" onchange="applyFilters()"><option value="">Todas</option></select>
