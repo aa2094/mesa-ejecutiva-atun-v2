@@ -71,11 +71,22 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
 .clasif-coy { background: #FCF3CF; color: #7D6608; }
 
 /* ── Editable cells ── */
-.editable { min-width: 120px; max-width: 200px; }
+.editable { min-width: 120px; }
 .editable textarea { width: 100%; min-height: 50px; border: 1px solid #ddd; border-radius: 3px; padding: 6px 8px; font-family: inherit; font-size: .82rem; resize: vertical; background: #FAFBFC; }
 .editable textarea:focus { border-color: var(--gl-accent); outline: none; background: #fff; }
-.editable input[type="date"] { width: 100%; border: 1px solid #ddd; border-radius: 3px; padding: 6px 8px; font-family: inherit; font-size: .82rem; background: #FAFBFC; }
+.editable input[type="date"] { border: 1px solid #ddd; border-radius: 3px; padding: 4px 6px; font-family: inherit; font-size: .78rem; background: #FAFBFC; }
 .editable input[type="date"]:focus { border-color: var(--gl-accent); outline: none; }
+
+/* ── Pasos list (multiple next-steps per problem) ── */
+.pasos-list { display: flex; flex-direction: column; gap: 8px; }
+.paso-entry { border-left: 3px solid var(--gl-border); padding-left: 8px; }
+.paso-entry:first-child { border-left-color: var(--gl-accent); }
+.paso-entry textarea { min-height: 40px; }
+.paso-meta { display: flex; gap: 6px; align-items: center; margin-top: 4px; }
+.paso-remove { cursor: pointer; color: #ccc; font-size: 1rem; line-height: 1; padding: 2px 4px; border-radius: 3px; }
+.paso-remove:hover { color: var(--gl-accent); background: #FDF2F2; }
+.paso-add { display: block; width: 100%; padding: 4px; border: 1.5px dashed #ddd; border-radius: 3px; background: none; font-family: inherit; font-size: .75rem; color: #999; cursor: pointer; margin-top: 2px; }
+.paso-add:hover { border-color: var(--gl-accent); color: var(--gl-accent); }
 
 /* ── Semáforo ── */
 .semaforo { display: flex; gap: 6px; align-items: center; }
@@ -393,7 +404,7 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
     <table class="matrix-table" id="main-table">
       <thead><tr>
         <th style="width:60px">Código</th><th style="width:220px">Problema</th><th style="width:80px">Plazo</th>
-        <th class="editable" style="min-width:280px">Próximo paso y responsable</th><th class="editable" style="width:110px">Fecha</th>
+        <th class="editable" style="min-width:320px">Próximo paso y responsable</th>
         <th style="width:110px">Semáforo</th><th style="width:50px"></th>
       </tr></thead>
       <tbody id="table-body"></tbody>
@@ -682,6 +693,28 @@ function renderSemaforo(code) {
 }
 function setSemaforo(code,color) { state.semaforos[code]=color; saveState(); renderTable(); }
 
+function getPasos(code) {
+  const e = state.edits[code] || {};
+  if (e.pasos && e.pasos.length) return e.pasos;
+  // Migrate old single paso/fecha to array
+  return [{ paso: e.paso || '', fecha: e.fecha || '' }];
+}
+
+function renderPasos(code) {
+  const pasos = getPasos(code);
+  let html = '<div class="pasos-list">';
+  pasos.forEach((p, i) => {
+    html += '<div class="paso-entry">' +
+      '<textarea onchange="editPaso(\'' + code + '\',' + i + ',\'paso\',this.value)" placeholder="Próximo paso...">' + esc(p.paso || '') + '</textarea>' +
+      '<div class="paso-meta">' +
+      '<input type="date" value="' + (p.fecha || '') + '" onchange="editPaso(\'' + code + '\',' + i + ',\'fecha\',this.value)">' +
+      (pasos.length > 1 ? '<span class="paso-remove" onclick="removePaso(\'' + code + '\',' + i + ')" title="Eliminar">&times;</span>' : '') +
+      '</div></div>';
+  });
+  html += '<button class="paso-add" onclick="addPaso(\'' + code + '\')">+ Agregar paso</button></div>';
+  return html;
+}
+
 function renderTable() {
   const tbody = document.getElementById('table-body');
   const search = document.getElementById('search-box').value.toLowerCase();
@@ -694,23 +727,23 @@ function renderTable() {
     if (fPlazo && p.plazo!==fPlazo) return;
     if (fSem && (state.semaforos[p.code]||'gris')!==fSem) return;
     const e = state.edits[p.code]||{};
-    const searchText = (p.code+p.name+p.detalle+p.impacto+p.solucion+p.institucion+(e.paso||'')).toLowerCase();
+    const pasosText = getPasos(p.code).map(pp => pp.paso||'').join(' ');
+    const searchText = (p.code+p.name+p.detalle+p.impacto+p.solucion+p.institucion+pasosText).toLowerCase();
     if (search && !searchText.includes(search)) return;
     if (p.cat!==currentCat) {
       currentCat=p.cat; const cat=CAT_MAP[p.cat];
-      html+=`<tr class="cat-header" onclick="toggleCat('${p.cat}')"><td colspan="7"><span class="cat-toggle" id="toggle-${p.cat}">&#9660;</span> ${cat.id} &middot; ${cat.name}</td></tr>`;
+      html+=`<tr class="cat-header" onclick="toggleCat('${p.cat}')"><td colspan="6"><span class="cat-toggle" id="toggle-${p.cat}">&#9660;</span> ${cat.id} &middot; ${cat.name}</td></tr>`;
     }
     count++;
     html+=`<tr class="problem-row" data-cat="${p.cat}" id="row-${p.code}">
       <td><span class="code-badge" style="background:${CAT_MAP[p.cat].color}">${p.code}</span></td>
       <td><strong>${p.name}</strong></td>
       <td><span class="plazo-badge ${plazoClass(p.plazo)}">${p.plazo}</span></td>
-      <td class="editable"><textarea onchange="editField('${p.code}','paso',this.value)" placeholder="Próximo paso...">${esc(e.paso||'')}</textarea></td>
-      <td class="editable"><input type="date" value="${e.fecha||''}" onchange="editField('${p.code}','fecha',this.value)"></td>
+      <td class="editable" style="max-width:none">${renderPasos(p.code)}</td>
       <td>${renderSemaforo(p.code)}</td>
       <td><span class="expand-btn" onclick="toggleDetail('${p.code}')">+</span></td>
     </tr>`;
-    html+=`<tr class="detail-row" id="detail-${p.code}"><td colspan="7"><div class="detail-content">
+    html+=`<tr class="detail-row" id="detail-${p.code}"><td colspan="6"><div class="detail-content">
       <div><h4>Detalle</h4><p>${p.detalle}</p></div><div><h4>Impacto y consecuencias</h4><p>${p.impacto}</p></div>
       <div><h4>Posible solución</h4><p>${p.solucion}</p></div><div><h4>Institución responsable</h4><p>${p.institucion}</p></div>
     </div></td></tr>`;
@@ -718,7 +751,31 @@ function renderTable() {
   tbody.innerHTML=html;
   document.getElementById('counter').textContent=count+' de '+PROBLEMS.length+' problemas';
 }
-function editField(code,field,value) { if(!state.edits[code]) state.edits[code]=={}; state.edits[code][field]=value; saveState(); }
+
+function editPaso(code, idx, field, value) {
+  if (!state.edits[code]) state.edits[code] = {};
+  if (!state.edits[code].pasos) state.edits[code].pasos = getPasos(code);
+  state.edits[code].pasos[idx][field] = value;
+  saveState();
+}
+
+function addPaso(code) {
+  if (!state.edits[code]) state.edits[code] = {};
+  if (!state.edits[code].pasos) state.edits[code].pasos = getPasos(code);
+  state.edits[code].pasos.push({ paso: '', fecha: '' });
+  saveState();
+  renderTable();
+}
+
+function removePaso(code, idx) {
+  if (!state.edits[code] || !state.edits[code].pasos) return;
+  state.edits[code].pasos.splice(idx, 1);
+  if (!state.edits[code].pasos.length) state.edits[code].pasos = [{ paso: '', fecha: '' }];
+  saveState();
+  renderTable();
+}
+
+function editField(code,field,value) { if(!state.edits[code]) state.edits[code]={}; state.edits[code][field]=value; saveState(); }
 function toggleDetail(code) {
   const row=document.getElementById('detail-'+code); row.classList.toggle('visible');
   document.querySelector(`#row-${code} .expand-btn`).textContent=row.classList.contains('visible')?'−':'+';
@@ -938,17 +995,25 @@ function exportPDF() {
   PROBLEMS.forEach(p => {
     const e = state.edits[p.code] || {};
     const sem = state.semaforos[p.code] || 'gris';
-    const hasPaso = (e.paso || '').trim();
-    const hasFecha = (e.fecha || '').trim();
+    const pasos = getPasos(p.code);
+    const hasAnyPaso = pasos.some(pp => (pp.paso||'').trim() || (pp.fecha||'').trim());
     const hasSem = sem !== 'gris';
-    if (!hasPaso && !hasFecha && !hasSem) return;
+    if (!hasAnyPaso && !hasSem) return;
     editCount++;
+    let pasosHtml = '';
+    pasos.forEach((pp, i) => {
+      if (!(pp.paso||'').trim() && !(pp.fecha||'').trim()) return;
+      pasosHtml += '<div style="' + (i > 0 ? 'margin-top:6px;padding-top:6px;border-top:1px dashed #eee' : '') + '">' +
+        (pp.paso ? pp.paso.replace(/</g,'&lt;') : '<span style="color:#bbb">—</span>') +
+        (pp.fecha ? ' <span style="color:#888;font-size:.78rem">(' + pp.fecha + ')</span>' : '') +
+        '</div>';
+    });
+    if (!pasosHtml) pasosHtml = '<span style="color:#bbb">—</span>';
     matrixRows += '<tr>' +
       '<td style="padding:8px 10px;border-bottom:1px solid #ddd;font-weight:700;color:' + CAT_MAP[p.cat].color + '">' + p.code + '</td>' +
       '<td style="padding:8px 10px;border-bottom:1px solid #ddd">' + p.name + '</td>' +
       '<td style="padding:8px 10px;border-bottom:1px solid #ddd;text-align:center">' + p.plazo + '</td>' +
-      '<td style="padding:8px 10px;border-bottom:1px solid #ddd">' + (hasPaso ? e.paso.replace(/</g,'&lt;') : '<span style="color:#bbb">—</span>') + '</td>' +
-      '<td style="padding:8px 10px;border-bottom:1px solid #ddd;text-align:center">' + (hasFecha ? e.fecha : '<span style="color:#bbb">—</span>') + '</td>' +
+      '<td style="padding:8px 10px;border-bottom:1px solid #ddd">' + pasosHtml + '</td>' +
       '<td style="padding:8px 10px;border-bottom:1px solid #ddd;text-align:center"><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:' + semColor[sem] + '"></span> ' + semLabel[sem] + '</td>' +
       '</tr>';
   });
@@ -1041,7 +1106,7 @@ function exportPDF() {
 
     '<h2>Matriz de seguimiento</h2>' +
     (matrixRows
-      ? '<table><thead><tr><th>Código</th><th>Problema</th><th style="text-align:center">Plazo</th><th>Próximo paso y responsable</th><th style="text-align:center">Fecha</th><th style="text-align:center">Semáforo</th></tr></thead><tbody>' + matrixRows + '</tbody></table>'
+      ? '<table><thead><tr><th>Código</th><th>Problema</th><th style="text-align:center">Plazo</th><th>Próximo paso y responsable</th><th style="text-align:center">Semáforo</th></tr></thead><tbody>' + matrixRows + '</tbody></table>'
       : '<p class="empty-msg">No se han registrado cambios en la matriz de seguimiento.</p>') +
 
     '<h2>Hojas de trabajo</h2>' +
