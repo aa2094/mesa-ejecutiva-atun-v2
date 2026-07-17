@@ -88,6 +88,16 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
 .paso-add { display: block; width: 100%; padding: 4px; border: 1.5px dashed #ddd; border-radius: 3px; background: none; font-family: inherit; font-size: .75rem; color: #999; cursor: pointer; margin-top: 2px; }
 .paso-add:hover { border-color: var(--gl-accent); color: var(--gl-accent); }
 
+/* ── Notes ── */
+.note-card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 14px; overflow: hidden; border-left: 4px solid var(--gl-border); }
+.note-card-header { display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: #FAFBFC; border-bottom: 1px solid #F0F0F0; }
+.note-card-header input { flex: 1; border: none; background: none; font-family: inherit; font-size: .9rem; font-weight: 600; color: var(--gl-dark); outline: none; }
+.note-card-header input::placeholder { color: #bbb; font-weight: 400; }
+.note-card-header .note-remove { cursor: pointer; color: #ccc; font-size: 1.1rem; padding: 2px 6px; border-radius: 3px; }
+.note-card-header .note-remove:hover { color: var(--gl-accent); background: #FDF2F2; }
+.note-card textarea { width: 100%; min-height: 100px; border: none; padding: 14px 16px; font-family: inherit; font-size: .88rem; resize: vertical; outline: none; line-height: 1.6; }
+.note-card textarea:focus { background: #FFFDF5; }
+
 /* ── Semáforo ── */
 .semaforo { display: flex; gap: 6px; align-items: center; }
 .sem-dot { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid #ddd; transition: all .15s; opacity: .35; }
@@ -347,6 +357,7 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
   <div class="tab active" onclick="switchTab('intro')">Introducción</div>
   <div class="tab" onclick="switchTab('table')">Matriz Completa</div>
   <div class="tab" onclick="switchTab('worksheets')">Hojas de Trabajo</div>
+  <div class="tab" onclick="switchTab('notes')">Notas</div>
   <div class="tab" onclick="switchTab('refs')">Referencias</div>
 </div>
 
@@ -370,8 +381,13 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
       <p>Hojas de trabajo basadas en la metodología PDIA para cada problema: descomposición con los 5 Por Qués y lluvia de ideas 3X3X3. Incluye un diagrama del proceso iterativo que guía la secuencia de trabajo.</p>
       <span class="ic-link" onclick="switchTab('worksheets')">Ir a Hojas de Trabajo &rarr;</span>
     </div>
+    <div class="intro-card" style="border-top-color:#2E86C1">
+      <h3><span class="ic-icon" style="background:#2E86C1">3</span> Notas</h3>
+      <p>Espacio libre para registrar observaciones, acuerdos, pendientes u otros apuntes que no encajen en la matriz ni en las hojas de trabajo. Todas las notas se incluyen automáticamente en el PDF exportable.</p>
+      <span class="ic-link" onclick="switchTab('notes')">Ir a Notas &rarr;</span>
+    </div>
     <div class="intro-card" style="border-top-color:#148F77">
-      <h3><span class="ic-icon" style="background:#148F77">3</span> Referencias</h3>
+      <h3><span class="ic-icon" style="background:#148F77">4</span> Referencias</h3>
       <p>Fuentes metodológicas de las hojas de trabajo y del ciclo iterativo: el <strong>PDIA Handbook</strong> (Andrews, Pritchett &amp; Woolcock), el <strong>Laboratorio de Gobierno de Chile</strong>, la guía de <strong>Teoría de Cambio de SoPact</strong> y <strong>The Practice of Adaptive Leadership</strong> (Heifetz, Grashow &amp; Linsky). Incluye enlaces directos a los documentos y lecturas complementarias.</p>
       <span class="ic-link" onclick="switchTab('refs')">Ir a Referencias &rarr;</span>
     </div>
@@ -528,7 +544,21 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
 </div>
 
 <!-- ════════════════════════════════════════════════════════════════ -->
-<!-- TAB 6: REFERENCIAS                                            -->
+<!-- TAB 3: NOTAS                                                   -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<div id="tab-notes" class="tab-content">
+  <div style="max-width:900px;margin:0 auto">
+    <h2 style="margin-bottom:4px;font-size:1.3rem;">Notas de sesión</h2>
+    <p style="color:#666;margin-bottom:20px;font-size:.88rem;line-height:1.6;">Espacio libre para registrar observaciones, acuerdos, pendientes u otros apuntes que no encajen en la matriz ni en las hojas de trabajo. Todas las notas se incluyen automáticamente en el PDF exportable.</p>
+
+    <div id="notes-list"></div>
+
+    <button onclick="addNote()" style="margin-top:12px;padding:10px 20px;border:1.5px dashed #ccc;border-radius:var(--radius);background:none;font-family:inherit;font-size:.88rem;color:#888;cursor:pointer;width:100%;transition:all .2s" onmouseover="this.style.borderColor='var(--gl-accent)';this.style.color='var(--gl-accent)'" onmouseout="this.style.borderColor='#ccc';this.style.color='#888'">+ Agregar nota</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- TAB 4: REFERENCIAS                                            -->
 <!-- ════════════════════════════════════════════════════════════════ -->
 <div id="tab-refs" class="tab-content">
   <div style="max-width:900px;margin:0 auto">
@@ -665,7 +695,7 @@ function showSaved() {
 // ══════════════════════════════════════════════════════════════════
 // TAB SWITCHING
 // ══════════════════════════════════════════════════════════════════
-const TAB_IDS = ['intro','table','worksheets','refs'];
+const TAB_IDS = ['intro','table','worksheets','notes','refs'];
 function switchTab(tab) {
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', TAB_IDS[i]===tab));
   TAB_IDS.forEach(id => {
@@ -674,6 +704,7 @@ function switchTab(tab) {
   });
   if (tab === 'table') renderTable();
   if (tab === 'worksheets') initWorksheets();
+  if (tab === 'notes') renderNotes();
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -982,6 +1013,57 @@ function addBsRow() {
 }
 
 // ══════════════════════════════════════════════════════════════════
+// TAB 3: NOTES
+// ══════════════════════════════════════════════════════════════════
+const NOTES_KEY = 'mesa_atun_notes_v1';
+
+function loadNotes() {
+  try { const raw = localStorage.getItem(NOTES_KEY); return raw ? JSON.parse(raw) : []; }
+  catch(e) { return []; }
+}
+function saveNotes(notes) { localStorage.setItem(NOTES_KEY, JSON.stringify(notes)); showSaved(); }
+
+function renderNotes() {
+  const container = document.getElementById('notes-list');
+  if (!container) return;
+  const notes = loadNotes();
+  if (!notes.length) {
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:#999;font-size:.9rem;">No hay notas. Haga clic en "+ Agregar nota" para crear la primera.</div>';
+    return;
+  }
+  let html = '';
+  notes.forEach((n, i) => {
+    html += '<div class="note-card">' +
+      '<div class="note-card-header">' +
+      '<input type="text" value="' + esc(n.title || '') + '" placeholder="Título de la nota..." onchange="editNote(' + i + ',\'title\',this.value)">' +
+      '<span class="note-remove" onclick="removeNote(' + i + ')" title="Eliminar nota">&times;</span>' +
+      '</div>' +
+      '<textarea onchange="editNote(' + i + ',\'text\',this.value)" placeholder="Escribir nota...">' + esc(n.text || '') + '</textarea>' +
+      '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function addNote() {
+  const notes = loadNotes();
+  notes.push({ title: '', text: '' });
+  saveNotes(notes);
+  renderNotes();
+}
+
+function removeNote(i) {
+  const notes = loadNotes();
+  notes.splice(i, 1);
+  saveNotes(notes);
+  renderNotes();
+}
+
+function editNote(i, field, value) {
+  const notes = loadNotes();
+  if (notes[i]) { notes[i][field] = value; saveNotes(notes); }
+}
+
+// ══════════════════════════════════════════════════════════════════
 // EXPORT PDF
 // ══════════════════════════════════════════════════════════════════
 function exportPDF() {
@@ -1110,13 +1192,30 @@ function exportPDF() {
       : '<p class="empty-msg">No se han registrado cambios en la matriz de seguimiento.</p>') +
 
     '<h2>Hojas de trabajo</h2>' +
-    (wsHtml || '<p class="empty-msg">No se han completado hojas de trabajo para ningún problema.</p>') +
+    (wsHtml || '<p class="empty-msg">No se han completado hojas de trabajo para ningún problema.</p>');
+
+  // ── 4. Notes ──
+  const notes = loadNotes();
+  const notesWithContent = notes.filter(n => (n.title||'').trim() || (n.text||'').trim());
+  let notesHtml = '';
+  if (notesWithContent.length) {
+    notesWithContent.forEach(n => {
+      notesHtml += '<div style="page-break-inside:avoid;margin-bottom:14px;border:1px solid #ddd;border-radius:6px;overflow:hidden">';
+      if ((n.title||'').trim()) notesHtml += '<div style="padding:8px 14px;background:#FAFBFC;border-bottom:1px solid #eee;font-weight:700;font-size:.9rem">' + n.title.replace(/</g,'&lt;') + '</div>';
+      if ((n.text||'').trim()) notesHtml += '<div style="padding:12px 14px;font-size:.85rem;line-height:1.6;white-space:pre-wrap">' + n.text.replace(/</g,'&lt;') + '</div>';
+      notesHtml += '</div>';
+    });
+  }
+
+  const fullHtml = html +
+    '<h2>Notas</h2>' +
+    (notesHtml || '<p class="empty-msg">No se registraron notas en esta sesión.</p>') +
 
     '<div style="margin-top:32px;padding-top:12px;border-top:1px solid #ddd;font-size:.78rem;color:#aaa;text-align:center">Mesa Ejecutiva del Sector Atún — Herramienta interactiva de seguimiento · Growth Lab, Harvard Kennedy School · Ecuador 2026</div>' +
     '</body></html>';
 
   const win = window.open('', '_blank');
-  win.document.write(html);
+  win.document.write(fullHtml);
   win.document.close();
   setTimeout(() => win.print(), 400);
 }
