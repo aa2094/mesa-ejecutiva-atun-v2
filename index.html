@@ -500,9 +500,16 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
   </div>
 
   <div class="ws-toolbar">
+    <label>Grupo:</label>
+    <select id="ws-group-filter" onchange="wsFilterGroup(this.value)">
+      <option value="">Todos los problemas</option>
+      <option value="grupo1">Grupo 1: Acceso a mercados y SIAP</option>
+      <option value="grupo2">Grupo 2: Facilitación de exportaciones</option>
+      <option value="grupo3">Grupo 3: Permisos y mejora regulatoria</option>
+    </select>
     <label>Problema de trabajo:</label>
     <select id="ws-problem-select" onchange="wsSelectProblem(this.value)">
-      <option value="">— Seleccionar un problema de la matriz —</option>
+      <option value="">— Seleccionar un problema —</option>
     </select>
     <span class="ws-problem-name" id="ws-problem-name"></span>
   </div>
@@ -944,14 +951,31 @@ function loadWsState() {
 function saveWsState() { localStorage.setItem(WS_STORAGE_KEY, JSON.stringify(wsState)); showSaved(); }
 
 function initWorksheets() {
+  wsPopulateProblems('');
+}
+
+function wsPopulateProblems(grupoFilter) {
   const sel = document.getElementById('ws-problem-select');
-  if (!sel || sel.options.length > 1) return;
+  if (!sel) return;
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">\u2014 Seleccionar un problema \u2014</option>';
   PROBLEMS.forEach(p => {
+    if (grupoFilter && getGrupo(p.code) !== grupoFilter) return;
     const opt = document.createElement('option');
     opt.value = p.code;
     opt.textContent = p.code + ' \u2014 ' + p.name;
     sel.appendChild(opt);
   });
+  // Restore previous selection if still in the list
+  if (prev) {
+    const stillExists = Array.from(sel.options).some(o => o.value === prev);
+    if (stillExists) { sel.value = prev; }
+    else { sel.value = ''; currentWsProblem = null; }
+  }
+}
+
+function wsFilterGroup(grupo) {
+  wsPopulateProblems(grupo);
 }
 
 function wsSelectProblem(code) {
