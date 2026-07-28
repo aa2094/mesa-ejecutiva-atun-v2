@@ -261,6 +261,14 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
 .ws-panel .ws-instructions { background: #FEF9E7; border-left: 4px solid var(--gl-orange); padding: 14px 18px; border-radius: 0 var(--radius) var(--radius) 0; margin-bottom: 24px; font-size: .85rem; line-height: 1.6; }
 .ws-panel .ws-instructions strong { color: var(--gl-dark); }
 
+/* ── HT0: Formulación del problema ── */
+.formulation-questions { display: flex; flex-direction: column; gap: 20px; }
+.formulation-field { background: #FAFBFC; border: 1px solid #E8E8E8; border-radius: var(--radius); padding: 18px 20px; border-left: 4px solid var(--gl-accent); }
+.formulation-field label { display: block; font-weight: 600; font-size: .9rem; color: var(--gl-dark); margin-bottom: 8px; line-height: 1.4; }
+.formulation-field .field-example { font-size: .78rem; color: #999; margin-bottom: 8px; font-style: italic; line-height: 1.5; padding: 8px 12px; background: #F0F4F8; border-radius: 4px; }
+.formulation-field textarea { width: 100%; min-height: 80px; border: 1px solid #ddd; border-radius: var(--radius); padding: 10px 12px; font-family: inherit; font-size: .88rem; resize: vertical; background: #fff; transition: border-color .2s; line-height: 1.5; }
+.formulation-field textarea:focus { border-color: var(--gl-accent); outline: none; }
+
 /* ── HT1: 5 Whys grid ── */
 .whys-problem { margin-bottom: 24px; }
 .whys-problem label { display: block; font-weight: 700; font-size: .9rem; color: var(--gl-dark); margin-bottom: 6px; }
@@ -373,12 +381,12 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
   <div class="intro-cards">
     <div class="intro-card" style="border-top-color:var(--gl-blue)">
       <h3><span class="ic-icon" style="background:var(--gl-blue)">1</span> Matriz Completa</h3>
-      <p>Tabla con los 31 problemas del sector atunero, organizados en 7 categorías. Puede filtrar por categoría, plazo o buscar por texto libre. Para cada problema puede registrar el próximo paso con responsable, fecha límite y el estado con el semáforo de progreso (verde / amarillo / rojo).</p>
+      <p>Tabla con los 31 problemas del sector atunero, organizados en 7 categorías. Incluye descripción breve y asignación a grupos de trabajo (3 grupos activos). Puede filtrar por categoría, grupo, plazo o buscar por texto libre. Para cada problema puede registrar próximos pasos con responsable, fecha límite y semáforo de progreso.</p>
       <span class="ic-link" onclick="switchTab('table')">Ir a la Matriz &rarr;</span>
     </div>
     <div class="intro-card" style="border-top-color:#7D3C98">
       <h3><span class="ic-icon" style="background:#7D3C98">2</span> Hojas de Trabajo</h3>
-      <p>Hojas de trabajo basadas en la metodología PDIA para cada problema: descomposición con los 5 Por Qués y lluvia de ideas 3X3X3. Incluye un diagrama del proceso iterativo que guía la secuencia de trabajo.</p>
+      <p>Tres hojas de trabajo basadas en la metodología PDIA para cada problema: (1) formulación del problema, (2) descomposición con los 5 Por Qués y (3) lluvia de ideas 3X3X3. Incluye un diagrama del proceso iterativo que guía la secuencia de trabajo.</p>
       <span class="ic-link" onclick="switchTab('worksheets')">Ir a Hojas de Trabajo &rarr;</span>
     </div>
     <div class="intro-card" style="border-top-color:#2E86C1">
@@ -405,10 +413,13 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
   <div class="intro-stats" style="margin-bottom:20px">
     <div class="intro-stat"><div class="stat-num">31</div><div class="stat-label">Problemas identificados</div></div>
     <div class="intro-stat"><div class="stat-num">7</div><div class="stat-label">Categorías</div></div>
+    <div class="intro-stat"><div class="stat-num">3</div><div class="stat-label">Grupos de trabajo</div></div>
   </div>
   <div class="filters">
     <label>Categoría</label>
     <select id="filter-cat" onchange="applyFilters()"><option value="">Todas</option></select>
+    <label>Grupo</label>
+    <select id="filter-grupo" onchange="applyFilters()"><option value="">Todos</option><option value="grupo1">Grupo 1: Acceso a mercados y SIAP</option><option value="grupo2">Grupo 2: Facilitación de exportaciones</option><option value="grupo3">Grupo 3: Permisos y mejora regulatoria</option><option value="sin">Sin asignación</option></select>
     <label>Plazo</label>
     <select id="filter-plazo" onchange="applyFilters()"><option value="">Todos</option><option>Corto</option><option>Mediano</option><option>Largo</option></select>
     <label>Semáforo</label>
@@ -419,8 +430,8 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
   <div class="table-wrapper">
     <table class="matrix-table" id="main-table">
       <thead><tr>
-        <th style="width:60px">Código</th><th style="width:220px">Problema</th><th style="width:80px">Plazo</th>
-        <th class="editable" style="min-width:320px">Próximo paso y responsable</th>
+        <th style="width:60px">Código</th><th style="width:180px">Problema</th><th style="width:200px">Descripción</th><th style="width:140px">Grupo</th><th style="width:80px">Plazo</th>
+        <th class="editable" style="min-width:280px">Próximo paso y responsable</th>
         <th style="width:110px">Semáforo</th><th style="width:50px"></th>
       </tr></thead>
       <tbody id="table-body"></tbody>
@@ -464,12 +475,12 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
       <div class="cycle-step" style="top:160px; left:420px;" onclick="cycleClick(2)" data-ws="1">
         <div class="step-circle" style="background:#148F77">2</div>
         <div class="step-label">Investigación del problema</div>
-        <div class="step-ws">&#8594; Hoja 1</div>
+        <div class="step-ws">&#8594; Hojas 1–2</div>
       </div>
-      <div class="cycle-step" style="top:440px; left:330px;" onclick="cycleClick(3)" data-ws="2">
+      <div class="cycle-step" style="top:440px; left:330px;" onclick="cycleClick(3)" data-ws="3">
         <div class="step-circle" style="background:#B7950B">3</div>
         <div class="step-label">Propuesta de solución</div>
-        <div class="step-ws">&#8594; Hoja 2</div>
+        <div class="step-ws">&#8594; Hoja 3</div>
       </div>
       <div class="cycle-step" style="top:440px; left:100px;" onclick="cycleClick(4)">
         <div class="step-circle" style="background:#A93226">4</div>
@@ -495,18 +506,59 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
     </select>
     <span class="ws-problem-name" id="ws-problem-name"></span>
   </div>
-
-  <div class="ws-pills" id="ws-pills-container">
-    <div class="ws-pill active" onclick="wsSwitch(1)"><span class="pill-num">1</span>Deconstruir el problema</div>
-    <div class="ws-pill" onclick="wsSwitch(2)"><span class="pill-num">2</span>Lluvia de ideas 3X3X3</div>
+  <div style="background:#F0F4F8;border-left:3px solid var(--gl-blue);padding:10px 16px;border-radius:0 var(--radius) var(--radius) 0;margin-bottom:20px;font-size:.82rem;color:#555;line-height:1.5">
+    <strong>Nota:</strong> Puede cambiar de problema en cualquier momento usando el menú desplegable. Los datos que ingrese se guardan automáticamente para cada problema y persisten entre visitas, siempre y cuando se trabaje desde la misma computadora y navegador.
   </div>
 
-  <!-- ── HT1: 5 Whys ── -->
+  <div class="ws-pills" id="ws-pills-container">
+    <div class="ws-pill active" onclick="wsSwitch(1)"><span class="pill-num">1</span>Formulación del problema</div>
+    <div class="ws-pill" onclick="wsSwitch(2)"><span class="pill-num">2</span>Deconstruir el problema</div>
+    <div class="ws-pill" onclick="wsSwitch(3)"><span class="pill-num">3</span>Lluvia de ideas 3X3X3</div>
+  </div>
+
+  <!-- ── HT1: Formulación del problema ── -->
   <div class="ws-panel active" id="ws-1">
-    <h2>Hoja de Trabajo 1: Deconstruir el problema</h2>
+    <h2>Hoja de Trabajo 1: Formulación del problema</h2>
+    <p class="ws-desc">Antes de analizar causas o proponer soluciones, es fundamental definir con precisión el problema que enfrenta el grupo de trabajo. Responda las siguientes preguntas para construir una formulación clara y compartida.</p>
+    <div class="ws-instructions">
+      <strong>Instrucciones:</strong> Complete cada recuadro con la información disponible. No es necesario tener respuestas perfectas — el objetivo es hacer explícito lo que el grupo sabe y lo que necesita averiguar. Esta formulación se revisará y refinará en cada iteración del ciclo de trabajo.
+    </div>
+    <div class="formulation-questions" id="formulation-fields">
+      <div class="formulation-field">
+        <label>1. ¿En qué consiste exactamente el problema? ¿A quién afecta, dónde y desde cuándo?</label>
+        <div class="field-example">Ejemplo: La emisión del certificado de captura tarda entre 5 y 15 días hábiles, cuando el estándar debería ser 48 horas. Afecta a las ~30 empresas exportadoras de atún que despachan hacia la UE, principalmente desde Manta. El problema se ha agravado desde 2023 con la reducción de personal en la SRP.</div>
+        <textarea id="form-q1" placeholder="Describa el problema con la mayor precisión posible..." onchange="wsAutoSave()"></textarea>
+      </div>
+      <div class="formulation-field">
+        <label>2. ¿Cómo se manifiesta en la práctica (costos, demoras, trámites, pérdida de mercados o de competitividad)?</label>
+        <div class="field-example">Ejemplo: Genera retención de contenedores en puertos europeos (costos de almacenaje de ~USD 200/día por contenedor), pérdida de clientes por incumplimiento de plazos de entrega, y riesgo de sanciones ante la DG MARE de la UE.</div>
+        <textarea id="form-q2" placeholder="Describa las consecuencias concretas y observables..." onchange="wsAutoSave()"></textarea>
+      </div>
+      <div class="formulation-field">
+        <label>3. ¿Con qué evidencia o datos contamos para dimensionarlo? ¿Qué información falta y quién puede proveerla?</label>
+        <div class="field-example">Ejemplo: Contamos con registros de tiempos de emisión del SIAP (promedio 8 días en 2025) y reportes de retención en puertos de la UE. Falta: número exacto de contenedores afectados por mes (la puede proveer la SRP) y estimación del costo total para el sector (gremios).</div>
+        <textarea id="form-q3" placeholder="Liste la evidencia disponible y los vacíos de información..." onchange="wsAutoSave()"></textarea>
+      </div>
+      <div class="formulation-field">
+        <label>4. ¿Cómo sabríamos que el problema está resuelto? ¿Qué indicador lo reflejaría?</label>
+        <div class="field-example">Ejemplo: El certificado de captura se emite en un máximo de 48 horas hábiles en el 95% de los casos. Indicador: tiempo promedio de emisión, medido mensualmente a través del SIAP.</div>
+        <textarea id="form-q4" placeholder="Defina criterios de éxito e indicadores medibles..." onchange="wsAutoSave()"></textarea>
+      </div>
+      <div class="formulation-field">
+        <label>5. De ser necesario, ¿cuáles de los problemas asignados deberían priorizarse para esta sesión, y con qué criterio?</label>
+        <div class="field-example">Ejemplo: Priorizar B1 (certificado de captura) sobre B5 (mejoras del SIAP) porque B1 tiene impacto inmediato en exportaciones y su solución es más acotada. B5 es más complejo y puede abordarse en una segunda fase.</div>
+        <textarea id="form-q5" placeholder="Identifique prioridades y justifique el criterio..." onchange="wsAutoSave()"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── HT2: 5 Whys ── -->
+  <div class="ws-panel" id="ws-2">
+    <h2>Hoja de Trabajo 2: Deconstruir el problema</h2>
     <p class="ws-desc">Usando la técnica de los "5 Por qués", identifique las causas raíz del problema seleccionado. Comience con 3 causas directas y pregunte iterativamente "¿Por qué ocurre esto?" para llegar a las causas más profundas.</p>
     <div class="ws-instructions">
-      <strong>Instrucciones:</strong> Escriba el problema como una pregunta en el recuadro superior. Luego identifique 3 posibles causas directas. Para cada causa, pregunte "¿Por qué ocurre esto?" hasta llegar a la causa raíz (máximo 4 niveles). No todas las causas necesitan 4 niveles.
+      <strong>Instrucciones:</strong> Escriba el problema como una pregunta en el recuadro superior. Luego identifique 3 posibles causas directas. Para cada causa, pregunte "¿Por qué ocurre esto?" hasta llegar a la causa raíz (máximo 4 niveles). No todas las causas necesitan 4 niveles.<br><br>
+      <strong>Ejemplo:</strong> Para el problema "¿Por qué la emisión del certificado de captura es lenta?", una primera causa podría ser "Personal insuficiente en la SRP". El segundo por qué: "¿Por qué hay personal insuficiente?" → "Porque las plazas no se han cubierto tras las salidas de 2023". El tercer por qué: "¿Por qué no se han cubierto?" → "Porque no hay partida presupuestaria asignada para nuevas contrataciones."
     </div>
     <div class="whys-problem">
       <label>Tu problema como una pregunta:</label>
@@ -517,9 +569,9 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
     </div>
   </div>
 
-  <!-- ── HT2: 3X3X3 Brainstorming ── -->
-  <div class="ws-panel" id="ws-2">
-    <h2>Hoja de Trabajo 2: Lluvia de ideas — Actividad 3X3X3</h2>
+  <!-- ── HT3: 3X3X3 Brainstorming ── -->
+  <div class="ws-panel" id="ws-3">
+    <h2>Hoja de Trabajo 3: Lluvia de ideas — Actividad 3X3X3</h2>
     <p class="ws-desc">Ejercicio colaborativo: 3 participantes generan 3 ideas cada uno, luego rotan para complementar las ideas de los demás. Tres rondas de 5 minutos (15 min total).</p>
     <div class="ws-instructions">
       <strong>Instrucciones:</strong><br>
@@ -574,7 +626,7 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
             <h3 style="font-size:1rem;margin-bottom:6px;">PDIA Handbook — Building State Capability</h3>
             <p style="font-size:.85rem;color:#666;line-height:1.55;margin-bottom:8px;">Andrews, M., Pritchett, L. &amp; Woolcock, M. (2017). <em>Building State Capability: Evidence, Analysis, Action.</em> Oxford University Press.</p>
             <p style="font-size:.85rem;color:#666;line-height:1.55;margin-bottom:12px;">Marco fundacional del enfoque PDIA (Problem-Driven Iterative Adaptation). Propone que la construcción de capacidad estatal debe partir de problemas concretos, avanzar mediante iteraciones rápidas y escalar a través de grupos de trabajo. La Hoja de Trabajo 1 (5 Por Qués) se deriva directamente de este marco, así como el ciclo iterativo de 5 pasos que guía la secuencia de trabajo.</p>
-            <p style="font-size:.85rem;"><strong>Relación con las hojas de trabajo:</strong> HT1 (descomposición del problema), ciclo iterativo.</p>
+            <p style="font-size:.85rem;"><strong>Relación con las hojas de trabajo:</strong> HT1 (formulación del problema), HT2 (descomposición del problema), ciclo iterativo.</p>
             <a href="https://library.oapen.org/bitstream/id/bb540dab-9bbb-45ea-8ef1-4843b24dd432/624551.pdf" target="_blank" style="display:inline-block;margin-top:10px;color:var(--gl-accent);font-weight:600;font-size:.85rem;text-decoration:none;">Descargar PDF (acceso abierto) &rarr;</a>
           </div>
         </div>
@@ -588,7 +640,7 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
             <h3 style="font-size:1rem;margin-bottom:6px;">Laboratorio de Gobierno de Chile</h3>
             <p style="font-size:.85rem;color:#666;line-height:1.55;margin-bottom:8px;">Gobierno de Chile. <em>Herramientas para proyectos de innovación pública.</em></p>
             <p style="font-size:.85rem;color:#666;line-height:1.55;margin-bottom:12px;">Plataforma de innovación pública del gobierno chileno que ofrece herramientas para cinco fases: exploración institucional, investigación del problema, ideación de soluciones, pilotaje y evaluación, e implementación. Su enfoque de co-creación ciudadana y prototipado rápido complementa la metodología PDIA. Útil especialmente para la Hoja de Trabajo 2 (lluvia de ideas 3X3X3).</p>
-            <p style="font-size:.85rem;"><strong>Relación con las hojas de trabajo:</strong> HT2 (técnicas de ideación y prototipado rápido).</p>
+            <p style="font-size:.85rem;"><strong>Relación con las hojas de trabajo:</strong> HT3 (técnicas de ideación y prototipado rápido).</p>
             <a href="https://www.lab.gob.cl/landing-block" target="_blank" style="display:inline-block;margin-top:10px;color:var(--gl-accent);font-weight:600;font-size:.85rem;text-decoration:none;">Visitar sitio web &rarr;</a>
           </div>
         </div>
@@ -646,6 +698,57 @@ const CATS = DATA.categories;
 const PROBLEMS = DATA.problems;
 const CAT_MAP = {};
 CATS.forEach(c => CAT_MAP[c.id] = c);
+
+// ── Brief descriptions ──
+const DESCRIPTIONS = {
+  A1:'Advertencia de la UE por pesca INDNR vigente desde 2019; avances verificables pero pendiente levantamiento.',
+  A2:'Erosión de preferencias arancelarias ante avance de TLC de la UE con Tailandia e Indonesia.',
+  A3:'Acuerdos comerciales vigentes (China, Corea, EFTA, R.U., CPTPP) poco aprovechados.',
+  A4:'Aranceles elevados (35–50%) y sobretasa del 15% limitan acceso al mercado de EE.UU.',
+  A5:'Tailandia compite con costos más bajos por regulación laboral menos exigente y menores estándares.',
+  B1:'Emisión lenta del certificado de captura provoca retención de carga en puertos europeos.',
+  B2:'Único firmante autorizado del certificado de origen en Manta; punto único de falla.',
+  B3:'Dos subsecretarías mantienen registros distintos de establecimientos sin información unificada.',
+  B4:'La UE no acepta certificado de origen digital; obliga a procesos en papel.',
+  B5:'SIAP requiere ~14 procesos de mejora pendientes para fortalecer la trazabilidad.',
+  B6:'Interoperabilidad lenta entre SIAP y sistema aduanero SENAE por personal reducido.',
+  B7:'Multiplicidad y duplicación de permisos de planta entre varias entidades regulatorias.',
+  B8:'Inspectores con formación insuficiente y alta rotación por cambios de autoridad.',
+  B9:'Certificados de captura de terceros estados demoran 15–60 días por falta de cooperación.',
+  C1:'ISD del 5% sobre materia prima importada desvía descargas a Perú; vía normativa disponible.',
+  C2:'Procesos no automatizados en SENAE generan demoras en compensaciones y devoluciones.',
+  C3:'Devoluciones lentas de IVA e impuesto a la renta (hasta 6 meses) afectan liquidez.',
+  C4:'Sobrecostos estructurales (salario, tasas, dolarización) fuera del alcance directo de la Mesa.',
+  D1:'Manta concentra ~70% de la industria pero carece de puerto de exportación operativo.',
+  D2:'Transmisión eléctrica y agua potable insuficientes en contexto de crisis energética.',
+  D3:'Un solo astillero/dique para ~109 embarcaciones; mantenimientos frecuentes en el exterior.',
+  E1:'Operadores informales sin cumplir estándares distorsionan el mercado.',
+  E2:'Consumo interno bajo (~9 kg per cápita vs ~20 kg media mundial).',
+  F1:'El Niño 2026 podría reducir capturas (~−40%) y exportaciones (~−12%).',
+  F2:'Cuota de la CIAT debe estar al día para mantener derecho a voz y voto.',
+  F3:'Endeudamiento durante vedas y crédito restringido por tarjeta amarilla.',
+  F4:'Inseguridad genera costos de USD 200–300 M anuales. Fuera del alcance de la Mesa.',
+  F5:'Pesca ilegal global presiona reputación; trazabilidad ecuatoriana es una fortaleza.',
+  G1:'Sistema de monitoreo de barcos inoperativo; pendiente traslado a nuevas dependencias.',
+  G2:'Mesa técnica de tarjeta amarilla sin sesionar hace 6+ meses; responsabilidad difusa.',
+  G3:'Cambios constantes de cartera erosionan rectoría y memoria institucional.'
+};
+
+// ── Working group assignments ──
+const GRUPO_MAP = {
+  A1:'grupo1', G2:'grupo1', B5:'grupo1',
+  B1:'grupo2', B2:'grupo2', C1:'grupo2', C2:'grupo2',
+  G1:'grupo3', B7:'grupo3'
+};
+const GRUPO_LABELS = {
+  grupo1:'Grupo 1: Acceso a mercados, trazabilidad y fortalecimiento del SIAP',
+  grupo2:'Grupo 2: Facilitación de exportaciones y tratamiento de costos asociados',
+  grupo3:'Grupo 3: Permisos, control sanitario y mejora regulatoria',
+  sin:'Sin asignación'
+};
+const GRUPO_SHORT = { grupo1:'Grupo 1', grupo2:'Grupo 2', grupo3:'Grupo 3', sin:'Sin asignación' };
+const GRUPO_COLORS = { grupo1:'#1B4F72', grupo2:'#7D3C98', grupo3:'#148F77', sin:'#BDC3C7' };
+function getGrupo(code) { return GRUPO_MAP[code] || 'sin'; }
 
 // ── State ──
 const STORAGE_KEY = 'mesa_atun_matrix_v1';
@@ -752,29 +855,35 @@ function renderTable() {
   const fCat = document.getElementById('filter-cat').value;
   const fPlazo = document.getElementById('filter-plazo').value;
   const fSem = document.getElementById('filter-sem').value;
+  const fGrupo = document.getElementById('filter-grupo').value;
   let html='', count=0, currentCat='';
   PROBLEMS.forEach(p => {
     if (fCat && p.cat!==fCat) return;
     if (fPlazo && p.plazo!==fPlazo) return;
     if (fSem && (state.semaforos[p.code]||'gris')!==fSem) return;
+    if (fGrupo && getGrupo(p.code)!==fGrupo) return;
     const e = state.edits[p.code]||{};
     const pasosText = getPasos(p.code).map(pp => pp.paso||'').join(' ');
-    const searchText = (p.code+p.name+p.detalle+p.impacto+p.solucion+p.institucion+pasosText).toLowerCase();
+    const desc = DESCRIPTIONS[p.code]||'';
+    const searchText = (p.code+p.name+p.detalle+p.impacto+p.solucion+p.institucion+pasosText+desc).toLowerCase();
     if (search && !searchText.includes(search)) return;
     if (p.cat!==currentCat) {
       currentCat=p.cat; const cat=CAT_MAP[p.cat];
-      html+=`<tr class="cat-header" onclick="toggleCat('${p.cat}')"><td colspan="6"><span class="cat-toggle" id="toggle-${p.cat}">&#9660;</span> ${cat.id} &middot; ${cat.name}</td></tr>`;
+      html+=`<tr class="cat-header" onclick="toggleCat('${p.cat}')"><td colspan="8"><span class="cat-toggle" id="toggle-${p.cat}">&#9660;</span> ${cat.id} &middot; ${cat.name}</td></tr>`;
     }
     count++;
+    const grupo = getGrupo(p.code);
     html+=`<tr class="problem-row" data-cat="${p.cat}" id="row-${p.code}">
       <td><span class="code-badge" style="background:${CAT_MAP[p.cat].color}">${p.code}</span></td>
       <td><strong>${p.name}</strong></td>
+      <td style="font-size:.82rem;color:#555;line-height:1.45">${desc}</td>
+      <td><span style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:.75rem;font-weight:600;background:${GRUPO_COLORS[grupo]}20;color:${GRUPO_COLORS[grupo]};border:1px solid ${GRUPO_COLORS[grupo]}40">${GRUPO_SHORT[grupo]}</span></td>
       <td><span class="plazo-badge ${plazoClass(p.plazo)}">${p.plazo}</span></td>
       <td class="editable" style="max-width:none">${renderPasos(p.code)}</td>
       <td>${renderSemaforo(p.code)}</td>
       <td><span class="expand-btn" onclick="toggleDetail('${p.code}')">+</span></td>
     </tr>`;
-    html+=`<tr class="detail-row" id="detail-${p.code}"><td colspan="6"><div class="detail-content">
+    html+=`<tr class="detail-row" id="detail-${p.code}"><td colspan="8"><div class="detail-content">
       <div><h4>Detalle</h4><p>${p.detalle}</p></div><div><h4>Impacto y consecuencias</h4><p>${p.impacto}</p></div>
       <div><h4>Posible solución</h4><p>${p.solucion}</p></div><div><h4>Institución responsable</h4><p>${p.institucion}</p></div>
     </div></td></tr>`;
@@ -874,7 +983,14 @@ function wsAutoSave() {
   if (!wsState[code]) wsState[code] = {};
   const s = wsState[code];
 
-  // HT1: 5 Whys
+  // HT1: Formulación del problema
+  if (!s.formulation) s.formulation = {};
+  for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById('form-q' + i);
+    if (el) s.formulation['q' + i] = el.value;
+  }
+
+  // HT2: 5 Whys
   const wp = document.getElementById('whys-problem-text');
   if (wp) s.whysProblem = wp.value;
   s.whysGrid = {};
@@ -882,7 +998,7 @@ function wsAutoSave() {
     s.whysGrid[ta.id] = ta.value;
   });
 
-  // HT2: 3X3X3 brainstorming
+  // HT3: 3X3X3 brainstorming
   s.postits = {};
   document.querySelectorAll('#bs-grid .postit textarea').forEach(ta => {
     if (ta.id) s.postits[ta.id] = ta.value;
@@ -894,7 +1010,14 @@ function wsAutoSave() {
 function wsLoadProblem(code) {
   const s = wsState[code] || {};
 
-  // HT1: 5 Whys — column-based layout matching CSS (.whys-col, .whys-col-header, .whys-level)
+  // HT1: Formulación del problema
+  const form = s.formulation || {};
+  for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById('form-q' + i);
+    if (el) el.value = form['q' + i] || '';
+  }
+
+  // HT2: 5 Whys — column-based layout matching CSS (.whys-col, .whys-col-header, .whys-level)
   const whysProblemEl = document.getElementById('whys-problem-text');
   if (whysProblemEl) whysProblemEl.value = s.whysProblem || '';
   const whysGrid = document.getElementById('whys-grid');
@@ -947,9 +1070,9 @@ function wsLoadProblem(code) {
 }
 
 function cycleClick(n) {
-  // Steps 2 and 3 of the cycle link to worksheets 1 and 2
-  if (n === 2) wsSwitch(1);
-  if (n === 3) wsSwitch(2);
+  // Steps 2 and 3 of the cycle link to worksheets
+  if (n === 2) wsSwitch(1); // Formulación del problema
+  if (n === 3) wsSwitch(3); // Lluvia de ideas
 }
 
 // HT2: Brainstorm timer
@@ -1104,21 +1227,42 @@ function exportPDF() {
   let wsHtml = '';
   let wsCount = 0;
   const wsSaved = loadWsState();
+  const formLabels = [
+    '¿En qué consiste exactamente el problema?',
+    '¿Cómo se manifiesta en la práctica?',
+    '¿Con qué evidencia o datos contamos?',
+    '¿Cómo sabríamos que el problema está resuelto?',
+    '¿Cuáles problemas deberían priorizarse?'
+  ];
   PROBLEMS.forEach(p => {
     const s = wsSaved[p.code];
     if (!s) return;
+    const hasForm = s.formulation && Object.values(s.formulation).some(v => (v||'').trim());
     const hasWhys = s.whysProblem || (s.whysGrid && Object.values(s.whysGrid).some(v => v.trim()));
     const hasPostits = s.postits && Object.values(s.postits).some(v => v.trim());
-    if (!hasWhys && !hasPostits) return;
+    if (!hasForm && !hasWhys && !hasPostits) return;
     wsCount++;
 
     wsHtml += '<div style="page-break-inside:avoid;margin-bottom:24px;border:1px solid #ddd;border-radius:6px;overflow:hidden">';
     wsHtml += '<div style="background:' + CAT_MAP[p.cat].color + ';color:#fff;padding:10px 16px;font-weight:700">' + p.code + ' — ' + p.name + '</div>';
 
-    // HT1: 5 Whys
-    if (hasWhys) {
+    // HT1: Formulación del problema
+    if (hasForm) {
       wsHtml += '<div style="padding:16px">';
-      wsHtml += '<h4 style="margin:0 0 10px;font-size:.9rem;color:#1D1C1D">HT1: Deconstruir el problema (5 Por Qués)</h4>';
+      wsHtml += '<h4 style="margin:0 0 10px;font-size:.9rem;color:#1D1C1D">HT1: Formulación del problema</h4>';
+      for (let i = 1; i <= 5; i++) {
+        const val = (s.formulation['q' + i] || '').trim();
+        if (!val) continue;
+        wsHtml += '<div style="margin-bottom:10px"><div style="font-size:.78rem;font-weight:600;color:#A51C30;margin-bottom:3px">' + formLabels[i-1] + '</div>';
+        wsHtml += '<div style="font-size:.85rem;line-height:1.5;white-space:pre-wrap">' + val.replace(/</g,'&lt;') + '</div></div>';
+      }
+      wsHtml += '</div>';
+    }
+
+    // HT2: 5 Whys
+    if (hasWhys) {
+      wsHtml += '<div style="padding:16px;' + (hasForm ? 'border-top:1px solid #eee' : '') + '">';
+      wsHtml += '<h4 style="margin:0 0 10px;font-size:.9rem;color:#1D1C1D">HT2: Deconstruir el problema (5 Por Qués)</h4>';
       if (s.whysProblem) wsHtml += '<p style="margin:0 0 12px;padding:8px 12px;background:#FFF8E1;border-left:3px solid #B7950B;font-style:italic">' + s.whysProblem.replace(/</g,'&lt;') + '</p>';
       if (s.whysGrid) {
         wsHtml += '<table style="width:100%;border-collapse:collapse;font-size:.82rem">';
@@ -1140,7 +1284,7 @@ function exportPDF() {
     // HT2: Brainstorming
     if (hasPostits) {
       wsHtml += '<div style="padding:16px;border-top:1px solid #eee">';
-      wsHtml += '<h4 style="margin:0 0 10px;font-size:.9rem;color:#1D1C1D">HT2: Lluvia de ideas 3X3X3</h4>';
+      wsHtml += '<h4 style="margin:0 0 10px;font-size:.9rem;color:#1D1C1D">HT3: Lluvia de ideas 3X3X3</h4>';
       wsHtml += '<table style="width:100%;border-collapse:collapse;font-size:.82rem">';
       const colors = ['#FFF9C4','#FFCCBC','#C8E6C9'];
       const maxRows = Math.ceil(Object.keys(s.postits).length / 3);
