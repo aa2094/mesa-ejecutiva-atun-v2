@@ -381,7 +381,7 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
   <div class="intro-cards">
     <div class="intro-card" style="border-top-color:var(--gl-blue)">
       <h3><span class="ic-icon" style="background:var(--gl-blue)">1</span> Matriz Completa</h3>
-      <p>Tabla con los 31 problemas del sector atunero, organizados en 7 categorías. Incluye descripción breve y asignación a grupos de trabajo (3 grupos activos). Para cada problema puede asignar un responsable y su sector (público/privado), registrar próximos pasos con fecha límite y semáforo de progreso. Puede filtrar por categoría, grupo, semáforo o buscar por texto libre.</p>
+      <p>Tabla con los 31 problemas del sector atunero, organizados en 7 categorías. Incluye descripción breve y asignación a grupos de trabajo (3 grupos activos). Para cada problema puede registrar múltiples próximos pasos, cada uno con su responsable, sector (público/privado), fecha límite y semáforo de progreso. Puede filtrar por categoría, grupo, semáforo o buscar por texto libre.</p>
       <span class="ic-link" onclick="switchTab('table')">Ir a la Matriz &rarr;</span>
     </div>
     <div class="intro-card" style="border-top-color:#7D3C98">
@@ -429,8 +429,7 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
     <table class="matrix-table" id="main-table">
       <thead><tr>
         <th style="width:60px">Código</th><th style="width:180px">Problema</th><th style="width:200px">Descripción</th><th style="width:140px">Grupo</th>
-        <th class="editable" style="min-width:140px">Responsable</th><th style="width:110px">Sector</th>
-        <th class="editable" style="min-width:280px">Próximo paso</th>
+        <th class="editable" style="min-width:320px">Próximo paso</th>
         <th style="width:110px">Semáforo</th><th style="width:50px"></th>
       </tr></thead>
       <tbody id="table-body"></tbody>
@@ -857,9 +856,17 @@ function setSemaforo(code,color) { state.semaforos[code]=color; saveState(); ren
 
 function getPasos(code) {
   const e = state.edits[code] || {};
-  if (e.pasos && e.pasos.length) return e.pasos;
+  if (e.pasos && e.pasos.length) {
+    return e.pasos.map((p, i) => ({
+      paso: p.paso || '', fecha: p.fecha || '',
+      responsable: p.responsable || (i === 0 && state.responsables && state.responsables[code] ? state.responsables[code] : ''),
+      sector: p.sector || (i === 0 && state.sectores && state.sectores[code] ? state.sectores[code] : '')
+    }));
+  }
   // Migrate old single paso/fecha to array
-  return [{ paso: e.paso || '', fecha: e.fecha || '' }];
+  const oldResp = state.responsables ? (state.responsables[code] || '') : '';
+  const oldSect = state.sectores ? (state.sectores[code] || '') : '';
+  return [{ paso: e.paso || '', fecha: e.fecha || '', responsable: oldResp, sector: oldSect }];
 }
 
 function renderPasos(code) {
@@ -869,6 +876,13 @@ function renderPasos(code) {
     html += '<div class="paso-entry">' +
       '<textarea onchange="editPaso(\'' + code + '\',' + i + ',\'paso\',this.value)" placeholder="Próximo paso...">' + esc(p.paso || '') + '</textarea>' +
       '<div class="paso-meta">' +
+      '<input type="text" value="' + esc(p.responsable || '') + '" placeholder="Responsable..." onchange="editPaso(\'' + code + '\',' + i + ',\'responsable\',this.value)" style="flex:1;min-width:90px;padding:4px 6px;border:1px solid #ddd;border-radius:3px;font-family:inherit;font-size:.78rem">' +
+      '<select onchange="editPaso(\'' + code + '\',' + i + ',\'sector\',this.value)" style="padding:4px 6px;border:1px solid #ddd;border-radius:3px;font-family:inherit;font-size:.78rem;background:#FAFBFC">' +
+      '<option value="">Sector</option>' +
+      '<option value="publico"' + (p.sector==='publico'?' selected':'') + '>P\u00fablico</option>' +
+      '<option value="privado"' + (p.sector==='privado'?' selected':'') + '>Privado</option>' +
+      '<option value="ambos"' + (p.sector==='ambos'?' selected':'') + '>Ambos</option>' +
+      '</select>' +
       '<input type="date" value="' + (p.fecha || '') + '" onchange="editPaso(\'' + code + '\',' + i + ',\'fecha\',this.value)">' +
       (pasos.length > 1 ? '<span class="paso-remove" onclick="removePaso(\'' + code + '\',' + i + ')" title="Eliminar">&times;</span>' : '') +
       '</div></div>';
@@ -895,7 +909,7 @@ function renderTable() {
     if (search && !searchText.includes(search)) return;
     if (p.cat!==currentCat) {
       currentCat=p.cat; const cat=CAT_MAP[p.cat];
-      html+=`<tr class="cat-header" onclick="toggleCat('${p.cat}')"><td colspan="9"><span class="cat-toggle" id="toggle-${p.cat}">&#9660;</span> ${cat.id} &middot; ${cat.name}</td></tr>`;
+      html+=`<tr class="cat-header" onclick="toggleCat('${p.cat}')"><td colspan="7"><span class="cat-toggle" id="toggle-${p.cat}">&#9660;</span> ${cat.id} &middot; ${cat.name}</td></tr>`;
     }
     count++;
     const grupo = getGrupo(p.code);
@@ -904,13 +918,11 @@ function renderTable() {
       <td><strong>${p.name}</strong></td>
       <td style="font-size:.82rem;color:#555;line-height:1.45">${desc}</td>
       <td><span style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:.75rem;font-weight:600;background:${GRUPO_COLORS[grupo]}20;color:${GRUPO_COLORS[grupo]};border:1px solid ${GRUPO_COLORS[grupo]}40">${GRUPO_SHORT[grupo]}</span></td>
-      <td class="editable"><textarea onchange="editResponsable('${p.code}',this.value)" placeholder="Responsable..." style="min-height:40px">${esc(state.responsables[p.code]||'')}</textarea></td>
-      <td>${renderSector(p.code)}</td>
       <td class="editable" style="max-width:none">${renderPasos(p.code)}</td>
       <td>${renderSemaforo(p.code)}</td>
       <td><span class="expand-btn" onclick="toggleDetail('${p.code}')">+</span></td>
     </tr>`;
-    html+=`<tr class="detail-row" id="detail-${p.code}"><td colspan="9"><div class="detail-content">
+    html+=`<tr class="detail-row" id="detail-${p.code}"><td colspan="7"><div class="detail-content">
       <div><h4>Detalle</h4><p>${p.detalle}</p></div><div><h4>Impacto y consecuencias</h4><p>${p.impacto}</p></div>
       <div><h4>Posible solución</h4><p>${p.solucion}</p></div><div><h4>Institución responsable</h4><p>${p.institucion}</p></div>
     </div></td></tr>`;
@@ -929,7 +941,7 @@ function editPaso(code, idx, field, value) {
 function addPaso(code) {
   if (!state.edits[code]) state.edits[code] = {};
   if (!state.edits[code].pasos) state.edits[code].pasos = getPasos(code);
-  state.edits[code].pasos.push({ paso: '', fecha: '' });
+  state.edits[code].pasos.push({ paso: '', fecha: '', responsable: '', sector: '' });
   saveState();
   renderTable();
 }
@@ -943,17 +955,6 @@ function removePaso(code, idx) {
 }
 
 function editField(code,field,value) { if(!state.edits[code]) state.edits[code]={}; state.edits[code][field]=value; saveState(); }
-function editResponsable(code, value) { state.responsables[code] = value; saveState(); }
-function editSector(code, value) { if (!state.sectores) state.sectores = {}; state.sectores[code] = value; saveState(); }
-function renderSector(code) {
-  const current = state.sectores ? (state.sectores[code] || '') : '';
-  return '<select onchange="editSector(\'' + code + '\',this.value)" style="padding:6px 8px;border:1px solid #ddd;border-radius:3px;font-family:inherit;font-size:.82rem;background:#FAFBFC">' +
-    '<option value="">\u2014</option>' +
-    '<option value="publico"' + (current==='publico'?' selected':'') + '>P\u00fablico</option>' +
-    '<option value="privado"' + (current==='privado'?' selected':'') + '>Privado</option>' +
-    '<option value="ambos"' + (current==='ambos'?' selected':'') + '>Ambos</option>' +
-    '</select>';
-}
 function toggleDetail(code) {
   const row=document.getElementById('detail-'+code); row.classList.toggle('visible');
   document.querySelector(`#row-${code} .expand-btn`).textContent=row.classList.contains('visible')?'−':'+';
@@ -1270,27 +1271,22 @@ function exportPDF() {
     const pasos = getPasos(p.code);
     const hasAnyPaso = pasos.some(pp => (pp.paso||'').trim() || (pp.fecha||'').trim());
     const hasSem = sem !== 'gris';
-    const resp = state.responsables[p.code] || '';
-    const sect = state.sectores ? (state.sectores[p.code] || '') : '';
-    const hasResp = resp.trim();
-    const hasSect = sect.trim();
-    if (!hasAnyPaso && !hasSem && !hasResp && !hasSect) return;
+    if (!hasAnyPaso && !hasSem) return;
     editCount++;
+    const sectorLabel = {publico:'Público',privado:'Privado',ambos:'Ambos'};
     let pasosHtml = '';
     pasos.forEach((pp, i) => {
-      if (!(pp.paso||'').trim() && !(pp.fecha||'').trim()) return;
+      if (!(pp.paso||'').trim() && !(pp.fecha||'').trim() && !(pp.responsable||'').trim()) return;
       pasosHtml += '<div style="' + (i > 0 ? 'margin-top:6px;padding-top:6px;border-top:1px dashed #eee' : '') + '">' +
         (pp.paso ? pp.paso.replace(/</g,'&lt;') : '<span style="color:#bbb">—</span>') +
+        (pp.responsable ? ' <span style="color:#1B4F72;font-size:.78rem;font-weight:600">[' + pp.responsable.replace(/</g,'&lt;') + (pp.sector ? ' · ' + (sectorLabel[pp.sector]||'') : '') + ']</span>' : '') +
         (pp.fecha ? ' <span style="color:#888;font-size:.78rem">(' + pp.fecha + ')</span>' : '') +
         '</div>';
     });
     if (!pasosHtml) pasosHtml = '<span style="color:#bbb">—</span>';
-    const sectorLabel = {publico:'Público',privado:'Privado',ambos:'Ambos'};
     matrixRows += '<tr>' +
       '<td style="padding:8px 10px;border-bottom:1px solid #ddd;font-weight:700;color:' + CAT_MAP[p.cat].color + '">' + p.code + '</td>' +
       '<td style="padding:8px 10px;border-bottom:1px solid #ddd">' + p.name + '</td>' +
-      '<td style="padding:8px 10px;border-bottom:1px solid #ddd">' + (resp ? resp.replace(/</g,'&lt;') : '<span style="color:#bbb">—</span>') + '</td>' +
-      '<td style="padding:8px 10px;border-bottom:1px solid #ddd;text-align:center">' + (sectorLabel[sect] || '—') + '</td>' +
       '<td style="padding:8px 10px;border-bottom:1px solid #ddd">' + pasosHtml + '</td>' +
       '<td style="padding:8px 10px;border-bottom:1px solid #ddd;text-align:center"><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:' + semColor[sem] + '"></span> ' + semLabel[sem] + '</td>' +
       '</tr>';
@@ -1418,7 +1414,7 @@ function exportPDF() {
 
     '<h2>Matriz de seguimiento</h2>' +
     (matrixRows
-      ? '<table><thead><tr><th>Código</th><th>Problema</th><th>Responsable</th><th style="text-align:center">Sector</th><th>Próximo paso</th><th style="text-align:center">Semáforo</th></tr></thead><tbody>' + matrixRows + '</tbody></table>'
+      ? '<table><thead><tr><th>Código</th><th>Problema</th><th>Próximo paso · responsable</th><th style="text-align:center">Semáforo</th></tr></thead><tbody>' + matrixRows + '</tbody></table>'
       : '<p class="empty-msg">No se han registrado cambios en la matriz de seguimiento.</p>') +
 
     '<h2>Hojas de trabajo</h2>' +
