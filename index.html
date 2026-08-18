@@ -381,12 +381,12 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
   <div class="intro-cards">
     <div class="intro-card" style="border-top-color:var(--gl-blue)">
       <h3><span class="ic-icon" style="background:var(--gl-blue)">1</span> Matriz Completa</h3>
-      <p>Tabla con los 31 problemas del sector atunero, organizados en 7 categorías. Incluye descripción breve y asignación a grupos de trabajo (3 grupos activos). Puede filtrar por categoría, grupo, plazo o buscar por texto libre. Para cada problema puede registrar próximos pasos con responsable, fecha límite y semáforo de progreso.</p>
+      <p>Tabla con los 31 problemas del sector atunero, organizados en 7 categorías. Incluye descripción breve y asignación a grupos de trabajo (3 grupos activos). Para cada problema puede asignar un responsable y su sector (público/privado), registrar próximos pasos con fecha límite y semáforo de progreso. Puede filtrar por categoría, grupo, semáforo o buscar por texto libre.</p>
       <span class="ic-link" onclick="switchTab('table')">Ir a la Matriz &rarr;</span>
     </div>
     <div class="intro-card" style="border-top-color:#7D3C98">
       <h3><span class="ic-icon" style="background:#7D3C98">2</span> Hojas de Trabajo</h3>
-      <p>Tres hojas de trabajo basadas en la metodología PDIA para cada problema: (1) formulación del problema, (2) descomposición con los 5 Por Qués y (3) lluvia de ideas 3X3X3. Incluye un diagrama del proceso iterativo que guía la secuencia de trabajo.</p>
+      <p>Tres hojas de trabajo basadas en la metodología PDIA para cada problema: (1) estado y seguimiento del problema, (2) descomposición con los 5 Por Qués y (3) lluvia de ideas 3X3X3. Cada hoja incluye espacio para notas. Incluye un diagrama del proceso iterativo que guía la secuencia de trabajo.</p>
       <span class="ic-link" onclick="switchTab('worksheets')">Ir a Hojas de Trabajo &rarr;</span>
     </div>
     <div class="intro-card" style="border-top-color:#2E86C1">
@@ -420,8 +420,6 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
     <select id="filter-cat" onchange="applyFilters()"><option value="">Todas</option></select>
     <label>Grupo</label>
     <select id="filter-grupo" onchange="applyFilters()"><option value="">Todos</option><option value="grupo1">Grupo 1: Acceso a mercados y SIAP</option><option value="grupo2">Grupo 2: Facilitación de exportaciones</option><option value="grupo3">Grupo 3: Permisos y mejora regulatoria</option><option value="sin">Sin asignación</option></select>
-    <label>Plazo</label>
-    <select id="filter-plazo" onchange="applyFilters()"><option value="">Todos</option><option>Corto</option><option>Mediano</option><option>Largo</option></select>
     <label>Semáforo</label>
     <select id="filter-sem" onchange="applyFilters()"><option value="">Todos</option><option value="verde">Verde</option><option value="amarillo">Amarillo</option><option value="rojo">Rojo</option><option value="gris">Sin asignar</option></select>
     <input type="text" id="search-box" placeholder="Buscar en la matriz..." oninput="applyFilters()">
@@ -430,8 +428,9 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
   <div class="table-wrapper">
     <table class="matrix-table" id="main-table">
       <thead><tr>
-        <th style="width:60px">Código</th><th style="width:180px">Problema</th><th style="width:200px">Descripción</th><th style="width:140px">Grupo</th><th style="width:80px">Plazo</th>
-        <th class="editable" style="min-width:280px">Próximo paso y responsable</th>
+        <th style="width:60px">Código</th><th style="width:180px">Problema</th><th style="width:200px">Descripción</th><th style="width:140px">Grupo</th>
+        <th class="editable" style="min-width:140px">Responsable</th><th style="width:110px">Sector</th>
+        <th class="editable" style="min-width:280px">Próximo paso</th>
         <th style="width:110px">Semáforo</th><th style="width:50px"></th>
       </tr></thead>
       <tbody id="table-body"></tbody>
@@ -518,44 +517,48 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
   </div>
 
   <div class="ws-pills" id="ws-pills-container">
-    <div class="ws-pill active" onclick="wsSwitch(1)"><span class="pill-num">1</span>Formulación del problema</div>
+    <div class="ws-pill active" onclick="wsSwitch(1)"><span class="pill-num">1</span>Estado y seguimiento</div>
     <div class="ws-pill" onclick="wsSwitch(2)"><span class="pill-num">2</span>Deconstruir el problema</div>
     <div class="ws-pill" onclick="wsSwitch(3)"><span class="pill-num">3</span>Lluvia de ideas 3X3X3</div>
   </div>
 
   <!-- ── HT1: Formulación del problema ── -->
   <div class="ws-panel active" id="ws-1">
-    <h2>Hoja de Trabajo 1: Formulación del problema</h2>
-    <p class="ws-desc">Antes de analizar causas o proponer soluciones, es fundamental definir con precisión el problema que enfrenta el grupo de trabajo. Responda las siguientes preguntas para construir una formulación clara y compartida.</p>
+    <h2>Hoja de Trabajo 1: Estado y seguimiento del problema</h2>
+    <p class="ws-desc">Esta hoja permite al grupo reportar avances, identificar bloqueos y definir los próximos pasos concretos para cada problema. Se actualiza en cada sesión para mantener un registro continuo del progreso.</p>
     <div class="ws-instructions">
-      <strong>Instrucciones:</strong> Complete cada recuadro con la información disponible. No es necesario tener respuestas perfectas — el objetivo es hacer explícito lo que el grupo sabe y lo que necesita averiguar. Esta formulación se revisará y refinará en cada iteración del ciclo de trabajo.
+      <strong>Instrucciones:</strong> Complete cada recuadro con la información disponible. El objetivo es documentar el estado actual, los avances logrados y lo que se necesita para continuar. Esta hoja se actualiza en cada iteración del ciclo de trabajo.
     </div>
     <div class="formulation-questions" id="formulation-fields">
       <div class="formulation-field">
-        <label>1. ¿En qué consiste exactamente el problema? ¿A quién afecta, dónde y desde cuándo?</label>
-        <div class="field-example">Ejemplo: La emisión del certificado de captura tarda entre 5 y 15 días hábiles, cuando el estándar debería ser 48 horas. Afecta a las ~30 empresas exportadoras de atún que despachan hacia la UE, principalmente desde Manta. El problema se ha agravado desde 2023 con la reducción de personal en la SRP.</div>
-        <textarea id="form-q1" placeholder="Describa el problema con la mayor precisión posible..." onchange="wsAutoSave()"></textarea>
+        <label>1. ¿En qué estado está el problema? ¿Qué progreso se ha hecho desde la última sesión? ¿Qué nos ha frenado?</label>
+        <div class="field-example">Ejemplo: En la última sesión se identificó que el certificado de captura tarda en promedio 8 días. Desde entonces, la SRP incorporó 2 inspectores adicionales en Manta y el tiempo promedio bajó a 5 días. Sin embargo, el cuello de botella sigue siendo la verificación manual de datos de desembarque, que no se ha podido automatizar por falta de presupuesto.</div>
+        <textarea id="form-q1" placeholder="Describa el estado actual del problema, avances y bloqueos..." onchange="wsAutoSave()"></textarea>
       </div>
       <div class="formulation-field">
-        <label>2. ¿Cómo se manifiesta en la práctica (costos, demoras, trámites, pérdida de mercados o de competitividad)?</label>
-        <div class="field-example">Ejemplo: Genera retención de contenedores en puertos europeos (costos de almacenaje de ~USD 200/día por contenedor), pérdida de clientes por incumplimiento de plazos de entrega, y riesgo de sanciones ante la DG MARE de la UE.</div>
-        <textarea id="form-q2" placeholder="Describa las consecuencias concretas y observables..." onchange="wsAutoSave()"></textarea>
+        <label>2. ¿Cuáles son los objetivos intermedios que se deben cumplir para resolver el problema y cuáles son sus plazos?</label>
+        <div class="field-example">Ejemplo: (1) Reducir el tiempo de emisión a 48 horas — plazo: 3 meses. (2) Digitalizar la verificación de datos de desembarque — plazo: 6 meses. (3) Capacitar a 4 inspectores adicionales — plazo: 2 meses.</div>
+        <textarea id="form-q2" placeholder="Liste los objetivos intermedios con sus plazos..." onchange="wsAutoSave()"></textarea>
       </div>
       <div class="formulation-field">
-        <label>3. ¿Con qué evidencia o datos contamos para dimensionarlo? ¿Qué información falta y quién puede proveerla?</label>
-        <div class="field-example">Ejemplo: Contamos con registros de tiempos de emisión del SIAP (promedio 8 días en 2025) y reportes de retención en puertos de la UE. Falta: número exacto de contenedores afectados por mes (la puede proveer la SRP) y estimación del costo total para el sector (gremios).</div>
-        <textarea id="form-q3" placeholder="Liste la evidencia disponible y los vacíos de información..." onchange="wsAutoSave()"></textarea>
+        <label>3. ¿Hay información nueva que cambia nuestra percepción de cuál es la causa raíz del problema y el enfoque en cómo resolver el problema?</label>
+        <div class="field-example">Ejemplo: En conversaciones con la DG MARE se reveló que el problema no es solo la velocidad de emisión sino la trazabilidad del origen de la materia prima. Esto sugiere que la solución debe integrar mejoras al SIAP (B5) junto con la agilización del certificado.</div>
+        <textarea id="form-q3" placeholder="Describa cualquier información nueva relevante..." onchange="wsAutoSave()"></textarea>
       </div>
       <div class="formulation-field">
-        <label>4. ¿Cómo sabríamos que el problema está resuelto? ¿Qué indicador lo reflejaría?</label>
-        <div class="field-example">Ejemplo: El certificado de captura se emite en un máximo de 48 horas hábiles en el 95% de los casos. Indicador: tiempo promedio de emisión, medido mensualmente a través del SIAP.</div>
-        <textarea id="form-q4" placeholder="Defina criterios de éxito e indicadores medibles..." onchange="wsAutoSave()"></textarea>
+        <label>4. ¿Qué evidencia puede proveer o generar tanto el sector privado como público que pueda compartir con la Mesa para que se caracterice adecuadamente la dimensión y naturaleza del problema?</label>
+        <div class="field-example">Ejemplo: El sector privado puede compartir datos de tiempos de espera en puertos europeos y costos de almacenaje por contenedor. El sector público puede proveer estadísticas de emisión del SIAP y el número de solicitudes procesadas por mes.</div>
+        <textarea id="form-q4" placeholder="Identifique evidencia que cada sector puede aportar..." onchange="wsAutoSave()"></textarea>
       </div>
       <div class="formulation-field">
-        <label>5. De ser necesario, ¿cuáles de los problemas asignados deberían priorizarse para esta sesión, y con qué criterio?</label>
-        <div class="field-example">Ejemplo: Priorizar B1 (certificado de captura) sobre B5 (mejoras del SIAP) porque B1 tiene impacto inmediato en exportaciones y su solución es más acotada. B5 es más complejo y puede abordarse en una segunda fase.</div>
-        <textarea id="form-q5" placeholder="Identifique prioridades y justifique el criterio..." onchange="wsAutoSave()"></textarea>
+        <label>5. ¿Tenemos los insumos necesarios para tomar el siguiente paso en la resolución del problema (decretos, documentos, las personas responsables presentes)? Si no, ¿cuál es el plan para tenerlos?</label>
+        <div class="field-example">Ejemplo: Para avanzar se necesita: (1) el borrador del acuerdo ministerial para la firma digital — pendiente de revisión legal, (2) la presencia del Director de la SRP para autorizar la reasignación de personal, y (3) los datos actualizados del SIAP. Falta el punto (2); se propone invitar al Director a la próxima sesión.</div>
+        <textarea id="form-q5" placeholder="Liste los insumos necesarios y su estado..." onchange="wsAutoSave()"></textarea>
       </div>
+    </div>
+    <div style="margin-top:28px;padding-top:20px;border-top:2px solid #E8E8E8">
+      <label style="display:block;font-weight:700;font-size:.9rem;color:var(--gl-dark);margin-bottom:8px">Notas de la hoja de trabajo</label>
+      <textarea id="ws-notes-1" placeholder="Registre observaciones, acuerdos o pendientes de esta hoja de trabajo..." onchange="wsAutoSave()" style="width:100%;min-height:100px;border:1px solid #ddd;border-radius:var(--radius);padding:12px;font-family:inherit;font-size:.88rem;resize:vertical;background:#FAFBFC;line-height:1.6"></textarea>
     </div>
   </div>
 
@@ -583,6 +586,10 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
     <div class="whys-grid" id="whys-grid">
       <!-- Generated by JS -->
     </div>
+    <div style="margin-top:28px;padding-top:20px;border-top:2px solid #E8E8E8">
+      <label style="display:block;font-weight:700;font-size:.9rem;color:var(--gl-dark);margin-bottom:8px">Notas de la hoja de trabajo</label>
+      <textarea id="ws-notes-2" placeholder="Registre observaciones, acuerdos o pendientes de esta hoja de trabajo..." onchange="wsAutoSave()" style="width:100%;min-height:100px;border:1px solid #ddd;border-radius:var(--radius);padding:12px;font-family:inherit;font-size:.88rem;resize:vertical;background:#FAFBFC;line-height:1.6"></textarea>
+    </div>
   </div>
 
   <!-- ── HT3: 3X3X3 Brainstorming ── -->
@@ -605,6 +612,10 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
     </div>
     <div class="brainstorm-grid" id="bs-grid">
       <!-- Generated by JS -->
+    </div>
+    <div style="margin-top:28px;padding-top:20px;border-top:2px solid #E8E8E8">
+      <label style="display:block;font-weight:700;font-size:.9rem;color:var(--gl-dark);margin-bottom:8px">Notas de la hoja de trabajo</label>
+      <textarea id="ws-notes-3" placeholder="Registre observaciones, acuerdos o pendientes de esta hoja de trabajo..." onchange="wsAutoSave()" style="width:100%;min-height:100px;border:1px solid #ddd;border-radius:var(--radius);padding:12px;font-family:inherit;font-size:.88rem;resize:vertical;background:#FAFBFC;line-height:1.6"></textarea>
     </div>
   </div>
 
@@ -642,7 +653,7 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
             <h3 style="font-size:1rem;margin-bottom:6px;">PDIA Handbook — Building State Capability</h3>
             <p style="font-size:.85rem;color:#666;line-height:1.55;margin-bottom:8px;">Andrews, M., Pritchett, L. &amp; Woolcock, M. (2017). <em>Building State Capability: Evidence, Analysis, Action.</em> Oxford University Press.</p>
             <p style="font-size:.85rem;color:#666;line-height:1.55;margin-bottom:12px;">Marco fundacional del enfoque PDIA (Problem-Driven Iterative Adaptation). Propone que la construcción de capacidad estatal debe partir de problemas concretos, avanzar mediante iteraciones rápidas y escalar a través de grupos de trabajo. La Hoja de Trabajo 1 (5 Por Qués) se deriva directamente de este marco, así como el ciclo iterativo de 5 pasos que guía la secuencia de trabajo.</p>
-            <p style="font-size:.85rem;"><strong>Relación con las hojas de trabajo:</strong> HT1 (formulación del problema), HT2 (descomposición del problema), ciclo iterativo.</p>
+            <p style="font-size:.85rem;"><strong>Relación con las hojas de trabajo:</strong> HT1 (estado y seguimiento del problema), HT2 (descomposición del problema), ciclo iterativo.</p>
             <a href="https://library.oapen.org/bitstream/id/bb540dab-9bbb-45ea-8ef1-4843b24dd432/624551.pdf" target="_blank" style="display:inline-block;margin-top:10px;color:var(--gl-accent);font-weight:600;font-size:.85rem;text-decoration:none;">Descargar PDF (acceso abierto) &rarr;</a>
           </div>
         </div>
@@ -771,7 +782,7 @@ const STORAGE_KEY = 'mesa_atun_matrix_v1';
 let state = loadState();
 
 function defaultState() {
-  const s = { edits: {}, priorities: {}, scores: {}, comments: {}, tipos: {}, responsables: {}, semaforos: {}, groups: [] };
+  const s = { edits: {}, priorities: {}, scores: {}, comments: {}, tipos: {}, responsables: {}, semaforos: {}, sectores: {}, groups: [] };
   PROBLEMS.forEach(p => {
     s.edits[p.code] = { actores:'', metas:'', paso:'', fecha:'' };
     s.priorities[p.code] = 'sinpriorizar';
@@ -780,6 +791,7 @@ function defaultState() {
     s.tipos[p.code] = '';
     s.responsables[p.code] = '';
     s.semaforos[p.code] = 'gris';
+    s.sectores[p.code] = '';
   });
   return s;
 }
@@ -869,13 +881,11 @@ function renderTable() {
   const tbody = document.getElementById('table-body');
   const search = document.getElementById('search-box').value.toLowerCase();
   const fCat = document.getElementById('filter-cat').value;
-  const fPlazo = document.getElementById('filter-plazo').value;
   const fSem = document.getElementById('filter-sem').value;
   const fGrupo = document.getElementById('filter-grupo').value;
   let html='', count=0, currentCat='';
   PROBLEMS.forEach(p => {
     if (fCat && p.cat!==fCat) return;
-    if (fPlazo && p.plazo!==fPlazo) return;
     if (fSem && (state.semaforos[p.code]||'gris')!==fSem) return;
     if (fGrupo && getGrupo(p.code)!==fGrupo) return;
     const e = state.edits[p.code]||{};
@@ -885,7 +895,7 @@ function renderTable() {
     if (search && !searchText.includes(search)) return;
     if (p.cat!==currentCat) {
       currentCat=p.cat; const cat=CAT_MAP[p.cat];
-      html+=`<tr class="cat-header" onclick="toggleCat('${p.cat}')"><td colspan="8"><span class="cat-toggle" id="toggle-${p.cat}">&#9660;</span> ${cat.id} &middot; ${cat.name}</td></tr>`;
+      html+=`<tr class="cat-header" onclick="toggleCat('${p.cat}')"><td colspan="9"><span class="cat-toggle" id="toggle-${p.cat}">&#9660;</span> ${cat.id} &middot; ${cat.name}</td></tr>`;
     }
     count++;
     const grupo = getGrupo(p.code);
@@ -894,12 +904,13 @@ function renderTable() {
       <td><strong>${p.name}</strong></td>
       <td style="font-size:.82rem;color:#555;line-height:1.45">${desc}</td>
       <td><span style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:.75rem;font-weight:600;background:${GRUPO_COLORS[grupo]}20;color:${GRUPO_COLORS[grupo]};border:1px solid ${GRUPO_COLORS[grupo]}40">${GRUPO_SHORT[grupo]}</span></td>
-      <td><span class="plazo-badge ${plazoClass(p.plazo)}">${p.plazo}</span></td>
+      <td class="editable"><textarea onchange="editResponsable('${p.code}',this.value)" placeholder="Responsable..." style="min-height:40px">${esc(state.responsables[p.code]||'')}</textarea></td>
+      <td>${renderSector(p.code)}</td>
       <td class="editable" style="max-width:none">${renderPasos(p.code)}</td>
       <td>${renderSemaforo(p.code)}</td>
       <td><span class="expand-btn" onclick="toggleDetail('${p.code}')">+</span></td>
     </tr>`;
-    html+=`<tr class="detail-row" id="detail-${p.code}"><td colspan="8"><div class="detail-content">
+    html+=`<tr class="detail-row" id="detail-${p.code}"><td colspan="9"><div class="detail-content">
       <div><h4>Detalle</h4><p>${p.detalle}</p></div><div><h4>Impacto y consecuencias</h4><p>${p.impacto}</p></div>
       <div><h4>Posible solución</h4><p>${p.solucion}</p></div><div><h4>Institución responsable</h4><p>${p.institucion}</p></div>
     </div></td></tr>`;
@@ -932,6 +943,17 @@ function removePaso(code, idx) {
 }
 
 function editField(code,field,value) { if(!state.edits[code]) state.edits[code]={}; state.edits[code][field]=value; saveState(); }
+function editResponsable(code, value) { state.responsables[code] = value; saveState(); }
+function editSector(code, value) { if (!state.sectores) state.sectores = {}; state.sectores[code] = value; saveState(); }
+function renderSector(code) {
+  const current = state.sectores ? (state.sectores[code] || '') : '';
+  return '<select onchange="editSector(\'' + code + '\',this.value)" style="padding:6px 8px;border:1px solid #ddd;border-radius:3px;font-family:inherit;font-size:.82rem;background:#FAFBFC">' +
+    '<option value="">\u2014</option>' +
+    '<option value="publico"' + (current==='publico'?' selected':'') + '>P\u00fablico</option>' +
+    '<option value="privado"' + (current==='privado'?' selected':'') + '>Privado</option>' +
+    '<option value="ambos"' + (current==='ambos'?' selected':'') + '>Ambos</option>' +
+    '</select>';
+}
 function toggleDetail(code) {
   const row=document.getElementById('detail-'+code); row.classList.toggle('visible');
   document.querySelector(`#row-${code} .expand-btn`).textContent=row.classList.contains('visible')?'−':'+';
@@ -1037,6 +1059,12 @@ function wsAutoSave() {
     if (ta.id) s.postits[ta.id] = ta.value;
   });
 
+  // HT notes
+  for (let h = 1; h <= 3; h++) {
+    const el = document.getElementById('ws-notes-' + h);
+    if (el) s['notesHT' + h] = el.value;
+  }
+
   saveWsState();
 }
 
@@ -1099,6 +1127,12 @@ function wsLoadProblem(code) {
     board.querySelectorAll('.postit textarea').forEach(ta => {
       ta.value = (s.postits && s.postits[ta.id]) || '';
     });
+  }
+
+  // HT notes
+  for (let h = 1; h <= 3; h++) {
+    const el = document.getElementById('ws-notes-' + h);
+    if (el) el.value = s['notesHT' + h] || '';
   }
 }
 
@@ -1236,7 +1270,11 @@ function exportPDF() {
     const pasos = getPasos(p.code);
     const hasAnyPaso = pasos.some(pp => (pp.paso||'').trim() || (pp.fecha||'').trim());
     const hasSem = sem !== 'gris';
-    if (!hasAnyPaso && !hasSem) return;
+    const resp = state.responsables[p.code] || '';
+    const sect = state.sectores ? (state.sectores[p.code] || '') : '';
+    const hasResp = resp.trim();
+    const hasSect = sect.trim();
+    if (!hasAnyPaso && !hasSem && !hasResp && !hasSect) return;
     editCount++;
     let pasosHtml = '';
     pasos.forEach((pp, i) => {
@@ -1247,10 +1285,12 @@ function exportPDF() {
         '</div>';
     });
     if (!pasosHtml) pasosHtml = '<span style="color:#bbb">—</span>';
+    const sectorLabel = {publico:'Público',privado:'Privado',ambos:'Ambos'};
     matrixRows += '<tr>' +
       '<td style="padding:8px 10px;border-bottom:1px solid #ddd;font-weight:700;color:' + CAT_MAP[p.cat].color + '">' + p.code + '</td>' +
       '<td style="padding:8px 10px;border-bottom:1px solid #ddd">' + p.name + '</td>' +
-      '<td style="padding:8px 10px;border-bottom:1px solid #ddd;text-align:center">' + p.plazo + '</td>' +
+      '<td style="padding:8px 10px;border-bottom:1px solid #ddd">' + (resp ? resp.replace(/</g,'&lt;') : '<span style="color:#bbb">—</span>') + '</td>' +
+      '<td style="padding:8px 10px;border-bottom:1px solid #ddd;text-align:center">' + (sectorLabel[sect] || '—') + '</td>' +
       '<td style="padding:8px 10px;border-bottom:1px solid #ddd">' + pasosHtml + '</td>' +
       '<td style="padding:8px 10px;border-bottom:1px solid #ddd;text-align:center"><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:' + semColor[sem] + '"></span> ' + semLabel[sem] + '</td>' +
       '</tr>';
@@ -1261,11 +1301,11 @@ function exportPDF() {
   let wsCount = 0;
   const wsSaved = loadWsState();
   const formLabels = [
-    '¿En qué consiste exactamente el problema?',
-    '¿Cómo se manifiesta en la práctica?',
-    '¿Con qué evidencia o datos contamos?',
-    '¿Cómo sabríamos que el problema está resuelto?',
-    '¿Cuáles problemas deberían priorizarse?'
+    '¿En qué estado está el problema? ¿Qué progreso se ha hecho?',
+    '¿Cuáles son los objetivos intermedios y sus plazos?',
+    '¿Hay información nueva sobre la causa raíz?',
+    '¿Qué evidencia puede proveer el sector privado y público?',
+    '¿Tenemos los insumos necesarios para el siguiente paso?'
   ];
   PROBLEMS.forEach(p => {
     const s = wsSaved[p.code];
@@ -1273,7 +1313,8 @@ function exportPDF() {
     const hasForm = s.formulation && Object.values(s.formulation).some(v => (v||'').trim());
     const hasWhys = s.whysProblem || (s.whysGrid && Object.values(s.whysGrid).some(v => v.trim()));
     const hasPostits = s.postits && Object.values(s.postits).some(v => v.trim());
-    if (!hasForm && !hasWhys && !hasPostits) return;
+    const hasHtNotes = s.notesHT1 || s.notesHT2 || s.notesHT3;
+    if (!hasForm && !hasWhys && !hasPostits && !hasHtNotes) return;
     wsCount++;
 
     wsHtml += '<div style="page-break-inside:avoid;margin-bottom:24px;border:1px solid #ddd;border-radius:6px;overflow:hidden">';
@@ -1282,7 +1323,7 @@ function exportPDF() {
     // HT1: Formulación del problema
     if (hasForm) {
       wsHtml += '<div style="padding:16px">';
-      wsHtml += '<h4 style="margin:0 0 10px;font-size:.9rem;color:#1D1C1D">HT1: Formulación del problema</h4>';
+      wsHtml += '<h4 style="margin:0 0 10px;font-size:.9rem;color:#1D1C1D">HT1: Estado y seguimiento del problema</h4>';
       for (let i = 1; i <= 5; i++) {
         const val = (s.formulation['q' + i] || '').trim();
         if (!val) continue;
@@ -1334,6 +1375,18 @@ function exportPDF() {
       wsHtml += '</div>';
     }
 
+    // HT notes
+    const htNoteLabels = ['Estado y seguimiento', 'Deconstruir el problema', 'Lluvia de ideas'];
+    for (let h = 1; h <= 3; h++) {
+      const noteVal = (s['notesHT' + h] || '').trim();
+      if (noteVal) {
+        wsHtml += '<div style="padding:12px 16px;border-top:1px solid #eee;background:#FAFBFC">';
+        wsHtml += '<div style="font-size:.78rem;font-weight:600;color:#555;margin-bottom:4px">Notas — ' + htNoteLabels[h-1] + '</div>';
+        wsHtml += '<div style="font-size:.85rem;line-height:1.5;white-space:pre-wrap">' + noteVal.replace(/</g,'&lt;') + '</div>';
+        wsHtml += '</div>';
+      }
+    }
+
     wsHtml += '</div>';
   });
 
@@ -1365,7 +1418,7 @@ function exportPDF() {
 
     '<h2>Matriz de seguimiento</h2>' +
     (matrixRows
-      ? '<table><thead><tr><th>Código</th><th>Problema</th><th style="text-align:center">Plazo</th><th>Próximo paso y responsable</th><th style="text-align:center">Semáforo</th></tr></thead><tbody>' + matrixRows + '</tbody></table>'
+      ? '<table><thead><tr><th>Código</th><th>Problema</th><th>Responsable</th><th style="text-align:center">Sector</th><th>Próximo paso</th><th style="text-align:center">Semáforo</th></tr></thead><tbody>' + matrixRows + '</tbody></table>'
       : '<p class="empty-msg">No se han registrado cambios en la matriz de seguimiento.</p>') +
 
     '<h2>Hojas de trabajo</h2>' +
