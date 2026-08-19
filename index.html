@@ -545,14 +545,14 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
         <textarea id="form-q3" placeholder="Describa cualquier información nueva relevante..." onchange="wsAutoSave()"></textarea>
       </div>
       <div class="formulation-field">
-        <label>4. ¿Qué evidencia puede proveer o generar tanto el sector privado como público que pueda compartir con la Mesa para que se caracterice adecuadamente la dimensión y naturaleza del problema?</label>
-        <div class="field-example">Ejemplo: El sector privado puede compartir datos de tiempos de espera en puertos europeos y costos de almacenaje por contenedor. El sector público puede proveer estadísticas de emisión del SIAP y el número de solicitudes procesadas por mes.</div>
-        <textarea id="form-q4" placeholder="Identifique evidencia que cada sector puede aportar..." onchange="wsAutoSave()"></textarea>
+        <label>4. En relación con el problema expuesto, ¿cómo considera el sector privado que podría darse una respuesta ágil y efectiva para su solución?</label>
+        <div class="field-example">Ejemplo: Las empresas exportadoras proponen que la SRP habilite una ventanilla express con revisión documental simplificada para exportadores habituales, lo que permitiría reducir el tiempo de emisión del certificado de captura de 8 días a 48 horas sin comprometer la trazabilidad.</div>
+        <textarea id="form-q4" placeholder="Describa la propuesta del sector privado para una solución ágil..." onchange="wsAutoSave()"></textarea>
       </div>
       <div class="formulation-field">
-        <label>5. ¿Tenemos los insumos necesarios para tomar el siguiente paso en la resolución del problema (decretos, documentos, las personas responsables presentes)? Si no, ¿cuál es el plan para tenerlos?</label>
-        <div class="field-example">Ejemplo: Para avanzar se necesita: (1) el borrador del acuerdo ministerial para la firma digital — pendiente de revisión legal, (2) la presencia del Director de la SRP para autorizar la reasignación de personal, y (3) los datos actualizados del SIAP. Falta el punto (2); se propone invitar al Director a la próxima sesión.</div>
-        <textarea id="form-q5" placeholder="Liste los insumos necesarios y su estado..." onchange="wsAutoSave()"></textarea>
+        <label>5. ¿Tenemos los insumos necesarios para tomar el siguiente paso en la resolución del problema (evidencia de la magnitud y naturaleza del problema, decretos, documentos, las personas responsables presentes)? Si sí, ¿cómo recopilarlos adecuadamente para que estén a disposición del grupo de trabajo para agilizar la resolución del problema? Si no, ¿cuál es el plan para tenerlos?</label>
+        <div class="field-example">Ejemplo: Se necesita: (1) datos de tiempos de emisión del SIAP (disponibles — solicitar a la SRP y centralizar en carpeta compartida), (2) el borrador del acuerdo ministerial para la firma digital (pendiente de revisión legal — se propone fijar plazo de 2 semanas), y (3) la presencia del Director de la SRP para autorizar la reasignación de personal (no disponible — invitar a la próxima sesión).</div>
+        <textarea id="form-q5" placeholder="Liste los insumos necesarios, su disponibilidad y el plan para obtenerlos..." onchange="wsAutoSave()"></textarea>
       </div>
     </div>
     <div style="margin-top:28px;padding-top:20px;border-top:2px solid #E8E8E8">
@@ -1300,7 +1300,7 @@ function exportPDF() {
     '¿En qué estado está el problema? ¿Qué progreso se ha hecho?',
     '¿Cuáles son los objetivos intermedios y sus plazos?',
     '¿Hay información nueva que cambia o actualiza nuestro diagnóstico?',
-    '¿Qué evidencia puede proveer el sector privado y público?',
+    '¿Cómo considera el sector privado que podría darse una respuesta ágil?',
     '¿Tenemos los insumos necesarios para el siguiente paso?'
   ];
   PROBLEMS.forEach(p => {
