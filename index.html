@@ -269,6 +269,19 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
 .formulation-field textarea { width: 100%; min-height: 80px; border: 1px solid #ddd; border-radius: var(--radius); padding: 10px 12px; font-family: inherit; font-size: .88rem; resize: vertical; background: #fff; transition: border-color .2s; line-height: 1.5; }
 .formulation-field textarea:focus { border-color: var(--gl-accent); outline: none; }
 
+/* ── HT1 inline commitments ── */
+.ht1-compromisos { margin-top:10px; }
+.ht1-compromiso { display:flex; flex-wrap:wrap; gap:6px; align-items:center; padding:8px 10px; background:#fff; border:1px solid #E0E0E0; border-left:3px solid var(--gl-accent); border-radius:0 var(--radius) var(--radius) 0; margin-bottom:6px; font-size:.82rem; }
+.ht1-compromiso textarea { flex:1 1 100%; min-height:32px; border:1px solid #eee; border-radius:3px; padding:6px 8px; font-family:inherit; font-size:.82rem; resize:vertical; background:#FAFBFC; }
+.ht1-compromiso textarea:focus { border-color:var(--gl-accent); outline:none; }
+.ht1-compromiso input[type="text"] { flex:1; min-width:80px; padding:4px 6px; border:1px solid #ddd; border-radius:3px; font-family:inherit; font-size:.78rem; }
+.ht1-compromiso select { padding:4px 6px; border:1px solid #ddd; border-radius:3px; font-family:inherit; font-size:.78rem; background:#FAFBFC; }
+.ht1-compromiso input[type="date"] { padding:4px 6px; border:1px solid #ddd; border-radius:3px; font-family:inherit; font-size:.78rem; }
+.ht1-compromiso .ht1-remove { cursor:pointer; color:#ccc; font-size:1rem; padding:2px 4px; border-radius:3px; }
+.ht1-compromiso .ht1-remove:hover { color:var(--gl-accent); background:#FDF2F2; }
+.ht1-add-compromiso { display:inline-block; padding:4px 12px; border:1.5px dashed #ccc; border-radius:3px; background:none; font-family:inherit; font-size:.78rem; color:#999; cursor:pointer; margin-top:4px; }
+.ht1-add-compromiso:hover { border-color:var(--gl-accent); color:var(--gl-accent); }
+
 /* ── HT1: 5 Whys grid ── */
 .whys-problem { margin-bottom: 24px; }
 .whys-problem label { display: block; font-weight: 700; font-size: .9rem; color: var(--gl-dark); margin-bottom: 6px; }
@@ -386,7 +399,7 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
     </div>
     <div class="intro-card" style="border-top-color:#7D3C98">
       <h3><span class="ic-icon" style="background:#7D3C98">2</span> Hojas de Trabajo</h3>
-      <p>Tres hojas de trabajo basadas en la metodología PDIA para cada problema: (1) estado y seguimiento del problema, (2) descomposición con los 5 Por Qués y (3) lluvia de ideas 3X3X3. Cada hoja incluye espacio para notas. Incluye un diagrama del proceso iterativo que guía la secuencia de trabajo.</p>
+      <p>Tres hojas de trabajo basadas en la metodología PDIA para cada problema: (1) estado y seguimiento del problema, (2) descomposición con los 5 Por Qués y (3) lluvia de ideas 3X3X3. Cada hoja incluye espacio para notas. La HT1 permite agregar compromisos directamente desde cada pregunta, que se sincronizan automáticamente con la Matriz Completa. Incluye un diagrama del proceso iterativo que guía la secuencia de trabajo.</p>
       <span class="ic-link" onclick="switchTab('worksheets')">Ir a Hojas de Trabajo &rarr;</span>
     </div>
     <div class="intro-card" style="border-top-color:#2E86C1">
@@ -533,28 +546,34 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
         <label>1. ¿En qué estado está el problema? ¿Qué progreso se ha hecho desde la última sesión? ¿Qué nos ha frenado?</label>
         <div class="field-example">Ejemplo: En la última sesión se identificó que el certificado de captura tarda en promedio 8 días. Desde entonces, la SRP incorporó 2 inspectores adicionales en Manta y el tiempo promedio bajó a 5 días. Sin embargo, el cuello de botella sigue siendo la verificación manual de datos de desembarque, que no se ha podido automatizar por falta de presupuesto.</div>
         <textarea id="form-q1" placeholder="Describa el estado actual del problema, avances y bloqueos..." onchange="wsAutoSave()"></textarea>
+        <div class="ht1-compromisos" id="ht1-compromisos-q1"></div>
       </div>
       <div class="formulation-field">
         <label>2. ¿Cuáles son los objetivos intermedios que se deben cumplir para resolver el problema y cuáles son sus plazos?</label>
         <div class="field-example">Ejemplo: (1) Reducir el tiempo de emisión a 48 horas — plazo: 3 meses. (2) Digitalizar la verificación de datos de desembarque — plazo: 6 meses. (3) Capacitar a 4 inspectores adicionales — plazo: 2 meses.</div>
         <textarea id="form-q2" placeholder="Liste los objetivos intermedios con sus plazos..." onchange="wsAutoSave()"></textarea>
+        <div class="ht1-compromisos" id="ht1-compromisos-q2"></div>
       </div>
       <div class="formulation-field">
         <label>3. ¿Hay información nueva que cambia o actualiza nuestro diagnóstico respecto de la naturaleza, magnitud o especificidad del problema?</label>
         <div class="field-example">Ejemplo: En conversaciones con la DG MARE se reveló que el problema no es solo la velocidad de emisión sino la trazabilidad del origen de la materia prima. Esto sugiere que la solución debe integrar mejoras al SIAP (B5) junto con la agilización del certificado.</div>
         <textarea id="form-q3" placeholder="Describa cualquier información nueva relevante..." onchange="wsAutoSave()"></textarea>
+        <div class="ht1-compromisos" id="ht1-compromisos-q3"></div>
       </div>
       <div class="formulation-field">
         <label>4. En relación con el problema expuesto, ¿cómo considera el sector privado que podría darse una respuesta ágil y efectiva para su solución?</label>
         <div class="field-example">Ejemplo: Las empresas exportadoras proponen que la SRP habilite una ventanilla express con revisión documental simplificada para exportadores habituales, lo que permitiría reducir el tiempo de emisión del certificado de captura de 8 días a 48 horas sin comprometer la trazabilidad.</div>
         <textarea id="form-q4" placeholder="Describa la propuesta del sector privado para una solución ágil..." onchange="wsAutoSave()"></textarea>
+        <div class="ht1-compromisos" id="ht1-compromisos-q4"></div>
       </div>
       <div class="formulation-field">
         <label>5. ¿Tenemos los insumos necesarios para tomar el siguiente paso en la resolución del problema (evidencia de la magnitud y naturaleza del problema, decretos, documentos, las personas responsables presentes)? Si sí, ¿cómo recopilarlos adecuadamente para que estén a disposición del grupo de trabajo para agilizar la resolución del problema? Si no, ¿cuál es el plan para tenerlos?</label>
         <div class="field-example">Ejemplo: Se necesita: (1) datos de tiempos de emisión del SIAP (disponibles — solicitar a la SRP y centralizar en carpeta compartida), (2) el borrador del acuerdo ministerial para la firma digital (pendiente de revisión legal — se propone fijar plazo de 2 semanas), y (3) la presencia del Director de la SRP para autorizar la reasignación de personal (no disponible — invitar a la próxima sesión).</div>
         <textarea id="form-q5" placeholder="Liste los insumos necesarios, su disponibilidad y el plan para obtenerlos..." onchange="wsAutoSave()"></textarea>
+        <div class="ht1-compromisos" id="ht1-compromisos-q5"></div>
       </div>
     </div>
+    <div id="ht1-compromisos-otros" style="margin-top:20px"></div>
     <div style="margin-top:28px;padding-top:20px;border-top:2px solid #E8E8E8">
       <label style="display:block;font-weight:700;font-size:.9rem;color:var(--gl-dark);margin-bottom:8px">Notas de la hoja de trabajo</label>
       <textarea id="ws-notes-1" placeholder="Registre observaciones, acuerdos o pendientes de esta hoja de trabajo..." onchange="wsAutoSave()" style="width:100%;min-height:100px;border:1px solid #ddd;border-radius:var(--radius);padding:12px;font-family:inherit;font-size:.88rem;resize:vertical;background:#FAFBFC;line-height:1.6"></textarea>
@@ -860,13 +879,14 @@ function getPasos(code) {
     return e.pasos.map((p, i) => ({
       paso: p.paso || '', fecha: p.fecha || '',
       responsable: p.responsable || (i === 0 && state.responsables && state.responsables[code] ? state.responsables[code] : ''),
-      sector: p.sector || (i === 0 && state.sectores && state.sectores[code] ? state.sectores[code] : '')
+      sector: p.sector || (i === 0 && state.sectores && state.sectores[code] ? state.sectores[code] : ''),
+      fromQ: p.fromQ || null
     }));
   }
   // Migrate old single paso/fecha to array
   const oldResp = state.responsables ? (state.responsables[code] || '') : '';
   const oldSect = state.sectores ? (state.sectores[code] || '') : '';
-  return [{ paso: e.paso || '', fecha: e.fecha || '', responsable: oldResp, sector: oldSect }];
+  return [{ paso: e.paso || '', fecha: e.fecha || '', responsable: oldResp, sector: oldSect, fromQ: null }];
 }
 
 function renderPasos(code) {
@@ -941,17 +961,85 @@ function editPaso(code, idx, field, value) {
 function addPaso(code) {
   if (!state.edits[code]) state.edits[code] = {};
   if (!state.edits[code].pasos) state.edits[code].pasos = getPasos(code);
-  state.edits[code].pasos.push({ paso: '', fecha: '', responsable: '', sector: '' });
+  state.edits[code].pasos.push({ paso: '', fecha: '', responsable: '', sector: '', fromQ: null });
   saveState();
   renderTable();
+  if (currentWsProblem === code) renderHT1Compromisos(code);
 }
 
 function removePaso(code, idx) {
   if (!state.edits[code] || !state.edits[code].pasos) return;
   state.edits[code].pasos.splice(idx, 1);
-  if (!state.edits[code].pasos.length) state.edits[code].pasos = [{ paso: '', fecha: '' }];
+  if (!state.edits[code].pasos.length) state.edits[code].pasos = [{ paso: '', fecha: '', responsable: '', sector: '', fromQ: null }];
   saveState();
   renderTable();
+  if (currentWsProblem === code) renderHT1Compromisos(code);
+}
+
+// ── HT1 inline commitments (synced with matrix pasos) ──
+function renderHT1Compromisos(code) {
+  if (!code) return;
+  const pasos = getPasos(code);
+  // Render per-question commitments
+  for (let q = 1; q <= 5; q++) {
+    const container = document.getElementById('ht1-compromisos-q' + q);
+    if (!container) continue;
+    const qPasos = [];
+    pasos.forEach((p, idx) => { if (p.fromQ === q) qPasos.push({ ...p, idx }); });
+    let html = '';
+    qPasos.forEach(p => {
+      html += renderHT1PasoCard(code, p.idx, p);
+    });
+    html += '<button class="ht1-add-compromiso" onclick="addHT1Paso(\'' + code + '\',' + q + ')">+ Agregar compromiso</button>';
+    container.innerHTML = html;
+  }
+  // Render "otros compromisos" (created in matrix, no fromQ)
+  const otrosContainer = document.getElementById('ht1-compromisos-otros');
+  if (!otrosContainer) return;
+  const otros = [];
+  pasos.forEach((p, idx) => { if (!p.fromQ) otros.push({ ...p, idx }); });
+  const hasContent = otros.some(p => (p.paso||'').trim() || (p.responsable||'').trim());
+  if (!hasContent && otros.length <= 1) {
+    otrosContainer.innerHTML = '';
+    return;
+  }
+  let html = '<div style="padding:14px 18px;background:#F0F4F8;border-radius:var(--radius);border-left:4px solid var(--gl-blue)">';
+  html += '<div style="font-weight:700;font-size:.88rem;color:var(--gl-dark);margin-bottom:8px">Otros compromisos (creados en la Matriz)</div>';
+  otros.forEach(p => { html += renderHT1PasoCard(code, p.idx, p); });
+  html += '</div>';
+  otrosContainer.innerHTML = html;
+}
+
+function renderHT1PasoCard(code, idx, p) {
+  const sectorLabel = {publico:'Público',privado:'Privado',ambos:'Ambos'};
+  return '<div class="ht1-compromiso">' +
+    '<textarea onchange="editPaso(\'' + code + '\',' + idx + ',\'paso\',this.value);renderHT1Compromisos(\'' + code + '\')" placeholder="Acción / compromiso...">' + esc(p.paso || '') + '</textarea>' +
+    '<input type="text" value="' + esc(p.responsable || '') + '" placeholder="Responsable..." onchange="editPaso(\'' + code + '\',' + idx + ',\'responsable\',this.value)">' +
+    '<select onchange="editPaso(\'' + code + '\',' + idx + ',\'sector\',this.value)">' +
+    '<option value="">Sector</option>' +
+    '<option value="publico"' + (p.sector==='publico'?' selected':'') + '>Público</option>' +
+    '<option value="privado"' + (p.sector==='privado'?' selected':'') + '>Privado</option>' +
+    '<option value="ambos"' + (p.sector==='ambos'?' selected':'') + '>Ambos</option>' +
+    '</select>' +
+    '<input type="date" value="' + (p.fecha || '') + '" onchange="editPaso(\'' + code + '\',' + idx + ',\'fecha\',this.value)">' +
+    '<span class="ht1-remove" onclick="removeHT1Paso(\'' + code + '\',' + idx + ')" title="Eliminar">&times;</span>' +
+    '</div>';
+}
+
+function addHT1Paso(code, qNum) {
+  if (!state.edits[code]) state.edits[code] = {};
+  if (!state.edits[code].pasos) state.edits[code].pasos = getPasos(code);
+  state.edits[code].pasos.push({ paso: '', fecha: '', responsable: '', sector: '', fromQ: qNum });
+  saveState();
+  renderHT1Compromisos(code);
+}
+
+function removeHT1Paso(code, idx) {
+  if (!state.edits[code] || !state.edits[code].pasos) return;
+  state.edits[code].pasos.splice(idx, 1);
+  if (!state.edits[code].pasos.length) state.edits[code].pasos = [{ paso: '', fecha: '', responsable: '', sector: '', fromQ: null }];
+  saveState();
+  renderHT1Compromisos(code);
 }
 
 function editField(code,field,value) { if(!state.edits[code]) state.edits[code]={}; state.edits[code][field]=value; saveState(); }
@@ -1078,6 +1166,7 @@ function wsLoadProblem(code) {
     const el = document.getElementById('form-q' + i);
     if (el) el.value = form['q' + i] || '';
   }
+  renderHT1Compromisos(code);
 
   // HT2: 5 Whys — column-based layout matching CSS (.whys-col, .whys-col-header, .whys-level)
   const whysProblemEl = document.getElementById('whys-problem-text');
@@ -1310,21 +1399,38 @@ function exportPDF() {
     const hasWhys = s.whysProblem || (s.whysGrid && Object.values(s.whysGrid).some(v => v.trim()));
     const hasPostits = s.postits && Object.values(s.postits).some(v => v.trim());
     const hasHtNotes = s.notesHT1 || s.notesHT2 || s.notesHT3;
-    if (!hasForm && !hasWhys && !hasPostits && !hasHtNotes) return;
+    const hasLinkedPasos = getPasos(p.code).some(pp => pp.fromQ && ((pp.paso||'').trim() || (pp.responsable||'').trim()));
+    if (!hasForm && !hasWhys && !hasPostits && !hasHtNotes && !hasLinkedPasos) return;
     wsCount++;
 
     wsHtml += '<div style="page-break-inside:avoid;margin-bottom:24px;border:1px solid #ddd;border-radius:6px;overflow:hidden">';
     wsHtml += '<div style="background:' + CAT_MAP[p.cat].color + ';color:#fff;padding:10px 16px;font-weight:700">' + p.code + ' — ' + p.name + '</div>';
 
-    // HT1: Formulación del problema
-    if (hasForm) {
+    // HT1: Estado y seguimiento del problema
+    const ht1Pasos = getPasos(p.code);
+    const hasHT1Pasos = ht1Pasos.some(pp => pp.fromQ && ((pp.paso||'').trim() || (pp.responsable||'').trim()));
+    if (hasForm || hasHT1Pasos) {
+      const pdfSectorLabel = {publico:'Público',privado:'Privado',ambos:'Ambos'};
       wsHtml += '<div style="padding:16px">';
       wsHtml += '<h4 style="margin:0 0 10px;font-size:.9rem;color:#1D1C1D">HT1: Estado y seguimiento del problema</h4>';
       for (let i = 1; i <= 5; i++) {
-        const val = (s.formulation['q' + i] || '').trim();
-        if (!val) continue;
-        wsHtml += '<div style="margin-bottom:10px"><div style="font-size:.78rem;font-weight:600;color:#A51C30;margin-bottom:3px">' + formLabels[i-1] + '</div>';
-        wsHtml += '<div style="font-size:.85rem;line-height:1.5;white-space:pre-wrap">' + val.replace(/</g,'&lt;') + '</div></div>';
+        const val = (s.formulation && s.formulation['q' + i] || '').trim();
+        const qPasos = ht1Pasos.filter(pp => pp.fromQ === i && ((pp.paso||'').trim() || (pp.responsable||'').trim()));
+        if (!val && !qPasos.length) continue;
+        wsHtml += '<div style="margin-bottom:12px"><div style="font-size:.78rem;font-weight:600;color:#A51C30;margin-bottom:3px">' + formLabels[i-1] + '</div>';
+        if (val) wsHtml += '<div style="font-size:.85rem;line-height:1.5;white-space:pre-wrap">' + val.replace(/</g,'&lt;') + '</div>';
+        if (qPasos.length) {
+          wsHtml += '<div style="margin-top:6px;padding-left:12px;border-left:3px solid #A51C30">';
+          qPasos.forEach(pp => {
+            wsHtml += '<div style="font-size:.82rem;margin-bottom:4px">';
+            wsHtml += '<strong style="color:#1D1C1D">Compromiso:</strong> ' + (pp.paso ? pp.paso.replace(/</g,'&lt;') : '—');
+            if (pp.responsable) wsHtml += ' <span style="color:#1B4F72;font-weight:600">[' + pp.responsable.replace(/</g,'&lt;') + (pp.sector ? ' · ' + (pdfSectorLabel[pp.sector]||'') : '') + ']</span>';
+            if (pp.fecha) wsHtml += ' <span style="color:#888">(' + pp.fecha + ')</span>';
+            wsHtml += '</div>';
+          });
+          wsHtml += '</div>';
+        }
+        wsHtml += '</div>';
       }
       wsHtml += '</div>';
     }
