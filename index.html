@@ -399,7 +399,7 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
     </div>
     <div class="intro-card" style="border-top-color:#7D3C98">
       <h3><span class="ic-icon" style="background:#7D3C98">2</span> Hojas de Trabajo</h3>
-      <p>Tres hojas de trabajo basadas en la metodología PDIA para cada problema: (1) estado y seguimiento del problema, (2) descomposición con los 5 Por Qués y (3) lluvia de ideas 3X3X3. Cada hoja incluye espacio para notas. La HT1 permite agregar compromisos directamente desde cada pregunta, que se sincronizan automáticamente con la Matriz Completa. Incluye un diagrama del proceso iterativo que guía la secuencia de trabajo.</p>
+      <p>Cinco hojas de trabajo basadas en la metodología PDIA para cada problema: (1) estado del problema — diagnóstico y evolución, (2) seguimiento — reporte de avances y compromisos operativos, (3) descomposición con los 5 Por Qués, (4) lluvia de ideas 3X3X3, y (5) reflexión — lecciones aprendidas y ajustes. Los compromisos de HT1, HT2 y la Matriz se sincronizan automáticamente. Cada hoja incluye espacio para notas. Incluye un diagrama del proceso iterativo que guía la secuencia de trabajo.</p>
       <span class="ic-link" onclick="switchTab('worksheets')">Ir a Hojas de Trabajo &rarr;</span>
     </div>
     <div class="intro-card" style="border-top-color:#2E86C1">
@@ -479,27 +479,29 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
       </div>
 
       <!-- 5 Steps positioned in a circle -->
-      <div class="cycle-step" style="top:15px; left:225px;" onclick="cycleClick(1)">
+      <div class="cycle-step" style="top:15px; left:225px;" onclick="cycleClick(1)" data-ws="2">
         <div class="step-circle" style="background:#2471A3">1</div>
         <div class="step-label">Revisar y actualizar</div>
+        <div class="step-ws">&#8594; Hoja 2</div>
       </div>
       <div class="cycle-step" style="top:160px; left:420px;" onclick="cycleClick(2)" data-ws="1">
         <div class="step-circle" style="background:#148F77">2</div>
         <div class="step-label">Investigación del problema</div>
-        <div class="step-ws">&#8594; Hojas 1–2</div>
+        <div class="step-ws">&#8594; Hojas 1–3</div>
       </div>
-      <div class="cycle-step" style="top:440px; left:330px;" onclick="cycleClick(3)" data-ws="3">
+      <div class="cycle-step" style="top:440px; left:330px;" onclick="cycleClick(3)" data-ws="4">
         <div class="step-circle" style="background:#B7950B">3</div>
         <div class="step-label">Propuesta de solución</div>
-        <div class="step-ws">&#8594; Hoja 3</div>
+        <div class="step-ws">&#8594; Hoja 4</div>
       </div>
       <div class="cycle-step" style="top:440px; left:100px;" onclick="cycleClick(4)">
         <div class="step-circle" style="background:#A93226">4</div>
         <div class="step-label">Ejecutar</div>
       </div>
-      <div class="cycle-step" style="top:160px; left:0px;" onclick="cycleClick(5)">
+      <div class="cycle-step" style="top:160px; left:0px;" onclick="cycleClick(5)" data-ws="5">
         <div class="step-circle" style="background:#7D3C98">5</div>
         <div class="step-label">Reflexionar</div>
+        <div class="step-ws">&#8594; Hoja 5</div>
       </div>
 
       <!-- Center label -->
@@ -529,15 +531,17 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
   </div>
 
   <div class="ws-pills" id="ws-pills-container">
-    <div class="ws-pill active" onclick="wsSwitch(1)"><span class="pill-num">1</span>Estado y seguimiento</div>
-    <div class="ws-pill" onclick="wsSwitch(2)"><span class="pill-num">2</span>Deconstruir el problema</div>
-    <div class="ws-pill" onclick="wsSwitch(3)"><span class="pill-num">3</span>Lluvia de ideas 3X3X3</div>
+    <div class="ws-pill active" onclick="wsSwitch(1)"><span class="pill-num">1</span>Estado del problema</div>
+    <div class="ws-pill" onclick="wsSwitch(2)"><span class="pill-num">2</span>Seguimiento</div>
+    <div class="ws-pill" onclick="wsSwitch(3)"><span class="pill-num">3</span>Deconstruir el problema</div>
+    <div class="ws-pill" onclick="wsSwitch(4)"><span class="pill-num">4</span>Lluvia de ideas 3X3X3</div>
+    <div class="ws-pill" onclick="wsSwitch(5)"><span class="pill-num">5</span>Reflexión</div>
   </div>
 
   <!-- ── HT1: Formulación del problema ── -->
   <div class="ws-panel active" id="ws-1">
-    <h2>Hoja de Trabajo 1: Estado y seguimiento del problema</h2>
-    <p class="ws-desc">Esta hoja permite al grupo reportar avances, identificar bloqueos y definir los próximos pasos concretos para cada problema. Se actualiza en cada sesión para mantener un registro continuo del progreso.</p>
+    <h2>Hoja de Trabajo 1: Estado del problema</h2>
+    <p class="ws-desc">Esta hoja permite al grupo documentar el estado actual, los avances logrados y los bloqueos pendientes de cada problema. Se actualiza en cada sesión para mantener un registro del diagnóstico y la evolución del problema.</p>
     <div class="ws-instructions">
       <strong>Instrucciones:</strong> Complete cada recuadro con la información disponible. El objetivo es documentar el estado actual, los avances logrados y lo que se necesita para continuar. Esta hoja se actualiza en cada iteración del ciclo de trabajo.
     </div>
@@ -580,9 +584,35 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
     </div>
   </div>
 
-  <!-- ── HT2: 5 Whys ── -->
+  <!-- ── HT2: Seguimiento ── -->
   <div class="ws-panel" id="ws-2">
-    <h2>Hoja de Trabajo 2: Deconstruir el problema</h2>
+    <h2>Hoja de Trabajo 2: Seguimiento</h2>
+    <p class="ws-desc">Esta hoja permite dar seguimiento operativo a cada problema: reportar avances desde la última sesión y registrar las acciones concretas que se deben tomar a continuación. Los compromisos se sincronizan automáticamente con la Matriz Completa.</p>
+    <div class="ws-instructions">
+      <strong>Instrucciones:</strong> Use esta hoja en cada sesión de seguimiento. Primero reporte el estado y progreso del problema, luego registre los compromisos concretos con responsable, sector y fecha.
+    </div>
+    <div class="formulation-questions" id="seguimiento-fields">
+      <div class="formulation-field">
+        <label>1. ¿En qué estado está el problema? ¿Qué progreso se ha hecho desde la última sesión? ¿Qué nos ha frenado?</label>
+        <div class="field-example">Ejemplo: En la última sesión se identificó que el certificado de captura tarda en promedio 8 días. Desde entonces, la SRP incorporó 2 inspectores adicionales en Manta y el tiempo promedio bajó a 5 días. Sin embargo, el cuello de botella sigue siendo la verificación manual de datos de desembarque.</div>
+        <textarea id="form-seg-q1" placeholder="Describa el estado actual del problema, avances y bloqueos..." onchange="wsAutoSave()"></textarea>
+      </div>
+      <div class="formulation-field">
+        <label>2. ¿Cuáles son las siguientes acciones que debemos tomar?</label>
+        <div class="field-example">Registre cada compromiso con su responsable, sector (público/privado/ambos) y fecha límite. Estos compromisos se sincronizan con la Matriz Completa.</div>
+        <div class="ht1-compromisos" id="ht2-compromisos-q2"></div>
+      </div>
+    </div>
+    <div id="ht2-compromisos-otros" style="margin-top:20px"></div>
+    <div style="margin-top:28px;padding-top:20px;border-top:2px solid #E8E8E8">
+      <label style="display:block;font-weight:700;font-size:.9rem;color:var(--gl-dark);margin-bottom:8px">Notas de la hoja de trabajo</label>
+      <textarea id="ws-notes-2" placeholder="Registre observaciones, acuerdos o pendientes de esta hoja de trabajo..." onchange="wsAutoSave()" style="width:100%;min-height:100px;border:1px solid #ddd;border-radius:var(--radius);padding:12px;font-family:inherit;font-size:.88rem;resize:vertical;background:#FAFBFC;line-height:1.6"></textarea>
+    </div>
+  </div>
+
+  <!-- ── HT3: 5 Whys ── -->
+  <div class="ws-panel" id="ws-3">
+    <h2>Hoja de Trabajo 3: Deconstruir el problema</h2>
     <p class="ws-desc">Usando la técnica de los "5 Por qués", identifique las causas raíz del problema seleccionado. Comience con 3 causas directas y pregunte iterativamente "¿Por qué ocurre esto?" para llegar a las causas más profundas.</p>
     <div class="ws-instructions">
       <strong>Instrucciones:</strong> Escriba el problema como una pregunta en el recuadro superior. Luego identifique 3 posibles causas directas. Para cada causa, pregunte "¿Por qué ocurre esto?" hasta llegar a la causa raíz (máximo 4 niveles). No todas las causas necesitan 4 niveles.<br><br>
@@ -606,13 +636,13 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
     </div>
     <div style="margin-top:28px;padding-top:20px;border-top:2px solid #E8E8E8">
       <label style="display:block;font-weight:700;font-size:.9rem;color:var(--gl-dark);margin-bottom:8px">Notas de la hoja de trabajo</label>
-      <textarea id="ws-notes-2" placeholder="Registre observaciones, acuerdos o pendientes de esta hoja de trabajo..." onchange="wsAutoSave()" style="width:100%;min-height:100px;border:1px solid #ddd;border-radius:var(--radius);padding:12px;font-family:inherit;font-size:.88rem;resize:vertical;background:#FAFBFC;line-height:1.6"></textarea>
+      <textarea id="ws-notes-3" placeholder="Registre observaciones, acuerdos o pendientes de esta hoja de trabajo..." onchange="wsAutoSave()" style="width:100%;min-height:100px;border:1px solid #ddd;border-radius:var(--radius);padding:12px;font-family:inherit;font-size:.88rem;resize:vertical;background:#FAFBFC;line-height:1.6"></textarea>
     </div>
   </div>
 
-  <!-- ── HT3: 3X3X3 Brainstorming ── -->
-  <div class="ws-panel" id="ws-3">
-    <h2>Hoja de Trabajo 3: Lluvia de ideas — Actividad 3X3X3</h2>
+  <!-- ── HT4: 3X3X3 Brainstorming ── -->
+  <div class="ws-panel" id="ws-4">
+    <h2>Hoja de Trabajo 4: Lluvia de ideas — Actividad 3X3X3</h2>
     <p class="ws-desc">Ejercicio colaborativo: 3 participantes generan 3 ideas cada uno, luego rotan para complementar las ideas de los demás. Tres rondas de 5 minutos (15 min total).</p>
     <div class="ws-instructions">
       <strong>Instrucciones:</strong><br>
@@ -633,7 +663,50 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
     </div>
     <div style="margin-top:28px;padding-top:20px;border-top:2px solid #E8E8E8">
       <label style="display:block;font-weight:700;font-size:.9rem;color:var(--gl-dark);margin-bottom:8px">Notas de la hoja de trabajo</label>
-      <textarea id="ws-notes-3" placeholder="Registre observaciones, acuerdos o pendientes de esta hoja de trabajo..." onchange="wsAutoSave()" style="width:100%;min-height:100px;border:1px solid #ddd;border-radius:var(--radius);padding:12px;font-family:inherit;font-size:.88rem;resize:vertical;background:#FAFBFC;line-height:1.6"></textarea>
+      <textarea id="ws-notes-4" placeholder="Registre observaciones, acuerdos o pendientes de esta hoja de trabajo..." onchange="wsAutoSave()" style="width:100%;min-height:100px;border:1px solid #ddd;border-radius:var(--radius);padding:12px;font-family:inherit;font-size:.88rem;resize:vertical;background:#FAFBFC;line-height:1.6"></textarea>
+    </div>
+  </div>
+
+  <!-- ── HT5: Reflexión ── -->
+  <div class="ws-panel" id="ws-5">
+    <h2>Hoja de Trabajo 5: Reflexión</h2>
+    <p class="ws-desc">Espacio para reflexionar sobre lo aprendido, lo que funcionó, lo que no y los ajustes necesarios para la próxima iteración. Complete al final de cada ciclo de trabajo.</p>
+    <div class="ws-instructions">
+      <strong>Instrucciones:</strong> Al cierre de cada ciclo de trabajo, tómense 10–15 minutos como grupo para responder estas cuatro preguntas. El objetivo es capturar lecciones aprendidas e identificar ajustes concretos para la próxima iteración.
+    </div>
+    <div class="reflection-cards" id="reflection-cards">
+      <div class="reflection-card">
+        <div class="reflection-card-header" style="background:#E8F6F3;color:#148F77"><span class="rc-num" style="background:#148F77">1</span>¿Qué aprendimos?</div>
+        <div class="reflection-card-body">
+          <div class="rc-hint">¿Qué información nueva obtuvimos? ¿Cambió nuestra comprensión del problema? ¿Surgieron causas o actores que no habíamos considerado?</div>
+          <textarea id="reflect-q1" placeholder="Describa los aprendizajes de esta iteración..." onchange="wsAutoSave()"></textarea>
+        </div>
+      </div>
+      <div class="reflection-card">
+        <div class="reflection-card-header" style="background:#D5F5E3;color:#1E8449"><span class="rc-num" style="background:#1E8449">2</span>¿Qué funcionó?</div>
+        <div class="reflection-card-body">
+          <div class="rc-hint">¿Qué acciones o decisiones produjeron resultados positivos? ¿Qué prácticas deberíamos mantener o replicar?</div>
+          <textarea id="reflect-q2" placeholder="Identifique las acciones que funcionaron bien..." onchange="wsAutoSave()"></textarea>
+        </div>
+      </div>
+      <div class="reflection-card">
+        <div class="reflection-card-header" style="background:#FADBD8;color:#C0392B"><span class="rc-num" style="background:#C0392B">3</span>¿Qué ajustaremos?</div>
+        <div class="reflection-card-body">
+          <div class="rc-hint">¿Qué no funcionó como esperábamos? ¿Qué haríamos diferente? ¿Hay bloqueos que requieren un cambio de estrategia?</div>
+          <textarea id="reflect-q3" placeholder="Identifique ajustes necesarios para la próxima iteración..." onchange="wsAutoSave()"></textarea>
+        </div>
+      </div>
+      <div class="reflection-card">
+        <div class="reflection-card-header" style="background:#D6EAF8;color:#1B4F72"><span class="rc-num" style="background:#1B4F72">4</span>¿Cuál es el siguiente paso?</div>
+        <div class="reflection-card-body">
+          <div class="rc-hint">Con base en lo aprendido, ¿cuál es la acción concreta más importante para la próxima iteración? ¿Quién es responsable?</div>
+          <textarea id="reflect-q4" placeholder="Defina el siguiente paso concreto..." onchange="wsAutoSave()"></textarea>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:28px;padding-top:20px;border-top:2px solid #E8E8E8">
+      <label style="display:block;font-weight:700;font-size:.9rem;color:var(--gl-dark);margin-bottom:8px">Notas de la hoja de trabajo</label>
+      <textarea id="ws-notes-5" placeholder="Registre observaciones, acuerdos o pendientes de esta hoja de trabajo..." onchange="wsAutoSave()" style="width:100%;min-height:100px;border:1px solid #ddd;border-radius:var(--radius);padding:12px;font-family:inherit;font-size:.88rem;resize:vertical;background:#FAFBFC;line-height:1.6"></textarea>
     </div>
   </div>
 
@@ -670,8 +743,8 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
           <div style="flex:1">
             <h3 style="font-size:1rem;margin-bottom:6px;">PDIA Handbook — Building State Capability</h3>
             <p style="font-size:.85rem;color:#666;line-height:1.55;margin-bottom:8px;">Andrews, M., Pritchett, L. &amp; Woolcock, M. (2017). <em>Building State Capability: Evidence, Analysis, Action.</em> Oxford University Press.</p>
-            <p style="font-size:.85rem;color:#666;line-height:1.55;margin-bottom:12px;">Marco fundacional del enfoque PDIA (Problem-Driven Iterative Adaptation). Propone que la construcción de capacidad estatal debe partir de problemas concretos, avanzar mediante iteraciones rápidas y escalar a través de grupos de trabajo. La Hoja de Trabajo 1 (5 Por Qués) se deriva directamente de este marco, así como el ciclo iterativo de 5 pasos que guía la secuencia de trabajo.</p>
-            <p style="font-size:.85rem;"><strong>Relación con las hojas de trabajo:</strong> HT1 (estado y seguimiento del problema), HT2 (descomposición del problema), ciclo iterativo.</p>
+            <p style="font-size:.85rem;color:#666;line-height:1.55;margin-bottom:12px;">Marco fundacional del enfoque PDIA (Problem-Driven Iterative Adaptation). Propone que la construcción de capacidad estatal debe partir de problemas concretos, avanzar mediante iteraciones rápidas y escalar a través de grupos de trabajo. La Hoja de Trabajo 3 (5 Por Qués) se deriva directamente de este marco, así como el ciclo iterativo de 5 pasos y la Hoja de Trabajo 5 (Reflexión) que cierra cada iteración.</p>
+            <p style="font-size:.85rem;"><strong>Relación con las hojas de trabajo:</strong> HT1 (estado del problema), HT2 (seguimiento), HT3 (descomposición del problema), HT5 (reflexión), ciclo iterativo.</p>
             <a href="https://library.oapen.org/bitstream/id/bb540dab-9bbb-45ea-8ef1-4843b24dd432/624551.pdf" target="_blank" style="display:inline-block;margin-top:10px;color:var(--gl-accent);font-weight:600;font-size:.85rem;text-decoration:none;">Descargar PDF (acceso abierto) &rarr;</a>
           </div>
         </div>
@@ -684,8 +757,8 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif; backgr
           <div style="flex:1">
             <h3 style="font-size:1rem;margin-bottom:6px;">Laboratorio de Gobierno de Chile</h3>
             <p style="font-size:.85rem;color:#666;line-height:1.55;margin-bottom:8px;">Gobierno de Chile. <em>Herramientas para proyectos de innovación pública.</em></p>
-            <p style="font-size:.85rem;color:#666;line-height:1.55;margin-bottom:12px;">Plataforma de innovación pública del gobierno chileno que ofrece herramientas para cinco fases: exploración institucional, investigación del problema, ideación de soluciones, pilotaje y evaluación, e implementación. Su enfoque de co-creación ciudadana y prototipado rápido complementa la metodología PDIA. Útil especialmente para la Hoja de Trabajo 2 (lluvia de ideas 3X3X3).</p>
-            <p style="font-size:.85rem;"><strong>Relación con las hojas de trabajo:</strong> HT3 (técnicas de ideación y prototipado rápido).</p>
+            <p style="font-size:.85rem;color:#666;line-height:1.55;margin-bottom:12px;">Plataforma de innovación pública del gobierno chileno que ofrece herramientas para cinco fases: exploración institucional, investigación del problema, ideación de soluciones, pilotaje y evaluación, e implementación. Su enfoque de co-creación ciudadana y prototipado rápido complementa la metodología PDIA. Útil especialmente para la Hoja de Trabajo 4 (lluvia de ideas 3X3X3).</p>
+            <p style="font-size:.85rem;"><strong>Relación con las hojas de trabajo:</strong> HT4 (técnicas de ideación y prototipado rápido).</p>
             <a href="https://www.lab.gob.cl/landing-block" target="_blank" style="display:inline-block;margin-top:10px;color:var(--gl-accent);font-weight:600;font-size:.85rem;text-decoration:none;">Visitar sitio web &rarr;</a>
           </div>
         </div>
@@ -964,7 +1037,7 @@ function addPaso(code) {
   state.edits[code].pasos.push({ paso: '', fecha: '', responsable: '', sector: '', fromQ: null });
   saveState();
   renderTable();
-  if (currentWsProblem === code) renderHT1Compromisos(code);
+  if (currentWsProblem === code) { renderHT1Compromisos(code); renderHT2Compromisos(code); }
 }
 
 function removePaso(code, idx) {
@@ -973,7 +1046,7 @@ function removePaso(code, idx) {
   if (!state.edits[code].pasos.length) state.edits[code].pasos = [{ paso: '', fecha: '', responsable: '', sector: '', fromQ: null }];
   saveState();
   renderTable();
-  if (currentWsProblem === code) renderHT1Compromisos(code);
+  if (currentWsProblem === code) { renderHT1Compromisos(code); renderHT2Compromisos(code); }
 }
 
 // ── HT1 inline commitments (synced with matrix pasos) ──
@@ -1032,6 +1105,7 @@ function addHT1Paso(code, qNum) {
   state.edits[code].pasos.push({ paso: '', fecha: '', responsable: '', sector: '', fromQ: qNum });
   saveState();
   renderHT1Compromisos(code);
+  renderHT2Compromisos(code);
 }
 
 function removeHT1Paso(code, idx) {
@@ -1040,6 +1114,46 @@ function removeHT1Paso(code, idx) {
   if (!state.edits[code].pasos.length) state.edits[code].pasos = [{ paso: '', fecha: '', responsable: '', sector: '', fromQ: null }];
   saveState();
   renderHT1Compromisos(code);
+  renderHT2Compromisos(code);
+}
+
+// ── HT2 inline commitments (Seguimiento — synced with matrix pasos, fromQ=6) ──
+function renderHT2Compromisos(code) {
+  if (!code) return;
+  const pasos = getPasos(code);
+  // Render Q2 commitments (fromQ === 6)
+  const container = document.getElementById('ht2-compromisos-q2');
+  if (container) {
+    const qPasos = [];
+    pasos.forEach((p, idx) => { if (p.fromQ === 6) qPasos.push({ ...p, idx }); });
+    let html = '';
+    qPasos.forEach(p => { html += renderHT1PasoCard(code, p.idx, p); });
+    html += '<button class="ht1-add-compromiso" onclick="addHT2Paso(\'' + code + '\')">+ Agregar compromiso</button>';
+    container.innerHTML = html;
+  }
+  // "Otros compromisos" for pasos not from HT2
+  const otrosContainer = document.getElementById('ht2-compromisos-otros');
+  if (!otrosContainer) return;
+  const otros = [];
+  pasos.forEach((p, idx) => { if (p.fromQ !== 6) otros.push({ ...p, idx }); });
+  const hasContent = otros.some(p => (p.paso||'').trim() || (p.responsable||'').trim());
+  if (!hasContent) { otrosContainer.innerHTML = ''; return; }
+  let html = '<div style="padding:14px 18px;background:#F0F4F8;border-radius:var(--radius);border-left:4px solid var(--gl-blue)">';
+  html += '<div style="font-weight:700;font-size:.88rem;color:var(--gl-dark);margin-bottom:8px">Otros compromisos (de HT1 y la Matriz)</div>';
+  otros.forEach(p => {
+    if (!(p.paso||'').trim() && !(p.responsable||'').trim()) return;
+    html += renderHT1PasoCard(code, p.idx, p);
+  });
+  html += '</div>';
+  otrosContainer.innerHTML = html;
+}
+
+function addHT2Paso(code) {
+  if (!state.edits[code]) state.edits[code] = {};
+  if (!state.edits[code].pasos) state.edits[code].pasos = getPasos(code);
+  state.edits[code].pasos.push({ paso: '', fecha: '', responsable: '', sector: '', fromQ: 6 });
+  saveState();
+  renderHT2Compromisos(code);
 }
 
 function editField(code,field,value) { if(!state.edits[code]) state.edits[code]={}; state.edits[code][field]=value; saveState(); }
@@ -1127,14 +1241,19 @@ function wsAutoSave() {
   if (!wsState[code]) wsState[code] = {};
   const s = wsState[code];
 
-  // HT1: Formulación del problema
+  // HT1: Estado del problema
   if (!s.formulation) s.formulation = {};
   for (let i = 1; i <= 5; i++) {
     const el = document.getElementById('form-q' + i);
     if (el) s.formulation['q' + i] = el.value;
   }
 
-  // HT2: 5 Whys
+  // HT2: Seguimiento
+  if (!s.seguimiento) s.seguimiento = {};
+  const segQ1 = document.getElementById('form-seg-q1');
+  if (segQ1) s.seguimiento.q1 = segQ1.value;
+
+  // HT3: 5 Whys
   const wp = document.getElementById('whys-problem-text');
   if (wp) s.whysProblem = wp.value;
   s.whysGrid = {};
@@ -1142,14 +1261,21 @@ function wsAutoSave() {
     s.whysGrid[ta.id] = ta.value;
   });
 
-  // HT3: 3X3X3 brainstorming
+  // HT4: 3X3X3 brainstorming
   s.postits = {};
   document.querySelectorAll('#bs-grid .postit textarea').forEach(ta => {
     if (ta.id) s.postits[ta.id] = ta.value;
   });
 
-  // HT notes
-  for (let h = 1; h <= 3; h++) {
+  // HT5: Reflexión
+  if (!s.reflection) s.reflection = {};
+  for (let r = 1; r <= 4; r++) {
+    const el = document.getElementById('reflect-q' + r);
+    if (el) s.reflection['r' + r] = el.value;
+  }
+
+  // HT notes (5 worksheets)
+  for (let h = 1; h <= 5; h++) {
     const el = document.getElementById('ws-notes-' + h);
     if (el) s['notesHT' + h] = el.value;
   }
@@ -1160,7 +1286,13 @@ function wsAutoSave() {
 function wsLoadProblem(code) {
   const s = wsState[code] || {};
 
-  // HT1: Formulación del problema
+  // Migrate old note keys: notesHT2 (was 5 Whys) → notesHT3, notesHT3 (was brainstorm) → notesHT4
+  if (s.notesHT2 && !s.notesHT3) { s.notesHT3 = s.notesHT2; delete s.notesHT2; }
+  if (s.notesHT3_old === undefined && s.notesHT3 && !s.notesHT4 && s._notesMigrated === undefined) {
+    // Only migrate if notesHT4 doesn't exist yet — one-time migration
+  }
+
+  // HT1: Estado del problema
   const form = s.formulation || {};
   for (let i = 1; i <= 5; i++) {
     const el = document.getElementById('form-q' + i);
@@ -1168,7 +1300,13 @@ function wsLoadProblem(code) {
   }
   renderHT1Compromisos(code);
 
-  // HT2: 5 Whys — column-based layout matching CSS (.whys-col, .whys-col-header, .whys-level)
+  // HT2: Seguimiento
+  const seg = s.seguimiento || {};
+  const segQ1 = document.getElementById('form-seg-q1');
+  if (segQ1) segQ1.value = seg.q1 || '';
+  renderHT2Compromisos(code);
+
+  // HT3: 5 Whys — column-based layout matching CSS (.whys-col, .whys-col-header, .whys-level)
   const whysProblemEl = document.getElementById('whys-problem-text');
   if (whysProblemEl) whysProblemEl.value = s.whysProblem || '';
   const whysGrid = document.getElementById('whys-grid');
@@ -1193,7 +1331,7 @@ function wsLoadProblem(code) {
     });
   }
 
-  // HT2: 3X3X3 Brainstorming — row-based grid matching CSS (.brainstorm-grid = 80px + 3 cols)
+  // HT4: 3X3X3 Brainstorming — row-based grid matching CSS (.brainstorm-grid = 80px + 3 cols)
   const board = document.getElementById('bs-grid');
   if (board && !board.querySelector('.postit')) {
     let html = '';
@@ -1219,17 +1357,26 @@ function wsLoadProblem(code) {
     });
   }
 
-  // HT notes
-  for (let h = 1; h <= 3; h++) {
+  // HT5: Reflexión
+  const refl = s.reflection || {};
+  for (let r = 1; r <= 4; r++) {
+    const el = document.getElementById('reflect-q' + r);
+    if (el) el.value = refl['r' + r] || '';
+  }
+
+  // HT notes (5 worksheets)
+  for (let h = 1; h <= 5; h++) {
     const el = document.getElementById('ws-notes-' + h);
     if (el) el.value = s['notesHT' + h] || '';
   }
 }
 
 function cycleClick(n) {
-  // Steps 2 and 3 of the cycle link to worksheets
-  if (n === 2) wsSwitch(1); // Formulación del problema
-  if (n === 3) wsSwitch(3); // Lluvia de ideas
+  // Steps of the cycle link to worksheets
+  if (n === 1) wsSwitch(2); // Revisar y actualizar → Seguimiento
+  if (n === 2) wsSwitch(1); // Investigación → Estado del problema
+  if (n === 3) wsSwitch(4); // Propuesta de solución → Lluvia de ideas
+  if (n === 5) wsSwitch(5); // Reflexionar → Reflexión
 }
 
 // HT2: Brainstorm timer
@@ -1396,23 +1543,27 @@ function exportPDF() {
     const s = wsSaved[p.code];
     if (!s) return;
     const hasForm = s.formulation && Object.values(s.formulation).some(v => (v||'').trim());
+    const hasSeg = s.seguimiento && Object.values(s.seguimiento).some(v => (v||'').trim());
     const hasWhys = s.whysProblem || (s.whysGrid && Object.values(s.whysGrid).some(v => v.trim()));
     const hasPostits = s.postits && Object.values(s.postits).some(v => v.trim());
-    const hasHtNotes = s.notesHT1 || s.notesHT2 || s.notesHT3;
+    const hasReflection = s.reflection && Object.values(s.reflection).some(v => (v||'').trim());
+    const hasHtNotes = s.notesHT1 || s.notesHT2 || s.notesHT3 || s.notesHT4 || s.notesHT5;
     const hasLinkedPasos = getPasos(p.code).some(pp => pp.fromQ && ((pp.paso||'').trim() || (pp.responsable||'').trim()));
-    if (!hasForm && !hasWhys && !hasPostits && !hasHtNotes && !hasLinkedPasos) return;
+    if (!hasForm && !hasSeg && !hasWhys && !hasPostits && !hasReflection && !hasHtNotes && !hasLinkedPasos) return;
     wsCount++;
 
     wsHtml += '<div style="page-break-inside:avoid;margin-bottom:24px;border:1px solid #ddd;border-radius:6px;overflow:hidden">';
     wsHtml += '<div style="background:' + CAT_MAP[p.cat].color + ';color:#fff;padding:10px 16px;font-weight:700">' + p.code + ' — ' + p.name + '</div>';
 
-    // HT1: Estado y seguimiento del problema
+    // Shared label map
+    const pdfSectorLabel = {publico:'Público',privado:'Privado',ambos:'Ambos'};
+
+    // HT1: Estado del problema
     const ht1Pasos = getPasos(p.code);
-    const hasHT1Pasos = ht1Pasos.some(pp => pp.fromQ && ((pp.paso||'').trim() || (pp.responsable||'').trim()));
+    const hasHT1Pasos = ht1Pasos.some(pp => pp.fromQ && pp.fromQ <= 5 && ((pp.paso||'').trim() || (pp.responsable||'').trim()));
     if (hasForm || hasHT1Pasos) {
-      const pdfSectorLabel = {publico:'Público',privado:'Privado',ambos:'Ambos'};
       wsHtml += '<div style="padding:16px">';
-      wsHtml += '<h4 style="margin:0 0 10px;font-size:.9rem;color:#1D1C1D">HT1: Estado y seguimiento del problema</h4>';
+      wsHtml += '<h4 style="margin:0 0 10px;font-size:.9rem;color:#1D1C1D">HT1: Estado del problema</h4>';
       for (let i = 1; i <= 5; i++) {
         const val = (s.formulation && s.formulation['q' + i] || '').trim();
         const qPasos = ht1Pasos.filter(pp => pp.fromQ === i && ((pp.paso||'').trim() || (pp.responsable||'').trim()));
@@ -1435,10 +1586,36 @@ function exportPDF() {
       wsHtml += '</div>';
     }
 
-    // HT2: 5 Whys
+    // HT2: Seguimiento
+    const hasHT2Pasos = ht1Pasos.some(pp => pp.fromQ === 6 && ((pp.paso||'').trim() || (pp.responsable||'').trim()));
+    if (hasSeg || hasHT2Pasos) {
+      wsHtml += '<div style="padding:16px;border-top:1px solid #eee">';
+      wsHtml += '<h4 style="margin:0 0 10px;font-size:.9rem;color:#1D1C1D">HT2: Seguimiento</h4>';
+      const segVal = (s.seguimiento && s.seguimiento.q1 || '').trim();
+      if (segVal) {
+        wsHtml += '<div style="margin-bottom:12px"><div style="font-size:.78rem;font-weight:600;color:#A51C30;margin-bottom:3px">¿En qué estado está el problema? ¿Qué progreso se ha hecho?</div>';
+        wsHtml += '<div style="font-size:.85rem;line-height:1.5;white-space:pre-wrap">' + segVal.replace(/</g,'&lt;') + '</div></div>';
+      }
+      const segPasos = ht1Pasos.filter(pp => pp.fromQ === 6 && ((pp.paso||'').trim() || (pp.responsable||'').trim()));
+      if (segPasos.length) {
+        wsHtml += '<div style="margin-bottom:12px"><div style="font-size:.78rem;font-weight:600;color:#A51C30;margin-bottom:3px">Siguientes acciones</div>';
+        wsHtml += '<div style="padding-left:12px;border-left:3px solid #A51C30">';
+        segPasos.forEach(pp => {
+          wsHtml += '<div style="font-size:.82rem;margin-bottom:4px">';
+          wsHtml += '<strong style="color:#1D1C1D">Compromiso:</strong> ' + (pp.paso ? pp.paso.replace(/</g,'&lt;') : '—');
+          if (pp.responsable) wsHtml += ' <span style="color:#1B4F72;font-weight:600">[' + pp.responsable.replace(/</g,'&lt;') + (pp.sector ? ' · ' + (pdfSectorLabel[pp.sector]||'') : '') + ']</span>';
+          if (pp.fecha) wsHtml += ' <span style="color:#888">(' + pp.fecha + ')</span>';
+          wsHtml += '</div>';
+        });
+        wsHtml += '</div></div>';
+      }
+      wsHtml += '</div>';
+    }
+
+    // HT3: 5 Whys
     if (hasWhys) {
-      wsHtml += '<div style="padding:16px;' + (hasForm ? 'border-top:1px solid #eee' : '') + '">';
-      wsHtml += '<h4 style="margin:0 0 10px;font-size:.9rem;color:#1D1C1D">HT2: Deconstruir el problema (5 Por Qués)</h4>';
+      wsHtml += '<div style="padding:16px;border-top:1px solid #eee">';
+      wsHtml += '<h4 style="margin:0 0 10px;font-size:.9rem;color:#1D1C1D">HT3: Deconstruir el problema (5 Por Qués)</h4>';
       if (s.whysProblem) wsHtml += '<p style="margin:0 0 12px;padding:8px 12px;background:#FFF8E1;border-left:3px solid #B7950B;font-style:italic">' + s.whysProblem.replace(/</g,'&lt;') + '</p>';
       if (s.whysGrid) {
         wsHtml += '<table style="width:100%;border-collapse:collapse;font-size:.82rem">';
@@ -1457,10 +1634,10 @@ function exportPDF() {
       wsHtml += '</div>';
     }
 
-    // HT2: Brainstorming
+    // HT4: Brainstorming
     if (hasPostits) {
       wsHtml += '<div style="padding:16px;border-top:1px solid #eee">';
-      wsHtml += '<h4 style="margin:0 0 10px;font-size:.9rem;color:#1D1C1D">HT3: Lluvia de ideas 3X3X3</h4>';
+      wsHtml += '<h4 style="margin:0 0 10px;font-size:.9rem;color:#1D1C1D">HT4: Lluvia de ideas 3X3X3</h4>';
       wsHtml += '<table style="width:100%;border-collapse:collapse;font-size:.82rem">';
       const colors = ['#FFF9C4','#FFCCBC','#C8E6C9'];
       const maxRows = Math.ceil(Object.keys(s.postits).length / 3);
@@ -1477,9 +1654,24 @@ function exportPDF() {
       wsHtml += '</div>';
     }
 
+    // HT5: Reflexión
+    if (hasReflection) {
+      const reflLabels = ['¿Qué aprendimos?','¿Qué funcionó?','¿Qué ajustaremos?','¿Cuál es el siguiente paso?'];
+      wsHtml += '<div style="padding:16px;border-top:1px solid #eee">';
+      wsHtml += '<h4 style="margin:0 0 10px;font-size:.9rem;color:#1D1C1D">HT5: Reflexión</h4>';
+      for (let r = 1; r <= 4; r++) {
+        const val = (s.reflection && s.reflection['r' + r] || '').trim();
+        if (val) {
+          wsHtml += '<div style="margin-bottom:10px"><div style="font-size:.78rem;font-weight:600;color:#A51C30;margin-bottom:3px">' + reflLabels[r-1] + '</div>';
+          wsHtml += '<div style="font-size:.85rem;line-height:1.5;white-space:pre-wrap">' + val.replace(/</g,'&lt;') + '</div></div>';
+        }
+      }
+      wsHtml += '</div>';
+    }
+
     // HT notes
-    const htNoteLabels = ['Estado y seguimiento', 'Deconstruir el problema', 'Lluvia de ideas'];
-    for (let h = 1; h <= 3; h++) {
+    const htNoteLabels = ['Estado del problema', 'Seguimiento', 'Deconstruir el problema', 'Lluvia de ideas', 'Reflexión'];
+    for (let h = 1; h <= 5; h++) {
       const noteVal = (s['notesHT' + h] || '').trim();
       if (noteVal) {
         wsHtml += '<div style="padding:12px 16px;border-top:1px solid #eee;background:#FAFBFC">';
